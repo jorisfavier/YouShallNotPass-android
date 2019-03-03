@@ -1,19 +1,21 @@
-package fr.jorisfavier.youshallnotpass.managers
+package fr.jorisfavier.youshallnotpass.managers.support
 
 import android.content.Context
 import android.security.keystore.KeyProperties
 import android.security.keystore.KeyGenParameterSpec
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat
 import androidx.core.os.CancellationSignal
+import fr.jorisfavier.youshallnotpass.managers.IFingerPrintAuthManager
 import java.lang.Exception
 import java.security.*
 import javax.crypto.KeyGenerator
 import javax.crypto.Cipher
 import javax.crypto.NoSuchPaddingException
 import javax.crypto.SecretKey
+import javax.inject.Inject
 
 
-class FingerPrintAuthManager {
+class FingerPrintAuthManager @Inject constructor(): IFingerPrintAuthManager {
 
     val KEY_STORE_NAME = "YouShallNotPass"
     var keyStore: KeyStore? = null
@@ -67,38 +69,12 @@ class FingerPrintAuthManager {
         return false
     }
 
-    fun fingerPrintAuth(context: Context){
+    override fun fingerPrintAuth(context: Context, callback: FingerprintManagerCompat.AuthenticationCallback){
         generateKey()
         initCipher()
         val cryptoObject = FingerprintManagerCompat.CryptoObject(cipher!!)
         val fingerprintManagerCompat = FingerprintManagerCompat.from(context)
 
-        fingerprintManagerCompat.authenticate(cryptoObject, 0, CancellationSignal(),
-                object : FingerprintManagerCompat.AuthenticationCallback() {
-                    override fun onAuthenticationError(errMsgId: Int, errString: CharSequence?) {
-                        super.onAuthenticationError(errMsgId, errString)
-                        //updateStatus(errString.toString())
-                        //biometricCallback.onAuthenticationError(errMsgId, errString)
-                    }
-
-                    override fun onAuthenticationHelp(helpMsgId: Int, helpString: CharSequence?) {
-                        super.onAuthenticationHelp(helpMsgId, helpString)
-                    //    updateStatus(helpString.toString())
-                      //  biometricCallback.onAuthenticationHelp(helpMsgId, helpString)
-                    }
-
-                    override fun onAuthenticationSucceeded(result: FingerprintManagerCompat.AuthenticationResult?) {
-                        super.onAuthenticationSucceeded(result)
-                        //dismissDialog()
-                        //biometricCallback.onAuthenticationSuccessful()
-                    }
-
-
-                    override fun onAuthenticationFailed() {
-                        super.onAuthenticationFailed()
-                        //updateStatus(context.getString(R.string.biometric_failed))
-                        //biometricCallback.onAuthenticationFailed()
-                    }
-                }, null)
+        fingerprintManagerCompat.authenticate(cryptoObject,0,CancellationSignal(),callback,null)
     }
 }
