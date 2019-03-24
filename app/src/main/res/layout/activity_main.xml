@@ -19,6 +19,7 @@
         android:layout_width="wrap_content"
         android:text="Authentication required"
         android:textAllCaps="true"
+        android:textColor="@color/primaryTextColor"
         android:textStyle="bold|italic"
         app:layout_constraintTop_toBottomOf="@+id/gandalfImgView"
         android:layout_marginTop="40dp"
@@ -31,7 +32,7 @@
         android:layout_height="30dp"
         android:src="@drawable/ic_fingerprint_black_24dp"
         android:layout_marginTop="10dp"
-        android:tint="@android:color/white"
+        android:tint="@color/primaryTextColor"
         app:layout_constraintTop_toBottomOf="@+id/authText"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
