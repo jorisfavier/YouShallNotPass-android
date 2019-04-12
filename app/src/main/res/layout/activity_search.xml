@@ -8,6 +8,7 @@
     android:descendantFocusability="beforeDescendants"
     tools:context=".features.search.SearchActivity">
     <EditText
+        android:id="@+id/search_searchedit"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_width="match_parent"
         android:layout_marginStart="30dp"
@@ -20,7 +21,18 @@
         android:focusableInTouchMode="true"
         android:paddingStart="20dp"
         android:layout_height="50dp" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintTop_toBottomOf="@id/search_searchedit"
+        app:layout_constraintBottom_toTopOf="@id/search_separator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
     <View
+        android:id="@+id/search_separator"
         android:layout_width="match_parent"
         app:layout_constraintBottom_toTopOf="@id/search_add_btn"
         android:layout_marginStart="10dp"
