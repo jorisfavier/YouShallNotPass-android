@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        DaggerAppComponent.create().inject(this)
+        YSNPApplication.currentInstance?.appComponent?.inject(this)
         viewmodel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
         viewmodel.authManager = fingerPrintManager
         setContentView(R.layout.activity_main)
