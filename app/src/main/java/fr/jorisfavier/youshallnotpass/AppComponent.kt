@@ -3,7 +3,6 @@ package fr.jorisfavier.youshallnotpass
 import dagger.Component
 import fr.jorisfavier.youshallnotpass.features.search.SearchActivity
 import fr.jorisfavier.youshallnotpass.managers.IItemManager
-import fr.jorisfavier.youshallnotpass.managers.support.ItemManager
 import javax.inject.Singleton
 
 @Singleton
