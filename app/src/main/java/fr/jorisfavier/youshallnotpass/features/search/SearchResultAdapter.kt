@@ -6,7 +6,9 @@ import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.models.Item
 import fr.jorisfavier.youshallnotpass.utils.inflate
 
-class SearchResultAdapter(private var results: List<Item>) : RecyclerView.Adapter<SearchResultViewHolder>() {
+class SearchResultAdapter() : RecyclerView.Adapter<SearchResultViewHolder>() {
+
+    private var results: List<Item> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchResultViewHolder {
         val view = parent.inflate(R.layout.viewholder_search_result,false)

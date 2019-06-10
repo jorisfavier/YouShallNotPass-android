@@ -5,12 +5,14 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.YSNPApplication
+import fr.jorisfavier.youshallnotpass.databinding.ActivitySearchBinding
 import fr.jorisfavier.youshallnotpass.managers.IItemManager
 import fr.jorisfavier.youshallnotpass.models.Item
 import kotlinx.android.synthetic.main.activity_search.*
@@ -22,24 +24,18 @@ class SearchActivity: AppCompatActivity() {
     lateinit var itemManager: IItemManager
 
     private lateinit var viewmodel: SearchViewModel
-    private var searchAdapter: SearchResultAdapter = SearchResultAdapter(listOf(Item(4,"Fnac"), Item(3, "Le Bon Coin")))
+    private lateinit var binding: ActivitySearchBinding
+    private var searchAdapter: SearchResultAdapter = SearchResultAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_search)
+        binding = DataBindingUtil.setContentView(this,R.layout.activity_search)
         YSNPApplication.currentInstance?.appComponent?.inject(this)
         viewmodel = ViewModelProviders.of(this).get(SearchViewModel::class.java)
         viewmodel.itemManager = itemManager
-        initSearchListener()
         initRecyclerView()
-    }
-
-
-    private fun initSearchListener() {
-        search_searchedit.setOnKeyListener { view: View, keyCode: Int, event: KeyEvent ->
-            viewmodel.setSearchValue(search_searchedit.text.toString())
-            true
-        }
+        binding.setLifecycleOwner(this)
+        binding.viewModel = viewmodel
     }
 
     private fun initRecyclerView() {

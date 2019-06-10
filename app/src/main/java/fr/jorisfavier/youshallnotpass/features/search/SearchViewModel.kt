@@ -1,9 +1,7 @@
 package fr.jorisfavier.youshallnotpass.features.search
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import androidx.databinding.ObservableInt
+import androidx.lifecycle.*
 import fr.jorisfavier.youshallnotpass.managers.IItemManager
 import fr.jorisfavier.youshallnotpass.models.Item
 import java.util.*
@@ -12,18 +10,26 @@ class SearchViewModel: ViewModel(){
 
     lateinit var itemManager: IItemManager
 
-    private val _search =  MutableLiveData<String>()
+    private val mediator = MediatorLiveData<String>()
+    val search =  MutableLiveData<String>()
 
-    val results: LiveData<List<Item>> = Transformations.switchMap(_search) { query ->
+
+    val results: LiveData<List<Item>> = Transformations.switchMap(mediator) { query ->
         itemManager.searchItem(query)
     }
+    val hasNoResult: LiveData<Boolean> = Transformations.map(results) { listItem ->
+        listItem.count() == 0
+    }
 
-    fun setSearchValue(value: String){
-        val input = value.toLowerCase(Locale.getDefault()).trim()
-        //Prevent to search the same query twice
-        if (input == _search.value) {
-            return
+
+
+    init {
+        mediator.addSource(search) { value ->
+            val input = value.toLowerCase(Locale.getDefault()).trim()
+            //Prevent to search the same query twice
+            if (input != search.value) {
+                mediator.value = value
+            }
         }
-        _search.value = input
     }
 }
