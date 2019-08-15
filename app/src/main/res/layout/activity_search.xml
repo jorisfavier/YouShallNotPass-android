@@ -76,6 +76,7 @@
             android:background="@null"
             android:drawableStart="@drawable/ic_add_white"
             android:drawableTint="@color/primaryTextColor"
+            android:onClick="addNewItem"
             android:layout_height="wrap_content" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

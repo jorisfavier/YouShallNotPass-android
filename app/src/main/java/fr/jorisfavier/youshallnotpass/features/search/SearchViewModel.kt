@@ -1,6 +1,5 @@
 package fr.jorisfavier.youshallnotpass.features.search
 
-import androidx.databinding.ObservableInt
 import androidx.lifecycle.*
 import fr.jorisfavier.youshallnotpass.managers.IItemManager
 import fr.jorisfavier.youshallnotpass.models.Item
@@ -20,8 +19,6 @@ class SearchViewModel: ViewModel(){
     val hasNoResult: LiveData<Boolean> = Transformations.map(results) { listItem ->
         listItem.count() == 0
     }
-
-
 
     init {
         mediator.addSource(search) { value ->

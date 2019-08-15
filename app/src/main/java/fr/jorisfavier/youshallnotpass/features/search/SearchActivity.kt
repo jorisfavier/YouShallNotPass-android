@@ -1,5 +1,6 @@
 package fr.jorisfavier.youshallnotpass.features.search
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.YSNPApplication
 import fr.jorisfavier.youshallnotpass.databinding.ActivitySearchBinding
+import fr.jorisfavier.youshallnotpass.features.Item.ItemActivity
 import fr.jorisfavier.youshallnotpass.managers.IItemManager
 import fr.jorisfavier.youshallnotpass.models.Item
 import kotlinx.android.synthetic.main.activity_search.*
@@ -36,6 +38,7 @@ class SearchActivity: AppCompatActivity() {
         initRecyclerView()
         binding.setLifecycleOwner(this)
         binding.viewModel = viewmodel
+
     }
 
     private fun initRecyclerView() {
@@ -44,5 +47,10 @@ class SearchActivity: AppCompatActivity() {
         viewmodel.results.observe(this, Observer { result ->
             searchAdapter.updateResults(result)
         })
+    }
+
+    fun addNewItem(view: View){
+        val newItemPageIntent = Intent(this,ItemActivity::class.java)
+        startActivity(newItemPageIntent)
     }
 }
