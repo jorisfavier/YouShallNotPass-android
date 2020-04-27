@@ -23,7 +23,7 @@
         <activity
             android:name=".features.search.SearchActivity"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".features.Item.ItemActivity"></activity>
+        <activity android:name=".features.item.ItemActivity"></activity>
     </application>
 
 </manifest>

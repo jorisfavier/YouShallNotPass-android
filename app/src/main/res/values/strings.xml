@@ -3,4 +3,10 @@
     <string name="common_no_results_found">No results found.</string>
     <string name="search_placeholder">Search</string>
     <string name="new_string">New</string>
+    <string name="item_create_title">New Item</string>
+    <string name="item_name">Item\'s name</string>
+    <string name="item_password">Password</string>
+    <string name="item_create">Create</string>
+    <string name="item_generate_password">Generate password</string>
+
 </resources>
