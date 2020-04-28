@@ -13,12 +13,13 @@ import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
-    @Inject lateinit var fingerPrintManager: IFingerPrintAuthManager
+    @Inject
+    lateinit var fingerPrintManager: IFingerPrintAuthManager
     private lateinit var viewmodel: HomeViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        DaggerAppComponent.create().inject(this)
+        YSNPApplication.currentInstance?.appComponent?.inject(this)
         viewmodel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
         viewmodel.authManager = fingerPrintManager
         setContentView(R.layout.activity_main)
@@ -26,30 +27,28 @@ class MainActivity : AppCompatActivity() {
         initObserver()
     }
 
-    fun initObserver(){
+    fun initObserver() {
         viewmodel.authSuccess.observe(this, Observer<Boolean> { success ->
-            if(success) {
+            if (success) {
                 redirectToSearchPage()
-            }
-            else {
+            } else {
                 displayErrorModal()
             }
         })
+        redirectToSearchPage()
     }
 
-    fun redirectToSearchPage(){
-        val searchPahgeIntent = Intent(this,SearchActivity::class.java)
+    fun redirectToSearchPage() {
+        val searchPahgeIntent = Intent(this, SearchActivity::class.java)
         startActivity(searchPahgeIntent)
     }
 
-    fun displayErrorModal(){
+    fun displayErrorModal() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Authentication failed")
         builder.setMessage("Authentication failed please try again.")
-        builder.setPositiveButton(android.R.string.yes,null)
+        builder.setPositiveButton(android.R.string.yes, null)
         builder.show()
     }
-
-
 
 }
