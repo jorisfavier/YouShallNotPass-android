@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:padding="10dp"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp">
+
     <TextView
         android:id="@+id/viewholder_searchresult_text"
         android:layout_width="match_parent"
-        tools:text="Vente privee"
-        android:textColor="@color/primaryTextColor"
-        android:textSize="16sp"
+        android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:layout_height="wrap_content" />
+        android:textAppearance="?attr/textAppearanceSubtitle1"
+        tools:text="Vente privee" />
 
 </LinearLayout>
