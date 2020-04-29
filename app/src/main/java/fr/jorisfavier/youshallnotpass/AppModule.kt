@@ -5,8 +5,6 @@ import androidx.room.Room
 import dagger.Module
 import dagger.Provides
 import fr.jorisfavier.youshallnotpass.dao.ItemDao
-import fr.jorisfavier.youshallnotpass.managers.support.FingerPrintAuthManager
-import fr.jorisfavier.youshallnotpass.managers.IFingerPrintAuthManager
 import fr.jorisfavier.youshallnotpass.managers.IItemManager
 import fr.jorisfavier.youshallnotpass.managers.support.ItemManager
 import javax.inject.Singleton
@@ -19,12 +17,6 @@ class AppModule(val application: YSNPApplication) {
     @Provides
     fun applicationProvider(): Application {
         return application
-    }
-
-    @Singleton
-    @Provides
-    fun fingerPrintManagerProvider(): IFingerPrintAuthManager {
-        return FingerPrintAuthManager()
     }
 
     @Singleton
