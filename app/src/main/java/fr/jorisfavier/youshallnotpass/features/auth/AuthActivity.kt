@@ -1,4 +1,4 @@
-package fr.jorisfavier.youshallnotpass
+package fr.jorisfavier.youshallnotpass.features.auth
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,20 +8,21 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import fr.jorisfavier.youshallnotpass.features.home.HomeViewModel
-import fr.jorisfavier.youshallnotpass.features.search.SearchActivity
+import fr.jorisfavier.youshallnotpass.R
+import fr.jorisfavier.youshallnotpass.YSNPApplication
+import fr.jorisfavier.youshallnotpass.features.home.HomeActivity
 
-class MainActivity : AppCompatActivity() {
+class AuthActivity : AppCompatActivity() {
 
-    private lateinit var viewmodel: HomeViewModel
+    private lateinit var viewmodel: AuthViewModel
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var biometricPromptInfo: BiometricPrompt.PromptInfo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         YSNPApplication.currentInstance?.appComponent?.inject(this)
-        viewmodel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
-        setContentView(R.layout.activity_main)
+        viewmodel = ViewModelProviders.of(this).get(AuthViewModel::class.java)
+        setContentView(R.layout.activity_auth)
         initObserver()
         initAuthentication()
         displayAuthPrompt()
@@ -42,7 +43,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun redirectToSearchPage() {
-        val searchPahgeIntent = Intent(this, SearchActivity::class.java)
+        val searchPahgeIntent = Intent(this, HomeActivity::class.java)
         startActivity(searchPahgeIntent)
         finish()
     }

@@ -1,10 +1,10 @@
-package fr.jorisfavier.youshallnotpass.features.home
+package fr.jorisfavier.youshallnotpass.features.auth
 
 import androidx.biometric.BiometricPrompt
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class HomeViewModel : ViewModel() {
+class AuthViewModel : ViewModel() {
     var authSuccess = MutableLiveData<Boolean>()
 
     val authCallback = object : BiometricPrompt.AuthenticationCallback() {
