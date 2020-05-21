@@ -1,4 +1,4 @@
-package fr.jorisfavier.youshallnotpass.features.auth
+package fr.jorisfavier.youshallnotpass.ui.auth
 
 import androidx.biometric.BiometricPrompt
 import androidx.lifecycle.MutableLiveData

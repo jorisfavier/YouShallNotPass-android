@@ -1,9 +1,9 @@
 package fr.jorisfavier.youshallnotpass
 
 import dagger.Component
-import fr.jorisfavier.youshallnotpass.features.auth.AuthActivity
-import fr.jorisfavier.youshallnotpass.features.search.SearchFragment
-import fr.jorisfavier.youshallnotpass.managers.IItemManager
+import fr.jorisfavier.youshallnotpass.ui.auth.AuthActivity
+import fr.jorisfavier.youshallnotpass.ui.search.SearchFragment
+import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import javax.inject.Singleton
 
 @Singleton
@@ -11,5 +11,5 @@ import javax.inject.Singleton
 interface AppComponent {
     fun inject(auth: AuthActivity)
     fun inject(search: SearchFragment)
-    fun inject(itemManager: IItemManager)
+    fun inject(itemRepository: IItemRepository)
 }

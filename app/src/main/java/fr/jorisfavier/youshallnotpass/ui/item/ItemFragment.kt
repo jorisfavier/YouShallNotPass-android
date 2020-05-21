@@ -1,4 +1,4 @@
-package fr.jorisfavier.youshallnotpass.features.item
+package fr.jorisfavier.youshallnotpass.ui.item
 
 import android.os.Bundle
 import android.view.LayoutInflater

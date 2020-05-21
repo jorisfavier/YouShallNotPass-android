@@ -1,4 +1,4 @@
-package fr.jorisfavier.youshallnotpass.models
+package fr.jorisfavier.youshallnotpass.data.models
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

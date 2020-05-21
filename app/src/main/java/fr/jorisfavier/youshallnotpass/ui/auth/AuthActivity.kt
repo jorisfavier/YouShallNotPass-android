@@ -1,4 +1,4 @@
-package fr.jorisfavier.youshallnotpass.features.auth
+package fr.jorisfavier.youshallnotpass.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.YSNPApplication
-import fr.jorisfavier.youshallnotpass.features.home.HomeActivity
+import fr.jorisfavier.youshallnotpass.ui.home.HomeActivity
 
 class AuthActivity : AppCompatActivity() {
 

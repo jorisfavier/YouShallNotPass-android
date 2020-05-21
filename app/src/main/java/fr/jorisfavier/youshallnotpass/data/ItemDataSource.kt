@@ -1,11 +1,11 @@
-package fr.jorisfavier.youshallnotpass.dao
+package fr.jorisfavier.youshallnotpass.data
 
 import androidx.room.Dao
 import androidx.room.Query
-import fr.jorisfavier.youshallnotpass.models.Item
+import fr.jorisfavier.youshallnotpass.data.models.Item
 
 @Dao
-interface ItemDao {
+interface ItemDataSource {
 
     /***
      *  Search for an item in the database based on his name

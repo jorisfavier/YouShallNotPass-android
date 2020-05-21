@@ -13,8 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.YouShallNotPass">
-        <activity android:name=".features.home.HomeActivity"></activity>
-        <activity android:name=".features.auth.AuthActivity">
+        <activity android:name=".ui.home.HomeActivity"></activity>
+        <activity android:name=".ui.auth.AuthActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,9 +22,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".features.search.SearchFragment"
+            android:name=".ui.search.SearchFragment"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".features.item.ItemFragment" />
+        <activity android:name=".ui.item.ItemFragment" />
     </application>
 
 </manifest>

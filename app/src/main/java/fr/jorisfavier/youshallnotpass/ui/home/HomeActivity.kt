@@ -1,4 +1,4 @@
-package fr.jorisfavier.youshallnotpass.features.home
+package fr.jorisfavier.youshallnotpass.ui.home
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

@@ -4,9 +4,9 @@ import android.app.Application
 import androidx.room.Room
 import dagger.Module
 import dagger.Provides
-import fr.jorisfavier.youshallnotpass.dao.ItemDao
-import fr.jorisfavier.youshallnotpass.managers.IItemManager
-import fr.jorisfavier.youshallnotpass.managers.support.ItemManager
+import fr.jorisfavier.youshallnotpass.data.ItemDataSource
+import fr.jorisfavier.youshallnotpass.repository.IItemRepository
+import fr.jorisfavier.youshallnotpass.repository.impl.ItemRepository
 import javax.inject.Singleton
 
 
@@ -21,8 +21,8 @@ class AppModule(val application: YSNPApplication) {
 
     @Singleton
     @Provides
-    fun provideItemManager(itemDao: ItemDao): IItemManager {
-        return ItemManager(itemDao)
+    fun provideItemManager(itemDataSource: ItemDataSource): IItemRepository {
+        return ItemRepository(itemDataSource)
     }
 
     @Singleton
@@ -35,7 +35,7 @@ class AppModule(val application: YSNPApplication) {
 
     @Singleton
     @Provides
-    fun provideItemDao(db: YouShallNotPassDatabase): ItemDao {
+    fun provideItemDao(db: YouShallNotPassDatabase): ItemDataSource {
         return db.itemDao()
     }
 

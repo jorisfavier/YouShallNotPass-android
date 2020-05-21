@@ -1,4 +1,4 @@
-package fr.jorisfavier.youshallnotpass.features.search
+package fr.jorisfavier.youshallnotpass.ui.search
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,14 +13,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.YSNPApplication
 import fr.jorisfavier.youshallnotpass.databinding.FragmentSearchBinding
-import fr.jorisfavier.youshallnotpass.managers.IItemManager
+import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import kotlinx.android.synthetic.main.fragment_search.*
 import javax.inject.Inject
 
 class SearchFragment : Fragment() {
 
     @Inject
-    lateinit var itemManager: IItemManager
+    lateinit var itemRepository: IItemRepository
     private lateinit var binding: FragmentSearchBinding
     private lateinit var viewmodel: SearchViewModel
     private var searchAdapter: SearchResultAdapter = SearchResultAdapter()
@@ -30,7 +30,7 @@ class SearchFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false)
         YSNPApplication.currentInstance?.appComponent?.inject(this)
         viewmodel = ViewModelProviders.of(this).get(SearchViewModel::class.java)
-        viewmodel.itemManager = itemManager
+        viewmodel.itemRepository = itemRepository
         binding.lifecycleOwner = this
         binding.viewModel = viewmodel
         return binding.root

@@ -1,9 +1,9 @@
-package fr.jorisfavier.youshallnotpass.managers
+package fr.jorisfavier.youshallnotpass.repository
 
 import androidx.lifecycle.LiveData
-import fr.jorisfavier.youshallnotpass.models.Item
+import fr.jorisfavier.youshallnotpass.data.models.Item
 
-interface IItemManager {
+interface IItemRepository {
 
     /***
      *  Search for an item based on his title
