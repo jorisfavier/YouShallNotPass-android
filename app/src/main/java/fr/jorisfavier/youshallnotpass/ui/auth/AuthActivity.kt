@@ -2,6 +2,7 @@ package fr.jorisfavier.youshallnotpass.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
@@ -14,14 +15,13 @@ import fr.jorisfavier.youshallnotpass.ui.home.HomeActivity
 
 class AuthActivity : AppCompatActivity() {
 
-    private lateinit var viewmodel: AuthViewModel
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var biometricPromptInfo: BiometricPrompt.PromptInfo
 
+    private val viewModel: AuthViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        YSNPApplication.currentInstance?.appComponent?.inject(this)
-        viewmodel = ViewModelProviders.of(this).get(AuthViewModel::class.java)
         setContentView(R.layout.activity_auth)
         initObserver()
         initAuthentication()
@@ -29,7 +29,7 @@ class AuthActivity : AppCompatActivity() {
     }
 
     private fun initObserver() {
-        viewmodel.authSuccess.observe(this, Observer<Boolean> { success ->
+        viewModel.authSuccess.observe(this, Observer { success ->
             if (success) {
                 redirectToSearchPage()
             } else {
@@ -64,7 +64,7 @@ class AuthActivity : AppCompatActivity() {
                 .setNegativeButtonText(getString(android.R.string.cancel))
                 .build()
         val executor = ContextCompat.getMainExecutor(this)
-        biometricPrompt = BiometricPrompt(this, executor, viewmodel.authCallback)
+        biometricPrompt = BiometricPrompt(this, executor, viewModel.authCallback)
     }
 
 }

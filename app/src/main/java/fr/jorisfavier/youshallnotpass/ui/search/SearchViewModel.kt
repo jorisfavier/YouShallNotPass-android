@@ -6,10 +6,9 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.data.models.Item
+import javax.inject.Inject
 
-class SearchViewModel : ViewModel() {
-
-    lateinit var itemRepository: IItemRepository
+class SearchViewModel @Inject constructor(private val itemRepository: IItemRepository) : ViewModel() {
 
     val search = MutableLiveData<String>()
 

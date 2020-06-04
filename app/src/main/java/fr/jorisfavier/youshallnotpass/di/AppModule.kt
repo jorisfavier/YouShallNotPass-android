@@ -1,27 +1,25 @@
-package fr.jorisfavier.youshallnotpass
+package fr.jorisfavier.youshallnotpass.di
 
 import android.app.Application
 import androidx.room.Room
 import dagger.Module
 import dagger.Provides
+import dagger.android.ContributesAndroidInjector
+import fr.jorisfavier.youshallnotpass.YSNPApplication
+import fr.jorisfavier.youshallnotpass.YouShallNotPassDatabase
 import fr.jorisfavier.youshallnotpass.data.ItemDataSource
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.repository.impl.ItemRepository
+import fr.jorisfavier.youshallnotpass.ui.search.SearchFragment
 import javax.inject.Singleton
 
 
-@Module
-class AppModule(val application: YSNPApplication) {
+@Module(includes = [ViewModelModule::class])
+class AppModule {
 
     @Singleton
     @Provides
-    fun applicationProvider(): Application {
-        return application
-    }
-
-    @Singleton
-    @Provides
-    fun provideItemManager(itemDataSource: ItemDataSource): IItemRepository {
+    fun provideItemRepository(itemDataSource: ItemDataSource): IItemRepository {
         return ItemRepository(itemDataSource)
     }
 
@@ -35,8 +33,7 @@ class AppModule(val application: YSNPApplication) {
 
     @Singleton
     @Provides
-    fun provideItemDao(db: YouShallNotPassDatabase): ItemDataSource {
+    fun provideItemDataSource(db: YouShallNotPassDatabase): ItemDataSource {
         return db.itemDao()
     }
-
 }

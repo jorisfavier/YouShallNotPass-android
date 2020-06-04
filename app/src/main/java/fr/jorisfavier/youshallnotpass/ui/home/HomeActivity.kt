@@ -2,6 +2,7 @@ package fr.jorisfavier.youshallnotpass.ui.home
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import dagger.android.AndroidInjection
 import fr.jorisfavier.youshallnotpass.R
 
 class HomeActivity : AppCompatActivity() {
