@@ -1,20 +1,23 @@
 package fr.jorisfavier.youshallnotpass
 
 import android.app.Application
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.HasAndroidInjector
+import fr.jorisfavier.youshallnotpass.di.DaggerAppComponent
+import javax.inject.Inject
 
-class YSNPApplication: Application() {
-    companion object {
-        var currentInstance: YSNPApplication? = null
-    }
+class YSNPApplication: Application(), HasAndroidInjector {
 
-    var appComponent: AppComponent? = null
+    @Inject
+    lateinit var activityInjector: DispatchingAndroidInjector<Any>
 
     override fun onCreate() {
         super.onCreate()
-        currentInstance = this
-        appComponent = DaggerAppComponent
-                            .builder()
-                            .appModule(AppModule(this))
-                            .build()
+        DaggerAppComponent
+                .builder()
+                .application(this)
+                .build().inject(this)
     }
+
+    override fun androidInjector() = activityInjector
 }
