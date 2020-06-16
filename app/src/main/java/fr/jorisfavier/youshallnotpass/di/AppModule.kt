@@ -8,6 +8,8 @@ import dagger.android.ContributesAndroidInjector
 import fr.jorisfavier.youshallnotpass.YSNPApplication
 import fr.jorisfavier.youshallnotpass.YouShallNotPassDatabase
 import fr.jorisfavier.youshallnotpass.data.ItemDataSource
+import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
+import fr.jorisfavier.youshallnotpass.manager.impl.CryptoManager
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.repository.impl.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.search.SearchFragment
@@ -35,5 +37,11 @@ class AppModule {
     @Provides
     fun provideItemDataSource(db: YouShallNotPassDatabase): ItemDataSource {
         return db.itemDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideCryptoManager(): ICryptoManager {
+        return CryptoManager()
     }
 }

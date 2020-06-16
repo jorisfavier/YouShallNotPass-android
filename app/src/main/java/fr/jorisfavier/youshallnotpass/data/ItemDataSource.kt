@@ -1,8 +1,11 @@
 package fr.jorisfavier.youshallnotpass.data
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import fr.jorisfavier.youshallnotpass.data.models.Item
+import fr.jorisfavier.youshallnotpass.data.model.Item
+
 
 @Dao
 interface ItemDataSource {
@@ -14,4 +17,12 @@ interface ItemDataSource {
      */
     @Query("SELECT * from Item where title like :title")
     fun searchItem(title: String): List<Item>
+
+    /**
+     * Insert an item into the database
+     * If the item already exist it will be replaced
+     * @param items
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertItems(vararg items: Item)
 }

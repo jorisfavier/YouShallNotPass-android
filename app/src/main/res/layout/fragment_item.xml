@@ -26,6 +26,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:inputType="text"
+                android:text="@={viewModel.name}"
                 android:layout_height="wrap_content"
                 />
 
@@ -46,6 +47,7 @@
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp"
                 android:layout_width="match_parent"
+                android:text="@={viewModel.password}"
                 android:inputType="textVisiblePassword"
                 android:layout_height="wrap_content"
                 />
@@ -53,7 +55,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/itemview_create_button"
+            android:id="@+id/createItemButton"
             android:layout_width="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -62,9 +64,10 @@
             android:layout_marginEnd="20dp"
             android:layout_height="wrap_content"/>
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/generatePasswordButton"
             android:layout_width="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/itemview_create_button"
+            app:layout_constraintRight_toLeftOf="@id/createItemButton"
             android:layout_marginBottom="40dp"
             android:text="@string/item_generate_password"
             android:layout_marginEnd="20dp"

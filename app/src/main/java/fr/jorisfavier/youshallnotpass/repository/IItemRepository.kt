@@ -1,7 +1,6 @@
 package fr.jorisfavier.youshallnotpass.repository
 
-import androidx.lifecycle.LiveData
-import fr.jorisfavier.youshallnotpass.data.models.Item
+import fr.jorisfavier.youshallnotpass.data.model.Item
 
 interface IItemRepository {
 
@@ -10,5 +9,13 @@ interface IItemRepository {
      *  @param title the item's name to search for
      *  @return a list of item
      */
-    fun searchItem(title: String): LiveData<List<Item>>
+    suspend fun searchItem(title: String): List<Item>
+
+    /**
+     * Persist an item into the app
+     * @param title the item's name
+     * @param password the item's encrypted password
+     * @param iv the item's initialization vector
+     */
+    suspend fun storeItem(title: String, password: ByteArray, iv: ByteArray)
 }

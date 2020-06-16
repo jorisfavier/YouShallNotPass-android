@@ -9,4 +9,6 @@
     <string name="item_create">Create</string>
     <string name="item_generate_password">Generate password</string>
     <string name="authentication_required">Authentication required</string>
+    <string name="item_creation_success">New item added</string>
+    <string name="item_name_or_password_missing">Please give your item a name and a password</string>
 </resources>

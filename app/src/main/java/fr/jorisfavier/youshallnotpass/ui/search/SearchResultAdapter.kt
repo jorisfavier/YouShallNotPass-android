@@ -3,7 +3,7 @@ package fr.jorisfavier.youshallnotpass.ui.search
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import fr.jorisfavier.youshallnotpass.R
-import fr.jorisfavier.youshallnotpass.data.models.Item
+import fr.jorisfavier.youshallnotpass.data.model.Item
 import fr.jorisfavier.youshallnotpass.utils.inflate
 
 class SearchResultAdapter() : RecyclerView.Adapter<SearchResultViewHolder>() {

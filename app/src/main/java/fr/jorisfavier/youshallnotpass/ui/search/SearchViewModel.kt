@@ -1,11 +1,8 @@
 package fr.jorisfavier.youshallnotpass.ui.search
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
+import fr.jorisfavier.youshallnotpass.data.model.Item
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
-import fr.jorisfavier.youshallnotpass.data.models.Item
 import javax.inject.Inject
 
 class SearchViewModel @Inject constructor(private val itemRepository: IItemRepository) : ViewModel() {
@@ -13,7 +10,13 @@ class SearchViewModel @Inject constructor(private val itemRepository: IItemRepos
     val search = MutableLiveData<String>()
 
     val results: LiveData<List<Item>> = Transformations.switchMap(search) { query ->
-        itemRepository.searchItem(query)
+        liveData {
+            if (query.isNotBlank() && query.isNotEmpty()) {
+                emit(itemRepository.searchItem("$query%"))
+            } else {
+                emit(listOf())
+            }
+        }
     }
     val hasNoResult: LiveData<Boolean> = Transformations.map(results) { listItem ->
         listItem.count() == 0
