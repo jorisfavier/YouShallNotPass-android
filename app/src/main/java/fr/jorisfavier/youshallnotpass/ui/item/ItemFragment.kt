@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -11,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentItemBinding
@@ -51,6 +53,15 @@ class ItemFragment : Fragment() {
         generatePasswordButton.setOnClickListener {
             viewModel.generateSecurePassword()
         }
+
+        passwordLengthBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+                viewModel.setPasswordLength(p1)
+            }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {}
+            override fun onStopTrackingTouch(p0: SeekBar?) {}
+        })
     }
 
     private fun createNewItem() {
@@ -62,6 +73,7 @@ class ItemFragment : Fragment() {
                             getString(R.string.item_creation_success),
                             Toast.LENGTH_LONG
                     ).show()
+                    findNavController().popBackStack()
                 } else {
                     Toast.makeText(
                             context,

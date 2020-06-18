@@ -11,4 +11,8 @@
     <string name="authentication_required">Authentication required</string>
     <string name="item_creation_success">New item added</string>
     <string name="item_name_or_password_missing">Please give your item a name and a password</string>
+    <string name="use_uppercase">Use uppercase</string>
+    <string name="use_number">Use number</string>
+    <string name="use_symbol">Use symbol</string>
+    <string name="password_length">Password length:</string>
 </resources>
