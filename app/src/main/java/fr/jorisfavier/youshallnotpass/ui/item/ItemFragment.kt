@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentItemBinding
+import fr.jorisfavier.youshallnotpass.model.exception.ItemAlreadyExistException
 import kotlinx.android.synthetic.main.fragment_item.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -67,19 +68,20 @@ class ItemFragment : Fragment() {
     private fun createNewItem() {
         lifecycleScope.launch {
             viewModel.addNewItem().collect {
+                var messageResourceId = R.string.item_name_or_password_missing
                 if (it.isSuccess) {
-                    Toast.makeText(
-                            context,
-                            getString(R.string.item_creation_success),
-                            Toast.LENGTH_LONG
-                    ).show()
+                    messageResourceId = R.string.item_creation_success
+                }
+                else if (it.exceptionOrNull() is ItemAlreadyExistException) {
+                    messageResourceId = R.string.item_already_exist
+                }
+
+                Toast.makeText(context,
+                        getString(messageResourceId),
+                        Toast.LENGTH_LONG
+                ).show()
+                if (it.isSuccess) {
                     findNavController().popBackStack()
-                } else {
-                    Toast.makeText(
-                            context,
-                            getString(R.string.item_name_or_password_missing),
-                            Toast.LENGTH_LONG
-                    ).show()
                 }
             }
         }

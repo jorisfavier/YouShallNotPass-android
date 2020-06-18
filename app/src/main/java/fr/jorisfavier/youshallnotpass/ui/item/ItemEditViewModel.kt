@@ -3,6 +3,7 @@ package fr.jorisfavier.youshallnotpass.ui.item
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
+import fr.jorisfavier.youshallnotpass.model.exception.ItemAlreadyExistException
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.utils.PasswordOptions
 import fr.jorisfavier.youshallnotpass.utils.PasswordUtil
@@ -44,8 +45,12 @@ class ItemEditViewModel @Inject constructor(
             if (passwordValue != null && nameValue != null) {
                 val cipher = cryptoManager.getInitializedCipherForEncryption()
                 val encryptedData = cryptoManager.encryptData(passwordValue, cipher)
-                itemRepository.storeItem(nameValue, encryptedData.ciphertext, encryptedData.initializationVector)
-                emit(Result.success(Unit))
+                if (itemRepository.searchItem(nameValue).isEmpty()) {
+                    itemRepository.storeItem(nameValue, encryptedData.ciphertext, encryptedData.initializationVector)
+                    emit(Result.success(Unit))
+                } else {
+                    emit(Result.failure<Unit>(ItemAlreadyExistException()))
+                }
             } else {
                 emit(Result.failure<Unit>(Exception()))
             }
