@@ -9,7 +9,8 @@ class SearchResultViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     private var view = itemView
 
-    fun bind(result: Item){
+    fun bind(result: Item, onClick: (Item) -> Unit) {
         view.viewholder_searchresult_text.text = result.title
+        view.setOnClickListener { onClick.invoke(result) }
     }
 }

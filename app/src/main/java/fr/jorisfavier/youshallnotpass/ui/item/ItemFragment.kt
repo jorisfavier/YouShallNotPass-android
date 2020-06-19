@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentItemBinding
@@ -28,6 +29,7 @@ class ItemFragment : Fragment() {
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private val viewModel: ItemEditViewModel by viewModels { viewModelFactory }
+    val args: ItemFragmentArgs by navArgs()
 
     private lateinit var binding: FragmentItemBinding
 
@@ -47,6 +49,8 @@ class ItemFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         (activity as AppCompatActivity).supportActionBar?.show()
 
+        viewModel.initData(args.itemId)
+
         createItemButton.setOnClickListener {
             createNewItem()
         }
@@ -63,6 +67,8 @@ class ItemFragment : Fragment() {
             override fun onStartTrackingTouch(p0: SeekBar?) {}
             override fun onStopTrackingTouch(p0: SeekBar?) {}
         })
+
+
     }
 
     private fun createNewItem() {
@@ -71,8 +77,7 @@ class ItemFragment : Fragment() {
                 var messageResourceId = R.string.item_name_or_password_missing
                 if (it.isSuccess) {
                     messageResourceId = R.string.item_creation_success
-                }
-                else if (it.exceptionOrNull() is ItemAlreadyExistException) {
+                } else if (it.exceptionOrNull() is ItemAlreadyExistException) {
                     messageResourceId = R.string.item_already_exist
                 }
 

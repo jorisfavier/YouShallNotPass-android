@@ -17,5 +17,10 @@
         android:id="@+id/itemFragment"
         android:name="fr.jorisfavier.youshallnotpass.ui.item.ItemFragment"
         android:label="@string/item_create_title"
-        tools:layout="@layout/fragment_item" />
+        tools:layout="@layout/fragment_item">
+        <argument
+            android:name="itemId"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </fragment>
 </navigation>

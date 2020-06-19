@@ -7,6 +7,7 @@
     <string name="item_name">Item\'s name</string>
     <string name="item_password">Password</string>
     <string name="item_create">Create</string>
+    <string name="item_update">Update</string>
     <string name="item_generate_password">Generate password</string>
     <string name="authentication_required">Authentication required</string>
     <string name="item_creation_success">New item added</string>

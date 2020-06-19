@@ -78,8 +78,20 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:text="@string/item_create"
+            android:visibility="@{viewModel.edition ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/updateItemButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:text="@string/item_update"
+            tools:visibility="gone"
+            android:visibility="@{viewModel.edition ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/createItemButton" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/generatePasswordButton"
@@ -89,7 +101,7 @@
             android:layout_marginEnd="20dp"
             android:text="@string/item_generate_password"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/createItemButton" />
+            app:layout_constraintRight_toLeftOf="@id/updateItemButton" />
 
 
         <com.google.android.material.textfield.TextInputLayout
@@ -130,6 +142,8 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <data>
+
+        <import type="android.view.View" />
 
         <variable
             name="viewModel"

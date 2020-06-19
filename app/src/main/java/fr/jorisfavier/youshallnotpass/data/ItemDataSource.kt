@@ -25,4 +25,12 @@ interface ItemDataSource {
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertItems(vararg items: Item)
+
+    /**
+     * Returns all the item with the given id
+     * @param id an item identifier
+     * @return a list of item, if the item hasn't been found it will return an empty list
+     */
+    @Query("SELECT * from Item where id=:id")
+    fun getItemById(id: Int): List<Item>
 }

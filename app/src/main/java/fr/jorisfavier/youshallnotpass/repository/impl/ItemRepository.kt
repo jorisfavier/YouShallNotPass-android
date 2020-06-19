@@ -21,5 +21,11 @@ class ItemRepository @Inject constructor(private var itemDataSource: ItemDataSou
         }
     }
 
+    override suspend fun getItemById(id: Int): Item? {
+        return withContext(Dispatchers.IO) {
+            itemDataSource.getItemById(id).firstOrNull()
+        }
+    }
+
 
 }

@@ -6,12 +6,12 @@ import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.data.model.Item
 import fr.jorisfavier.youshallnotpass.utils.inflate
 
-class SearchResultAdapter() : RecyclerView.Adapter<SearchResultViewHolder>() {
+class SearchResultAdapter(val onItemClicked: (Item) -> Unit) : RecyclerView.Adapter<SearchResultViewHolder>() {
 
     private var results: List<Item> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchResultViewHolder {
-        val view = parent.inflate(R.layout.viewholder_search_result,false)
+        val view = parent.inflate(R.layout.viewholder_search_result, false)
         return SearchResultViewHolder(view)
     }
 
@@ -20,7 +20,7 @@ class SearchResultAdapter() : RecyclerView.Adapter<SearchResultViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: SearchResultViewHolder, position: Int) {
-        holder.bind(results[position])
+        holder.bind(results[position], onItemClicked)
     }
 
     fun updateResults(newList: List<Item>) {

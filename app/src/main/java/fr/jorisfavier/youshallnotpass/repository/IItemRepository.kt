@@ -18,4 +18,11 @@ interface IItemRepository {
      * @param iv the item's initialization vector
      */
     suspend fun storeItem(title: String, password: ByteArray, iv: ByteArray)
+
+    /**
+     * Retrieves an item base on the given id
+     * @param id the item's identifier
+     * @return an item or null if not found
+     */
+    suspend fun getItemById(id: Int): Item?
 }

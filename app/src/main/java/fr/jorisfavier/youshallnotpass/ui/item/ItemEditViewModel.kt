@@ -2,6 +2,8 @@ package fr.jorisfavier.youshallnotpass.ui.item
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import fr.jorisfavier.youshallnotpass.data.model.Item
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.model.exception.ItemAlreadyExistException
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
@@ -9,6 +11,7 @@ import fr.jorisfavier.youshallnotpass.utils.PasswordOptions
 import fr.jorisfavier.youshallnotpass.utils.PasswordUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ItemEditViewModel @Inject constructor(
@@ -22,6 +25,8 @@ class ItemEditViewModel @Inject constructor(
     val hasUppercase = MutableLiveData(true)
     val hasSymbol = MutableLiveData(true)
     val hasNumber = MutableLiveData(true)
+    private var currentItem: Item? = null
+    val isEdition = MutableLiveData(false)
 
     private val passwordOptions: Int
         get() {
@@ -31,6 +36,23 @@ class ItemEditViewModel @Inject constructor(
             result += if (hasNumber.value!!) PasswordOptions.NUMBER.value else 0
             return result
         }
+
+    fun initData(itemId: Int) {
+        if (itemId > 0) {
+            viewModelScope.launch {
+                currentItem = itemRepository.getItemById(itemId)
+                currentItem?.let {
+                    isEdition.value = true
+                    val cipher =
+                            cryptoManager.getInitializedCipherForDecryption(it.initializationVector)
+                    name.value = it.title
+                    password.value = cryptoManager.decryptData(it.password, cipher)
+                }
+            }
+        } else {
+            isEdition.value = false
+        }
+    }
 
     fun generateSecurePassword() {
         passwordLength.value?.let {
