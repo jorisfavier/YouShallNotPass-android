@@ -1,8 +1,10 @@
 package fr.jorisfavier.youshallnotpass.ui.item
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.data.model.Item
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.model.exception.ItemAlreadyExistException
@@ -26,7 +28,9 @@ class ItemEditViewModel @Inject constructor(
     val hasSymbol = MutableLiveData(true)
     val hasNumber = MutableLiveData(true)
     private var currentItem: Item? = null
-    val isEdition = MutableLiveData(false)
+
+    private val _createOrUpdateText = MutableLiveData(R.string.item_create)
+    val createOrUpdateText: LiveData<Int> = _createOrUpdateText
 
     private val passwordOptions: Int
         get() {
@@ -42,15 +46,13 @@ class ItemEditViewModel @Inject constructor(
             viewModelScope.launch {
                 currentItem = itemRepository.getItemById(itemId)
                 currentItem?.let {
-                    isEdition.value = true
+                    _createOrUpdateText.value = R.string.item_update
                     val cipher =
                             cryptoManager.getInitializedCipherForDecryption(it.initializationVector)
                     name.value = it.title
                     password.value = cryptoManager.decryptData(it.password, cipher)
                 }
             }
-        } else {
-            isEdition.value = false
         }
     }
 
@@ -60,21 +62,30 @@ class ItemEditViewModel @Inject constructor(
         }
     }
 
-    fun addNewItem(): Flow<Result<Unit>> {
+    fun updateOrCreateItem(): Flow<Result<Int>> {
         return flow {
             val passwordValue = password.value
             val nameValue = name.value
+            val id = currentItem?.id ?: 0
             if (passwordValue != null && nameValue != null) {
                 val cipher = cryptoManager.getInitializedCipherForEncryption()
                 val encryptedData = cryptoManager.encryptData(passwordValue, cipher)
-                if (itemRepository.searchItem(nameValue).isEmpty()) {
-                    itemRepository.storeItem(nameValue, encryptedData.ciphertext, encryptedData.initializationVector)
-                    emit(Result.success(Unit))
+
+                if (id == 0 && itemRepository.searchItem(nameValue).isNotEmpty()) {
+                    emit(Result.failure<Int>(ItemAlreadyExistException()))
                 } else {
-                    emit(Result.failure<Unit>(ItemAlreadyExistException()))
+                    itemRepository.updateOrCreateItem(
+                            Item(id,
+                                    nameValue,
+                                    encryptedData.ciphertext,
+                                    encryptedData.initializationVector)
+                    )
+                    val successResourceId =
+                            if (id == 0) R.string.item_creation_success else R.string.item_update_success
+                    emit(Result.success(successResourceId))
                 }
             } else {
-                emit(Result.failure<Unit>(Exception()))
+                emit(Result.failure<Int>(Exception()))
             }
         }
     }

@@ -1,9 +1,6 @@
 package fr.jorisfavier.youshallnotpass.data
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import fr.jorisfavier.youshallnotpass.data.model.Item
 
 
@@ -33,4 +30,11 @@ interface ItemDataSource {
      */
     @Query("SELECT * from Item where id=:id")
     fun getItemById(id: Int): List<Item>
+
+    /**
+     * Update items to the database
+     * @param items
+     */
+    @Update
+    fun updateItems(vararg items: Item)
 }

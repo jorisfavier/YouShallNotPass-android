@@ -29,7 +29,7 @@ class ItemFragment : Fragment() {
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private val viewModel: ItemEditViewModel by viewModels { viewModelFactory }
-    val args: ItemFragmentArgs by navArgs()
+    private val args: ItemFragmentArgs by navArgs()
 
     private lateinit var binding: FragmentItemBinding
 
@@ -51,8 +51,8 @@ class ItemFragment : Fragment() {
 
         viewModel.initData(args.itemId)
 
-        createItemButton.setOnClickListener {
-            createNewItem()
+        createOrUpdateItemButton.setOnClickListener {
+            createOrUpdateItem()
         }
 
         generatePasswordButton.setOnClickListener {
@@ -67,16 +67,14 @@ class ItemFragment : Fragment() {
             override fun onStartTrackingTouch(p0: SeekBar?) {}
             override fun onStopTrackingTouch(p0: SeekBar?) {}
         })
-
-
     }
 
-    private fun createNewItem() {
+    private fun createOrUpdateItem() {
         lifecycleScope.launch {
-            viewModel.addNewItem().collect {
+            viewModel.updateOrCreateItem().collect {
                 var messageResourceId = R.string.item_name_or_password_missing
                 if (it.isSuccess) {
-                    messageResourceId = R.string.item_creation_success
+                    messageResourceId = it.getOrDefault(R.string.item_creation_success)
                 } else if (it.exceptionOrNull() is ItemAlreadyExistException) {
                     messageResourceId = R.string.item_already_exist
                 }

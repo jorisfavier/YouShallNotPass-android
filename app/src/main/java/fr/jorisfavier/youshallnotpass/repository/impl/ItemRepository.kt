@@ -15,15 +15,19 @@ class ItemRepository @Inject constructor(private var itemDataSource: ItemDataSou
         }
     }
 
-    override suspend fun storeItem(title: String, password: ByteArray, iv: ByteArray) {
-        withContext(Dispatchers.IO) {
-            itemDataSource.insertItems(Item(0, title, password, iv))
-        }
-    }
-
     override suspend fun getItemById(id: Int): Item? {
         return withContext(Dispatchers.IO) {
             itemDataSource.getItemById(id).firstOrNull()
+        }
+    }
+
+    override suspend fun updateOrCreateItem(item: Item) {
+        withContext(Dispatchers.IO) {
+            if (item.id == 0) {
+                itemDataSource.insertItems(item)
+            } else {
+                itemDataSource.updateItems(item)
+            }
         }
     }
 

@@ -73,25 +73,15 @@
             tools:text="256" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/createItemButton"
+            android:id="@+id/createOrUpdateItemButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
-            android:text="@string/item_create"
-            android:visibility="@{viewModel.edition ? View.GONE : View.VISIBLE}"
+            android:text="@{viewModel.createOrUpdateText}"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
+            app:layout_constraintRight_toRightOf="parent"
+            tools:text="Create" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/updateItemButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:text="@string/item_update"
-            tools:visibility="gone"
-            android:visibility="@{viewModel.edition ? View.VISIBLE : View.GONE}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/createItemButton" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/generatePasswordButton"
@@ -101,7 +91,7 @@
             android:layout_marginEnd="20dp"
             android:text="@string/item_generate_password"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/updateItemButton" />
+            app:layout_constraintRight_toLeftOf="@id/createOrUpdateItemButton" />
 
 
         <com.google.android.material.textfield.TextInputLayout

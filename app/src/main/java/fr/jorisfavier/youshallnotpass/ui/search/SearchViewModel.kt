@@ -21,8 +21,4 @@ class SearchViewModel @Inject constructor(private val itemRepository: IItemRepos
     val hasNoResult: LiveData<Boolean> = Transformations.map(results) { listItem ->
         listItem.count() == 0
     }
-
-    fun onItemClicked(item: Item) {
-
-    }
 }
