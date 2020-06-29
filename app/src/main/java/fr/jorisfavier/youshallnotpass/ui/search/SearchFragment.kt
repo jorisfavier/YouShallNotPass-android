@@ -56,6 +56,7 @@ class SearchFragment : Fragment() {
     private fun initRecyclerView() {
         searchRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
         searchRecyclerView.adapter = searchAdapter
+        searchRecyclerView.setHasFixedSize(true)
         viewModel.results.observe(viewLifecycleOwner, Observer { result ->
             searchAdapter.updateResults(result)
         })

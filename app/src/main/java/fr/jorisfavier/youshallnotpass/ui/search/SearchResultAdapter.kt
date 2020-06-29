@@ -6,9 +6,10 @@ import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.data.model.Item
 import fr.jorisfavier.youshallnotpass.utils.inflate
 
-class SearchResultAdapter(val onItemClicked: (Item) -> Unit) : RecyclerView.Adapter<SearchResultViewHolder>() {
+class SearchResultAdapter(private val onItemEditClicked: (Item) -> Unit) : RecyclerView.Adapter<SearchResultViewHolder>() {
 
     private var results: List<Item> = ArrayList()
+    private var lastExpandedViewHolder: SearchResultViewHolder? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchResultViewHolder {
         val view = parent.inflate(R.layout.viewholder_search_result, false)
@@ -20,12 +21,18 @@ class SearchResultAdapter(val onItemClicked: (Item) -> Unit) : RecyclerView.Adap
     }
 
     override fun onBindViewHolder(holder: SearchResultViewHolder, position: Int) {
-        holder.bind(results[position], onItemClicked)
+        holder.bind(results[position], onItemEditClicked)
+        holder.itemView.setOnClickListener {
+            if (lastExpandedViewHolder != holder) {
+                lastExpandedViewHolder?.toggleViewState(false)
+            }
+            lastExpandedViewHolder = holder
+            holder.toggleViewState(!holder.isExpanded)
+        }
     }
 
     fun updateResults(newList: List<Item>) {
         results = newList
         notifyDataSetChanged()
     }
-
 }
