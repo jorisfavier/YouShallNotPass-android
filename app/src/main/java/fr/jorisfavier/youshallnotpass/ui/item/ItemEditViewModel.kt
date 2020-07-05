@@ -47,10 +47,8 @@ class ItemEditViewModel @Inject constructor(
                 currentItem = itemRepository.getItemById(itemId)
                 currentItem?.let {
                     _createOrUpdateText.value = R.string.item_update
-                    val cipher =
-                            cryptoManager.getInitializedCipherForDecryption(it.initializationVector)
                     name.value = it.title
-                    password.value = cryptoManager.decryptData(it.password, cipher)
+                    password.value = cryptoManager.decryptData(it.password, it.initializationVector)
                 }
             }
         }
@@ -68,8 +66,7 @@ class ItemEditViewModel @Inject constructor(
             val nameValue = name.value
             val id = currentItem?.id ?: 0
             if (passwordValue != null && nameValue != null) {
-                val cipher = cryptoManager.getInitializedCipherForEncryption()
-                val encryptedData = cryptoManager.encryptData(passwordValue, cipher)
+                val encryptedData = cryptoManager.encryptData(passwordValue)
 
                 if (id == 0 && itemRepository.searchItem(nameValue).isNotEmpty()) {
                     emit(Result.failure<Int>(ItemAlreadyExistException()))

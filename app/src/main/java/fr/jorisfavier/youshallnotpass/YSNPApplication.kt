@@ -6,7 +6,7 @@ import dagger.android.HasAndroidInjector
 import fr.jorisfavier.youshallnotpass.di.DaggerAppComponent
 import javax.inject.Inject
 
-class YSNPApplication: Application(), HasAndroidInjector {
+class YSNPApplication : Application(), HasAndroidInjector {
 
     @Inject
     lateinit var activityInjector: DispatchingAndroidInjector<Any>

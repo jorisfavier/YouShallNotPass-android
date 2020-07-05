@@ -45,9 +45,7 @@ class SearchViewModel @Inject constructor(
     }
 
     fun decryptPassword(item: Item): String {
-        val cipher =
-                cryptoManager.getInitializedCipherForDecryption(item.initializationVector)
-        return cryptoManager.decryptData(item.password, cipher)
+        return cryptoManager.decryptData(item.password, item.initializationVector)
     }
 
     fun copyPasswordToClipboard(item: Item) {

@@ -7,25 +7,36 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.android.AndroidInjection
 import fr.jorisfavier.youshallnotpass.R
-import fr.jorisfavier.youshallnotpass.YSNPApplication
 import fr.jorisfavier.youshallnotpass.ui.home.HomeActivity
+import javax.inject.Inject
 
 class AuthActivity : AppCompatActivity() {
 
+    companion object {
+        const val redirectToHomeExtraKey = "redirectToHome"
+    }
+
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var biometricPromptInfo: BiometricPrompt.PromptInfo
+    private var redirectToHome = true
 
-    private val viewModel: AuthViewModel by viewModels()
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private val viewModel: AuthViewModel by viewModels { viewModelFactory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_auth)
+        AndroidInjection.inject(this)
         initObserver()
         initAuthentication()
         displayAuthPrompt()
+        redirectToHome = intent.getBooleanExtra(redirectToHomeExtraKey, true)
     }
 
     private fun initObserver() {
@@ -43,8 +54,10 @@ class AuthActivity : AppCompatActivity() {
     }
 
     private fun redirectToSearchPage() {
-        val searchPahgeIntent = Intent(this, HomeActivity::class.java)
-        startActivity(searchPahgeIntent)
+        if (redirectToHome) {
+            val searchPageIntent = Intent(this, HomeActivity::class.java)
+            startActivity(searchPageIntent)
+        }
         finish()
     }
 

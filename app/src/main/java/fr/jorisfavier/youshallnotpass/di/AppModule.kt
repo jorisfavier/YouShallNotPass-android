@@ -8,7 +8,9 @@ import dagger.Module
 import dagger.Provides
 import fr.jorisfavier.youshallnotpass.YouShallNotPassDatabase
 import fr.jorisfavier.youshallnotpass.data.ItemDataSource
+import fr.jorisfavier.youshallnotpass.manager.IAuthManager
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
+import fr.jorisfavier.youshallnotpass.manager.impl.AuthManager
 import fr.jorisfavier.youshallnotpass.manager.impl.CryptoManager
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.repository.impl.ItemRepository
@@ -47,5 +49,11 @@ class AppModule {
     @Provides
     fun provideClipboardManager(app: Application): ClipboardManager {
         return app.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    }
+
+    @Singleton
+    @Provides
+    fun provideAuthManager(): IAuthManager {
+        return AuthManager()
     }
 }
