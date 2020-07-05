@@ -23,8 +23,8 @@
         <!--on which they appear.-->
         <item name="colorOnPrimary">@android:color/white</item>
         <item name="colorOnSecondary">@android:color/white</item>
-        <item name="colorOnBackground">@color/nero</item>
-        <item name="colorOnSurface">@color/nero</item>
+        <item name="colorOnBackground">@color/night_rider</item>
+        <item name="colorOnSurface">@color/night_rider</item>
         <item name="colorOnError">@android:color/white</item>
 
         <!--Component styles-->

@@ -37,4 +37,11 @@ interface ItemDataSource {
      */
     @Update
     fun updateItems(vararg items: Item)
+
+    /**
+     * Delete items from the database
+     * @param items
+     */
+    @Delete
+    fun deleteItems(vararg items: Item)
 }

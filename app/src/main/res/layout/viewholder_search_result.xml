@@ -38,6 +38,46 @@
                 app:layout_constraintTop_toBottomOf="@id/searchResultItemTitle"
                 tools:visibility="visible">
 
+                <TextView
+                    android:id="@+id/searchResultItemPasswordTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:textAppearance="?attr/textAppearanceCaption"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:text="@string/item_password"/>
+
+                <TextView
+                    android:id="@+id/searchResultItemPassword"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:text="@string/item_password"
+                    app:layout_constraintBaseline_toBaselineOf="@id/searchResultCopyButton"
+                    android:textAppearance="?attr/textAppearanceBody1"
+                    app:layout_constraintTop_toBottomOf="@id/searchResultItemPasswordTitle"
+                    app:layout_constraintBottom_toBottomOf="@id/searchResultCopyButton"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:inputType="textPassword"/>
+
+                <Button
+                    android:id="@+id/searchResultCopyButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/searchResultItemPasswordTitle"
+                    style="@style/Widget.App.Button.IconOnly"
+                    app:icon="@drawable/ic_outline_copy"/>
+
+                <Button
+                    android:id="@+id/searchResultShowHideButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toStartOf="@id/searchResultCopyButton"
+                    app:layout_constraintTop_toTopOf="@id/searchResultCopyButton"
+                    style="@style/Widget.App.Button.IconOnly"
+                    app:icon="@drawable/ic_visibility"/>
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/searchResultItemEditButton"
                     android:layout_width="wrap_content"
@@ -45,7 +85,7 @@
                     android:layout_marginTop="20dp"
                     android:text="@string/edit"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/searchResultItemPassword" />
+                    app:layout_constraintTop_toBottomOf="@id/searchResultCopyButton" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/searchResultItemDeleteButton"
@@ -57,23 +97,8 @@
                     app:layout_constraintEnd_toStartOf="@id/searchResultItemEditButton"
                     app:layout_constraintTop_toTopOf="@id/searchResultItemEditButton" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/searchResultItemPassword"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:hint="@string/item_password"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:passwordToggleEnabled="true">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPassword"
-                        android:text="password" />
 
-                </com.google.android.material.textfield.TextInputLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

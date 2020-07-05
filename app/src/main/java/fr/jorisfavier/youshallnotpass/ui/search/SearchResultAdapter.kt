@@ -6,7 +6,12 @@ import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.data.model.Item
 import fr.jorisfavier.youshallnotpass.utils.inflate
 
-class SearchResultAdapter(private val onItemEditClicked: (Item) -> Unit) : RecyclerView.Adapter<SearchResultViewHolder>() {
+class SearchResultAdapter(
+        private val onItemEditClicked: (Item) -> Unit,
+        private val onDeleteItemClicked: (Item) -> Unit,
+        private val decryptPassword: (Item) -> String,
+        private val copyPasswordToClipboard: (Item) -> Unit
+) : RecyclerView.Adapter<SearchResultViewHolder>() {
 
     private var results: List<Item> = ArrayList()
     private var lastExpandedViewHolder: SearchResultViewHolder? = null
@@ -21,7 +26,13 @@ class SearchResultAdapter(private val onItemEditClicked: (Item) -> Unit) : Recyc
     }
 
     override fun onBindViewHolder(holder: SearchResultViewHolder, position: Int) {
-        holder.bind(results[position], onItemEditClicked)
+        holder.bind(
+                results[position],
+                onItemEditClicked,
+                onDeleteItemClicked,
+                decryptPassword,
+                copyPasswordToClipboard
+        )
         holder.itemView.setOnClickListener {
             if (lastExpandedViewHolder != holder) {
                 lastExpandedViewHolder?.toggleViewState(false)

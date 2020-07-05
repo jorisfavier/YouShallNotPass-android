@@ -6,12 +6,17 @@
     <style name="ThemeOverlay.YouShallNotPass.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.Dialog">
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowAnimationStyle">@style/Animation.YouShallNotPass.BottomSheet.Modal</item>
+        <item name="android:windowAnimationStyle">
+            @style/Animation.YouShallNotPass.BottomSheet.Modal
+        </item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="bottomSheetStyle">@style/Widget.YouShallNotPass.BottomSheet.Modal</item>
         <item name="android:navigationBarColor">?attr/colorSurface</item>
-        <item name="android:navigationBarDividerColor" tools:ignore="NewApi">@android:color/transparent</item>
+        <item name="android:navigationBarDividerColor" tools:ignore="NewApi">
+            @android:color/transparent
+        </item>
     </style>
+
     <style name="Widget.YouShallNotPass.BottomSheet.Modal" parent="Widget.MaterialComponents.BottomSheet.Modal">
         <item name="shapeAppearanceOverlay">?attr/shapeAppearanceLargeComponent</item>
     </style>
@@ -19,6 +24,16 @@
     <!--Navigation Drawer-->
     <style name="Widget.YouShallNotPass.NavigationView" parent="Widget.MaterialComponents.NavigationView">
         <item name="itemTextAppearance">?attr/textAppearanceBody2</item>
+    </style>
+
+    <style name="Widget.App.Button.IconOnly" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="iconPadding">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingRight">12dp</item>
+        <item name="android:minWidth">48dp</item>
+        <item name="android:minHeight">48dp</item>
     </style>
 
 </resources>

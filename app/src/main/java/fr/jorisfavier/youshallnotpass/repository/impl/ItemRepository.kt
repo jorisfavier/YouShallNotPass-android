@@ -31,5 +31,11 @@ class ItemRepository @Inject constructor(private var itemDataSource: ItemDataSou
         }
     }
 
+    override suspend fun deleteItem(item: Item) {
+        withContext(Dispatchers.IO) {
+            itemDataSource.deleteItems(item)
+        }
+    }
+
 
 }

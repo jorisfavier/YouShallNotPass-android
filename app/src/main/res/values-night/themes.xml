@@ -18,8 +18,8 @@
     <style name="Theme.YouShallNotPass" parent="Base.Theme.YouShallNotPass">
         <!--Material color attributes (dark theme) -->
 
-        <item name="android:colorBackground">@color/nero</item>
-        <item name="colorSurface">?attr/colorPrimary</item>
+        <item name="android:colorBackground">@color/night_rider</item>
+        <item name="colorSurface">@color/black_800</item>
 
         <item name="colorOnPrimary">@android:color/white</item>
         <item name="colorOnSecondary">@android:color/white</item>

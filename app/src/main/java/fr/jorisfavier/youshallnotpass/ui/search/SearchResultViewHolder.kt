@@ -1,11 +1,13 @@
 package fr.jorisfavier.youshallnotpass.ui.search
 
 import android.animation.ValueAnimator
+import android.text.InputType
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.core.animation.doOnStart
 import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.RecyclerView
+import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.data.model.Item
 import fr.jorisfavier.youshallnotpass.utils.fadeIn
 import fr.jorisfavier.youshallnotpass.utils.fadeOut
@@ -20,14 +22,22 @@ class SearchResultViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     var isExpanded = false
         private set
 
+    private var isPasswordVisible = false
+
     private val detailHeight = 150.px
     private val detailPadding = (-10).px
     private val animDuration = 500L
 
 
-    fun bind(result: Item, onEditItemClicked: (Item) -> Unit) {
+    fun bind(result: Item, onEditItemClicked: (Item) -> Unit,
+             onDeleteItemClicked: (Item) -> Unit,
+             decryptPassword: (Item) -> String,
+             copyToClipboard: (Item) -> Unit) {
         view.searchResultItemTitle.text = result.title
+        view.searchResultShowHideButton.setOnClickListener { togglePasswordVisibility(decryptPassword(result)) }
+        view.searchResultCopyButton.setOnClickListener { copyToClipboard(result) }
         view.searchResultItemEditButton.setOnClickListener { onEditItemClicked.invoke(result) }
+        view.searchResultItemDeleteButton.setOnClickListener { onDeleteItemClicked.invoke(result) }
     }
 
     fun toggleViewState(expand: Boolean) {
@@ -61,6 +71,19 @@ class SearchResultViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
             }
             anim.start()
         }
+    }
+
+    private fun togglePasswordVisibility(password: String) {
+        isPasswordVisible = !isPasswordVisible
+        var text = view.context.getText(R.string.item_password)
+        if (isPasswordVisible) {
+            text = password
+            view.searchResultItemPassword.inputType =
+                    InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+        } else {
+            view.searchResultItemPassword.inputType = InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+        view.searchResultItemPassword.text = text
     }
 
 }

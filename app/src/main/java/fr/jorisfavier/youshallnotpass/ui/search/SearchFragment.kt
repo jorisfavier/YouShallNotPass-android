@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -13,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.data.model.Item
@@ -27,7 +29,12 @@ class SearchFragment : Fragment() {
 
     private lateinit var binding: FragmentSearchBinding
     private var searchAdapter: SearchResultAdapter =
-            SearchResultAdapter(this::navigateToEditItemFragment)
+            SearchResultAdapter(
+                    this::navigateToEditItemFragment,
+                    this::deleteItem,
+                    this::decryptPassword,
+                    this::copyToClipboard
+            )
 
     private val viewModel: SearchViewModel by viewModels { viewModelFactory }
 
@@ -70,5 +77,23 @@ class SearchFragment : Fragment() {
     private fun navigateToEditItemFragment(item: Item) {
         val action = SearchFragmentDirections.actionSearchFragmentToItemFragment(item.id)
         findNavController().navigate(action)
+    }
+
+    private fun deleteItem(item: Item) {
+        MaterialAlertDialogBuilder(context)
+                .setTitle(R.string.delete_title)
+                .setMessage(R.string.delete_confirmation)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.yes) { _, _ -> viewModel.deleteItem(item) }
+                .show()
+    }
+
+    private fun decryptPassword(item: Item): String {
+        return viewModel.decryptPassword(item)
+    }
+
+    private fun copyToClipboard(item: Item) {
+        viewModel.copyPasswordToClipboard(item)
+        Toast.makeText(context, R.string.copy_to_clipboard_success, Toast.LENGTH_LONG).show()
     }
 }

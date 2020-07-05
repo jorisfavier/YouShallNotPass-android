@@ -1,18 +1,17 @@
 package fr.jorisfavier.youshallnotpass.di
 
 import android.app.Application
+import android.content.ClipboardManager
+import android.content.Context
 import androidx.room.Room
 import dagger.Module
 import dagger.Provides
-import dagger.android.ContributesAndroidInjector
-import fr.jorisfavier.youshallnotpass.YSNPApplication
 import fr.jorisfavier.youshallnotpass.YouShallNotPassDatabase
 import fr.jorisfavier.youshallnotpass.data.ItemDataSource
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.manager.impl.CryptoManager
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.repository.impl.ItemRepository
-import fr.jorisfavier.youshallnotpass.ui.search.SearchFragment
 import javax.inject.Singleton
 
 
@@ -43,5 +42,10 @@ class AppModule {
     @Provides
     fun provideCryptoManager(): ICryptoManager {
         return CryptoManager()
+    }
+
+    @Provides
+    fun provideClipboardManager(app: Application): ClipboardManager {
+        return app.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     }
 }

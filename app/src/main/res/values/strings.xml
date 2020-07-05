@@ -20,4 +20,7 @@
     <string name="password_length">Password length:</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="delete_title">Delete item</string>
+    <string name="delete_confirmation">Do you really want to delete this item?</string>
+    <string name="copy_to_clipboard_success">Password copied</string>
 </resources>

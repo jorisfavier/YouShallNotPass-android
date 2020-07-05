@@ -24,4 +24,10 @@ interface IItemRepository {
      * @param item
      */
     suspend fun updateOrCreateItem(item: Item)
+
+    /**
+     * Delete an item from the app
+     * @param item
+     */
+    suspend fun deleteItem(item: Item)
 }
