@@ -23,4 +23,6 @@
     <string name="delete_title">Delete item</string>
     <string name="delete_confirmation">Do you really want to delete this item?</string>
     <string name="copy_to_clipboard_success">Password copied</string>
+    <string name="delete_success">The item has been successfully deleted</string>
+    <string name="error_occurred">An error occurred</string>
 </resources>

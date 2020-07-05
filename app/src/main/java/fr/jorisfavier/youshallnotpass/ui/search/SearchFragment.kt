@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,6 +21,9 @@ import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.data.model.Item
 import fr.jorisfavier.youshallnotpass.databinding.FragmentSearchBinding
 import kotlinx.android.synthetic.main.fragment_search.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SearchFragment : Fragment() {
@@ -79,12 +83,23 @@ class SearchFragment : Fragment() {
         findNavController().navigate(action)
     }
 
+    @ExperimentalCoroutinesApi
     private fun deleteItem(item: Item) {
         MaterialAlertDialogBuilder(context)
                 .setTitle(R.string.delete_title)
                 .setMessage(R.string.delete_confirmation)
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.yes) { _, _ -> viewModel.deleteItem(item) }
+                .setPositiveButton(android.R.string.yes) { _, _ ->
+                    lifecycleScope.launch {
+                        viewModel.deleteItem(item).collect {
+                            var message = R.string.error_occurred
+                            if (it.isSuccess) {
+                                message = R.string.delete_success
+                            }
+                            Toast.makeText(context, getString(message), Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
                 .show()
     }
 

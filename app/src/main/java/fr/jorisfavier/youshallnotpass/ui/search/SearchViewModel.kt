@@ -6,7 +6,10 @@ import androidx.lifecycle.*
 import fr.jorisfavier.youshallnotpass.data.model.Item
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class SearchViewModel @Inject constructor(
@@ -30,9 +33,14 @@ class SearchViewModel @Inject constructor(
         listItem.count() == 0
     }
 
-    fun deleteItem(item: Item) {
-        viewModelScope.launch {
+    @ExperimentalCoroutinesApi
+    fun deleteItem(item: Item): Flow<Result<Unit>> {
+        return flow {
             itemRepository.deleteItem(item)
+            search.value = search.value
+            emit(Result.success(Unit))
+        }.catch {
+            emit(Result.failure(Exception()))
         }
     }
 
