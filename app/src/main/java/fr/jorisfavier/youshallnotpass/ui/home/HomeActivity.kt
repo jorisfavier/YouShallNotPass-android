@@ -33,6 +33,13 @@ class HomeActivity : AppCompatActivity() {
         return navController.navigateUp()
     }
 
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        savedInstanceState?.let {
+            viewModel.onConfigurationChanged()
+        }
+    }
+
     override fun onPause() {
         viewModel.onAppPaused()
         super.onPause()

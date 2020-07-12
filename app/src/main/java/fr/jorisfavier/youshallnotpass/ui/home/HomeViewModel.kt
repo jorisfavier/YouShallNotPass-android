@@ -11,6 +11,9 @@ class HomeViewModel @Inject constructor(private val authManager: IAuthManager) :
     private val _requireAuthentication = MutableLiveData<Unit>()
     val requireAuthentication: LiveData<Unit> = _requireAuthentication
 
+    fun onConfigurationChanged() {
+        authManager.isUserAuthenticated = true
+    }
 
     fun onAppPaused() {
         authManager.isUserAuthenticated = false
