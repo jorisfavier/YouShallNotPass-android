@@ -12,6 +12,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.R
+import fr.jorisfavier.youshallnotpass.utils.getEntryforValue
 import javax.inject.Inject
 
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -57,6 +58,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
         viewModel.getDefaultThemeValue(
                 resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK)?.let {
             appThemePreference.value = it
+        }
+        appThemePreference.summary = appThemePreference.getEntryforValue(appThemePreference.value)
+        appThemePreference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+            appThemePreference.summary = appThemePreference.getEntryforValue(newValue)
+            true
         }
     }
 }
