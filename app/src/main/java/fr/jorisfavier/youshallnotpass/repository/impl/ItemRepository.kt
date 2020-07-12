@@ -9,6 +9,12 @@ import javax.inject.Inject
 
 class ItemRepository @Inject constructor(private var itemDataSource: ItemDataSource) : IItemRepository {
 
+    override suspend fun getAllItems(): List<Item> {
+        return withContext(Dispatchers.IO) {
+            itemDataSource.getAllItems()
+        }
+    }
+
     override suspend fun searchItem(title: String): List<Item> {
         return withContext(Dispatchers.IO) {
             itemDataSource.searchItem(title)

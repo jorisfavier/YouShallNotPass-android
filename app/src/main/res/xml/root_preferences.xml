@@ -1,0 +1,18 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SwitchPreferenceCompat
+        app:key="allItems"
+        app:summary="@string/all_items_settings_description"
+        app:title="@string/display_all_items" />
+    <Preference
+        app:key="import"
+        app:title="@string/import_password" />
+    <Preference
+        app:key="export"
+        app:title="@string/export_password" />
+    <ListPreference
+        app:key="theme"
+        app:title="@string/app_theme" />
+
+
+</PreferenceScreen>

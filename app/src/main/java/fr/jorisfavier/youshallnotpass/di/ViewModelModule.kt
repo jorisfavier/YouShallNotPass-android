@@ -9,6 +9,7 @@ import fr.jorisfavier.youshallnotpass.ui.auth.AuthViewModel
 import fr.jorisfavier.youshallnotpass.ui.home.HomeViewModel
 import fr.jorisfavier.youshallnotpass.ui.item.ItemEditViewModel
 import fr.jorisfavier.youshallnotpass.ui.search.SearchViewModel
+import fr.jorisfavier.youshallnotpass.ui.settings.SettingsViewModel
 
 @Module
 abstract class ViewModelModule {
@@ -31,6 +32,11 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(HomeViewModel::class)
     abstract fun bindHomeViewModel(homeViewModel: HomeViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(SettingsViewModel::class)
+    abstract fun bindSettingsViewModel(settingsViewModel: SettingsViewModel): ViewModel
 
     @Binds
     abstract fun bindViewModelFactory(factory: MainViewModelFactory): ViewModelProvider.Factory

@@ -12,6 +12,9 @@
         <action
             android:id="@+id/action_searchFragment_to_itemFragment"
             app:destination="@id/itemFragment" />
+        <action
+            android:id="@+id/action_searchFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/itemFragment"
@@ -23,4 +26,8 @@
             app:argType="integer"
             android:defaultValue="0" />
     </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="fr.jorisfavier.youshallnotpass.ui.settings.SettingsFragment"
+        android:label="@string/settings" />
 </navigation>

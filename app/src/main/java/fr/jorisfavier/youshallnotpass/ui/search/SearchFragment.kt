@@ -1,5 +1,6 @@
 package fr.jorisfavier.youshallnotpass.ui.search
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -31,6 +32,9 @@ class SearchFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
+    @Inject
+    lateinit var sharedPreferences: SharedPreferences
+
     private lateinit var binding: FragmentSearchBinding
     private var searchAdapter: SearchResultAdapter =
             SearchResultAdapter(
@@ -58,10 +62,28 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecyclerView()
-        addNewItemButton.setOnClickListener {
+        initSettings()
+        binding.addNewItemButton.setOnClickListener {
             addNewItem(it)
         }
         (activity as AppCompatActivity).supportActionBar?.hide()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        sharedPreferences.registerOnSharedPreferenceChangeListener(viewModel.onSharedPreferenceChangeListener)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(viewModel.onSharedPreferenceChangeListener)
+    }
+
+    private fun initSettings() {
+        binding.settingsButton.setOnClickListener {
+            val action = SearchFragmentDirections.actionSearchFragmentToSettingsFragment()
+            findNavController().navigate(action)
+        }
     }
 
     private fun initRecyclerView() {

@@ -4,6 +4,12 @@ import fr.jorisfavier.youshallnotpass.data.model.Item
 
 interface IItemRepository {
 
+    /**
+     * Return all items stored in the app
+     * @return a list of item
+     */
+    suspend fun getAllItems(): List<Item>
+
     /***
      *  Search for an item based on his title
      *  @param title the item's name to search for

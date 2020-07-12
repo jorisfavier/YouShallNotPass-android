@@ -25,4 +25,14 @@
     <string name="copy_to_clipboard_success">Password copied</string>
     <string name="delete_success">The item has been successfully deleted</string>
     <string name="error_occurred">An error occurred</string>
+    <string name="settings">Settings</string>
+    <string name="display_all_items">Display all items</string>
+    <string name="all_items_settings_description">Indicates if all the items should be visible on the home screen</string>
+    <string name="import_password">Import password</string>
+    <string name="export_password">Export password</string>
+    <string name="app_theme">App theme</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
+    <string name="battery_saver">Set by Battery Saver</string>
+    <string name="system_default">System default</string>
 </resources>

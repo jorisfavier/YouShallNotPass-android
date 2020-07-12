@@ -3,6 +3,8 @@ package fr.jorisfavier.youshallnotpass.di
 import android.app.Application
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.SharedPreferences
+import android.preference.PreferenceManager
 import androidx.room.Room
 import dagger.Module
 import dagger.Provides
@@ -55,5 +57,11 @@ class AppModule {
     @Provides
     fun provideAuthManager(): IAuthManager {
         return AuthManager()
+    }
+
+    @Singleton
+    @Provides
+    fun provideSharedPreference(app: Application): SharedPreferences {
+        return PreferenceManager.getDefaultSharedPreferences(app)
     }
 }

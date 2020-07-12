@@ -7,6 +7,13 @@ import fr.jorisfavier.youshallnotpass.data.model.Item
 @Dao
 interface ItemDataSource {
 
+    /**
+     * Returns all stored items
+     * @return a list of item
+     */
+    @Query("SELECT * from Item")
+    fun getAllItems(): List<Item>
+
     /***
      *  Search for an item in the database based on his name
      *  @param title the item's name to search for

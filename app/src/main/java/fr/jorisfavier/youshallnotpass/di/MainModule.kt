@@ -6,6 +6,7 @@ import fr.jorisfavier.youshallnotpass.ui.auth.AuthActivity
 import fr.jorisfavier.youshallnotpass.ui.home.HomeActivity
 import fr.jorisfavier.youshallnotpass.ui.item.ItemFragment
 import fr.jorisfavier.youshallnotpass.ui.search.SearchFragment
+import fr.jorisfavier.youshallnotpass.ui.settings.SettingsFragment
 
 @Module
 abstract class MainModule {
@@ -21,5 +22,8 @@ abstract class MainModule {
 
     @ContributesAndroidInjector
     abstract fun contributeHomeActivity(): HomeActivity
+
+    @ContributesAndroidInjector
+    abstract fun contributeSettingsFragment(): SettingsFragment
 
 }
