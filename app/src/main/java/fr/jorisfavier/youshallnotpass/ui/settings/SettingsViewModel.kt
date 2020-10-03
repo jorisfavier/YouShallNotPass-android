@@ -47,4 +47,8 @@ class SettingsViewModel @Inject constructor(
             null
         }
     }
+
+    private fun createCsvExport(): ByteArray {
+
+    }
 }

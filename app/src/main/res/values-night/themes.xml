@@ -20,7 +20,7 @@
 
         <item name="android:colorBackground">@color/night_rider</item>
         <item name="colorSurface">@color/black_800</item>
-
+        <item name="colorError">@color/totem_pole</item>
         <item name="colorOnPrimary">@android:color/white</item>
         <item name="colorOnSecondary">@android:color/white</item>
         <item name="colorOnBackground">@android:color/white</item>
