@@ -35,4 +35,6 @@
     <string name="dark">Dark</string>
     <string name="battery_saver">Set by Battery Saver</string>
     <string name="system_default">System default</string>
+    <string name="password_export_failed">Oops! An error occurred while exporting your passwords. Please try again.</string>
+
 </resources>

@@ -8,6 +8,7 @@ import javax.inject.Inject
 
 class HomeViewModel @Inject constructor(private val authManager: IAuthManager) : ViewModel() {
 
+    private var ignoreNextPause = false
     private val _requireAuthentication = MutableLiveData<Unit>()
     val requireAuthentication: LiveData<Unit> = _requireAuthentication
 
@@ -16,13 +17,20 @@ class HomeViewModel @Inject constructor(private val authManager: IAuthManager) :
     }
 
     fun onAppPaused() {
-        authManager.isUserAuthenticated = false
+        if (!ignoreNextPause) {
+            authManager.isUserAuthenticated = false
+        }
+        ignoreNextPause = false
     }
 
     fun onAppResumed() {
         if (!authManager.isUserAuthenticated) {
             _requireAuthentication.value = Unit
         }
+    }
+
+    fun ignoreNextPause() {
+        ignoreNextPause = true
     }
 
 

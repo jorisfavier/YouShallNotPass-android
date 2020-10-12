@@ -15,10 +15,10 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class SearchViewModel @Inject constructor(
-        private val itemRepository: IItemRepository,
-        private val cryptoManager: ICryptoManager,
-        private val clipboardManager: ClipboardManager,
-        private val sharedPreferences: SharedPreferences
+    private val itemRepository: IItemRepository,
+    private val cryptoManager: ICryptoManager,
+    private val clipboardManager: ClipboardManager,
+    private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
     val search = MutableLiveData<String>("")
@@ -27,7 +27,11 @@ class SearchViewModel @Inject constructor(
         liveData {
             if (query.isNotBlank() && query.isNotEmpty()) {
                 emit(itemRepository.searchItem("$query%"))
-            } else if (sharedPreferences.getBoolean(SettingsFragment.ALL_ITEMS_PREFERENCE_KEY, false)) {
+            } else if (sharedPreferences.getBoolean(
+                    SettingsFragment.ALL_ITEMS_PREFERENCE_KEY,
+                    false
+                )
+            ) {
                 emit(itemRepository.getAllItems())
             } else {
                 emit(listOf())
@@ -39,11 +43,11 @@ class SearchViewModel @Inject constructor(
     }
 
     val onSharedPreferenceChangeListener =
-            SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-                if (key == SettingsFragment.ALL_ITEMS_PREFERENCE_KEY) {
-                    search.value = search.value
-                }
+        SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == SettingsFragment.ALL_ITEMS_PREFERENCE_KEY) {
+                search.value = search.value
             }
+        }
 
     @ExperimentalCoroutinesApi
     fun deleteItem(item: Item): Flow<Result<Unit>> {
@@ -62,6 +66,6 @@ class SearchViewModel @Inject constructor(
 
     fun copyPasswordToClipboard(item: Item) {
         val clip = ClipData.newPlainText("password", decryptPassword(item))
-        clipboardManager.primaryClip = clip
+        clipboardManager.setPrimaryClip(clip)
     }
 }

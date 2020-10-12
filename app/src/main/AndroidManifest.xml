@@ -11,6 +11,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.YouShallNotPass">
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="fr.jorisfavier.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
         <activity android:name=".ui.home.HomeActivity"/>
         <activity android:name=".ui.auth.AuthActivity">
             <intent-filter>
