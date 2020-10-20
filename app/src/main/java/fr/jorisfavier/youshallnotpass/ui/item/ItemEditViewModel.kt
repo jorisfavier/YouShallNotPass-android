@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import fr.jorisfavier.youshallnotpass.R
-import fr.jorisfavier.youshallnotpass.data.model.Item
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
+import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.exception.ItemAlreadyExistException
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.utils.PasswordOptions
@@ -17,8 +17,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ItemEditViewModel @Inject constructor(
-        private val cryptoManager: ICryptoManager,
-        private val itemRepository: IItemRepository
+    private val cryptoManager: ICryptoManager,
+    private val itemRepository: IItemRepository
 ) : ViewModel() {
 
     val name = MutableLiveData<String>()
@@ -69,20 +69,17 @@ class ItemEditViewModel @Inject constructor(
                 val encryptedData = cryptoManager.encryptData(passwordValue)
 
                 if (id == 0 && itemRepository.searchItem(nameValue).isNotEmpty()) {
-                    emit(Result.failure<Int>(ItemAlreadyExistException()))
+                    emit(Result.failure(ItemAlreadyExistException()))
                 } else {
                     itemRepository.updateOrCreateItem(
-                            Item(id,
-                                    nameValue,
-                                    encryptedData.ciphertext,
-                                    encryptedData.initializationVector)
+                        Item(id, nameValue, encryptedData.ciphertext, encryptedData.initializationVector)
                     )
                     val successResourceId =
-                            if (id == 0) R.string.item_creation_success else R.string.item_update_success
+                        if (id == 0) R.string.item_creation_success else R.string.item_update_success
                     emit(Result.success(successResourceId))
                 }
             } else {
-                emit(Result.failure<Int>(Exception()))
+                emit(Result.failure(Exception()))
             }
         }
     }

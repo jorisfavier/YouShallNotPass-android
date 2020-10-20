@@ -8,7 +8,8 @@ import androidx.core.animation.doOnStart
 import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.RecyclerView
 import fr.jorisfavier.youshallnotpass.R
-import fr.jorisfavier.youshallnotpass.data.model.Item
+import fr.jorisfavier.youshallnotpass.data.model.ItemEntity
+import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.utils.fadeIn
 import fr.jorisfavier.youshallnotpass.utils.fadeOut
 import fr.jorisfavier.youshallnotpass.utils.px

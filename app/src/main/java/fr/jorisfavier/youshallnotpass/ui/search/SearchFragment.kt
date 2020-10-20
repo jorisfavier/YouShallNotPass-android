@@ -19,8 +19,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.R
-import fr.jorisfavier.youshallnotpass.data.model.Item
 import fr.jorisfavier.youshallnotpass.databinding.FragmentSearchBinding
+import fr.jorisfavier.youshallnotpass.model.Item
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -37,12 +37,12 @@ class SearchFragment : Fragment() {
 
     private lateinit var binding: FragmentSearchBinding
     private var searchAdapter: SearchResultAdapter =
-            SearchResultAdapter(
-                    this::navigateToEditItemFragment,
-                    this::deleteItem,
-                    this::decryptPassword,
-                    this::copyToClipboard
-            )
+        SearchResultAdapter(
+            this::navigateToEditItemFragment,
+            this::deleteItem,
+            this::decryptPassword,
+            this::copyToClipboard
+        )
 
     private val viewModel: SearchViewModel by viewModels { viewModelFactory }
 
@@ -108,21 +108,21 @@ class SearchFragment : Fragment() {
     @ExperimentalCoroutinesApi
     private fun deleteItem(item: Item) {
         MaterialAlertDialogBuilder(context)
-                .setTitle(R.string.delete_title)
-                .setMessage(R.string.delete_confirmation)
-                .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.yes) { _, _ ->
-                    lifecycleScope.launch {
-                        viewModel.deleteItem(item).collect {
-                            var message = R.string.error_occurred
-                            if (it.isSuccess) {
-                                message = R.string.delete_success
-                            }
-                            Toast.makeText(context, getString(message), Toast.LENGTH_LONG).show()
+            .setTitle(R.string.delete_title)
+            .setMessage(R.string.delete_confirmation)
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                lifecycleScope.launch {
+                    viewModel.deleteItem(item).collect {
+                        var message = R.string.error_occurred
+                        if (it.isSuccess) {
+                            message = R.string.delete_success
                         }
+                        Toast.makeText(context, getString(message), Toast.LENGTH_LONG).show()
                     }
                 }
-                .show()
+            }
+            .show()
     }
 
     private fun decryptPassword(item: Item): String {

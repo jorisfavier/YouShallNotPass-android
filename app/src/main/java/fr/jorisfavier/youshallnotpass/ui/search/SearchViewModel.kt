@@ -3,9 +3,13 @@ package fr.jorisfavier.youshallnotpass.ui.search
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.SharedPreferences
-import androidx.lifecycle.*
-import fr.jorisfavier.youshallnotpass.data.model.Item
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
+import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.ui.settings.SettingsFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi

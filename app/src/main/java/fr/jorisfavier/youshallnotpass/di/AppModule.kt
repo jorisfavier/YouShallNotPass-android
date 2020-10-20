@@ -12,8 +12,10 @@ import fr.jorisfavier.youshallnotpass.YouShallNotPassDatabase
 import fr.jorisfavier.youshallnotpass.data.ItemDataSource
 import fr.jorisfavier.youshallnotpass.manager.IAuthManager
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
+import fr.jorisfavier.youshallnotpass.manager.IFileManager
 import fr.jorisfavier.youshallnotpass.manager.impl.AuthManager
 import fr.jorisfavier.youshallnotpass.manager.impl.CryptoManager
+import fr.jorisfavier.youshallnotpass.manager.impl.FileManager
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.repository.impl.ItemRepository
 import javax.inject.Singleton
@@ -32,8 +34,8 @@ class AppModule {
     @Provides
     fun provideDb(app: Application): YouShallNotPassDatabase {
         return Room.databaseBuilder(app, YouShallNotPassDatabase::class.java, "ysnp.db")
-                .fallbackToDestructiveMigration()
-                .build()
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Singleton
@@ -63,5 +65,11 @@ class AppModule {
     @Provides
     fun provideSharedPreference(app: Application): SharedPreferences {
         return PreferenceManager.getDefaultSharedPreferences(app)
+    }
+
+    @Singleton
+    @Provides
+    fun provideFileManager(app: Application): IFileManager {
+        return FileManager(app.applicationContext)
     }
 }

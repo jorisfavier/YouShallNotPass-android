@@ -1,6 +1,5 @@
 package fr.jorisfavier.youshallnotpass.ui.settings
 
-import android.app.Application
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
@@ -8,26 +7,23 @@ import android.net.Uri
 import android.os.Build
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
+import fr.jorisfavier.youshallnotpass.manager.IFileManager
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
+import fr.jorisfavier.youshallnotpass.utils.toByteArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.FileWriter
 import javax.inject.Inject
 
 class SettingsViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences,
     private val itemRepository: IItemRepository,
     private val cryptoManager: ICryptoManager,
-    private val application: Application
+    private val fileManager: IFileManager
 ) : ViewModel() {
 
     val themeValues: Array<String>
@@ -85,6 +81,10 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Export all items into a csv file
+     * @return an Uri to the csv file
+     */
     private suspend fun createCsvExport(): Uri {
         return withContext(Dispatchers.Default) {
             val items = itemRepository.getAllItems()
@@ -94,22 +94,21 @@ class SettingsViewModel @Inject constructor(
                 res.append("${it.title},$itemPassword")
                 res.append("\n")
             }
-            val exportPath = application.getExternalFilesDir("exports")
-            val file = File(exportPath, "ysnpExport.csv")
-            viewModelScope.launch(Dispatchers.IO) {
-                val writer = FileWriter(file)
-                writer.write(res.toString())
-                writer.flush()
-                writer.close()
-            }
-            FileProvider.getUriForFile(application, "fr.jorisfavier.fileprovider", file)
+            fileManager.saveToCsv(res.toString())
         }
     }
 
+    /**
+     * Export all items into an encrypted file
+     * @param password the key to encrypt the file's content
+     * @return an Uri to the encrypted file
+     */
     private suspend fun createYsnpExport(): Uri {
         return withContext(Dispatchers.Default) {
-            //TODO implement secure export
-            Uri.EMPTY
+            val items = itemRepository.getAllItems()
+            var data = items.map { it.toByteArray() }.reduce { acc, bytes -> acc + bytes }
+            data = cryptoManager.encryptDataWithPassword("test", data)
+            fileManager.saveToYsnpFile(data)
         }
     }
 }

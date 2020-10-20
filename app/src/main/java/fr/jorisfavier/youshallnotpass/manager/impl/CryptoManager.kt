@@ -4,12 +4,16 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.manager.model.EncryptedData
+import fr.jorisfavier.youshallnotpass.utils.md5
 import java.nio.charset.Charset
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
+import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.GCMParameterSpec
+import javax.crypto.spec.PBEKeySpec
+import javax.crypto.spec.PBEParameterSpec
 
 class CryptoManager : ICryptoManager {
 
@@ -19,6 +23,7 @@ class CryptoManager : ICryptoManager {
     private val ENCRYPTION_PADDING = KeyProperties.ENCRYPTION_PADDING_NONE
     private val ENCRYPTION_ALGORITHM = KeyProperties.KEY_ALGORITHM_AES
     private val KEY_NAME = "ysnp_encryption_key"
+    private val COUNT = 999;
 
     override fun encryptData(plaintext: String): EncryptedData {
         val cipher = getInitializedCipherForEncryption()
@@ -30,6 +35,27 @@ class CryptoManager : ICryptoManager {
         val cipher = getInitializedCipherForDecryption(initializationVector)
         val plaintext = cipher.doFinal(ciphertext)
         return String(plaintext, Charset.forName("UTF-8"))
+    }
+
+    override fun encryptDataWithPassword(password: String, data: ByteArray): ByteArray {
+        val pbParamSpec = PBEParameterSpec(password.md5(), COUNT)
+        val pbKeySpec = PBEKeySpec(password.toCharArray())
+        val secretKeyFactory = SecretKeyFactory.getInstance("PBEWITHSHA256AND256BITAES-CBC-BC")
+        val key = secretKeyFactory.generateSecret(pbKeySpec)
+        val cipher = Cipher.getInstance("PBEWITHSHA256AND256BITAES-CBC-BC")
+        cipher.init(Cipher.ENCRYPT_MODE, key, pbParamSpec)
+        return cipher.doFinal(data)
+    }
+
+    override fun decryptDataWithPassword(password: String, encryptedData: ByteArray): String {
+        val pbParamSpec = PBEParameterSpec(password.md5(), COUNT)
+        val pbKeySpec = PBEKeySpec(password.toCharArray())
+        val secretKeyFactory = SecretKeyFactory.getInstance("PBEWITHSHA256AND256BITAES-CBC-BC")
+        val key = secretKeyFactory.generateSecret(pbKeySpec)
+        val cipher = Cipher.getInstance("PBEWITHSHA256AND256BITAES-CBC-BC")
+        cipher.init(Cipher.DECRYPT_MODE, key, pbParamSpec)
+        val decrypted = cipher.doFinal(encryptedData)
+        return decrypted.toString(Charset.forName("utf-8"))
     }
 
     /**
@@ -69,8 +95,10 @@ class CryptoManager : ICryptoManager {
         }
 
         // if you reach here, then a new SecretKey must be generated
-        val paramsBuilder = KeyGenParameterSpec.Builder(KEY_NAME,
-                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
+        val paramsBuilder = KeyGenParameterSpec.Builder(
+            KEY_NAME,
+            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+        )
         paramsBuilder.apply {
             setBlockModes(ENCRYPTION_BLOCK_MODE)
             setEncryptionPaddings(ENCRYPTION_PADDING)
@@ -79,8 +107,10 @@ class CryptoManager : ICryptoManager {
         }
 
         val keyGenParams = paramsBuilder.build()
-        val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES,
-                ANDROID_KEYSTORE)
+        val keyGenerator = KeyGenerator.getInstance(
+            KeyProperties.KEY_ALGORITHM_AES,
+            ANDROID_KEYSTORE
+        )
         keyGenerator.init(keyGenParams)
         return keyGenerator.generateKey()
     }

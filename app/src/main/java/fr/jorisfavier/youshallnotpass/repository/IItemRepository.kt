@@ -1,6 +1,7 @@
 package fr.jorisfavier.youshallnotpass.repository
 
-import fr.jorisfavier.youshallnotpass.data.model.Item
+import android.net.Uri
+import fr.jorisfavier.youshallnotpass.model.Item
 
 interface IItemRepository {
 
