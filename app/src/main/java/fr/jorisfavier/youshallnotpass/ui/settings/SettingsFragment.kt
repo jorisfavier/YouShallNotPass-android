@@ -3,10 +3,7 @@ package fr.jorisfavier.youshallnotpass.ui.settings
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
-import android.widget.RadioGroup
 import android.widget.Toast
-import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -16,7 +13,6 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.ui.home.HomeViewModel
@@ -83,28 +79,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun initExportPreference() {
-        val customView = layoutInflater.inflate(R.layout.dialog_settings_export, null)
         exportPreference.setOnPreferenceClickListener {
-            customView.parent?.let {
-                (it as? ViewGroup)?.removeView(customView)
-            }
-            MaterialAlertDialogBuilder(context)
-                .setTitle(R.string.export_password)
-                .setView(customView)
-                .setPositiveButton(R.string.export_password) { dialogInterface, _ ->
-                    val checkedId = customView.findViewById<RadioGroup>(R.id.settingsExportRadioGrp).checkedRadioButtonId
-                    exportPasswords(checkedId)
-                    dialogInterface.dismiss()
-                }
-                .setNegativeButton(android.R.string.cancel, null)
-                .show()
+            val dialog = ExportDialogFragment(::exportPasswords)
+            dialog.show(requireActivity().supportFragmentManager, ExportDialogFragment::class.java.simpleName)
             true
         }
     }
 
-    private fun exportPasswords(@IdRes checkedId: Int) {
+    private fun exportPasswords(encrypt: Boolean, password: String) {
         lifecycleScope.launch {
-            viewModel.exportPasswords(checkedId).collect {
+            viewModel.exportPasswords(encrypt, password).collect {
                 if (it.isFailure) {
                     Toast.makeText(requireContext(), R.string.password_export_failed, Toast.LENGTH_LONG).show()
                 } else {

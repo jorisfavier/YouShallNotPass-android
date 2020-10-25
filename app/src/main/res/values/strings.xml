@@ -35,6 +35,12 @@
     <string name="dark">Dark</string>
     <string name="battery_saver">Set by Battery Saver</string>
     <string name="system_default">System default</string>
+    <string name="export_password_missing">Please provide a password in order to encrypt the file</string>
     <string name="password_export_failed">Oops! An error occurred while exporting your passwords. Please try again.</string>
+    <string name="csv_export_explanation">The file exported with this option will generate readable text that could expose your password security</string>
+    <string name="ysnp_file">YSNP file</string>
+    <string name="ysnp_export_explanation">The file exported with this option will be encrypted and only readable from the YSNP app.</string>
+    <string name="export">Export</string>
+    <string name="password">Password</string>
 
 </resources>

@@ -1,49 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/exportDialogScrollView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="20dp">
+    android:layout_height="wrap_content"
+    android:paddingTop="10dp">
 
-    <RadioGroup
-        android:id="@+id/settingsExportRadioGrp"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:checkedButton="@id/ysnpExportRadioButton"
-        android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:paddingHorizontal="20dp"
+        android:paddingBottom="20dp"
+        android:paddingTop="0dp">
 
-        <RadioButton
-            android:id="@+id/csvExportRadioButton"
+        <RadioGroup
+            android:id="@+id/settingsExportRadioGrp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="CSV file" />
+            android:checkedButton="@id/ysnpExportRadioButton"
+            android:orientation="vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
+            <RadioButton
+                android:id="@+id/csvExportRadioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="CSV file" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="-10dp"
+                android:layout_marginBottom="10dp"
+                android:text="@string/csv_export_explanation"
+                android:textAppearance="?attr/textAppearanceCaption"
+                android:textColor="?attr/colorError" />
+
+            <RadioButton
+                android:id="@+id/ysnpExportRadioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/ysnp_file" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="-10dp"
+                android:layout_marginBottom="10dp"
+                android:text="@string/ysnp_export_explanation"
+                android:textAppearance="?attr/textAppearanceCaption" />
+        </RadioGroup>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/exportPasswordContainer"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
-            android:layout_marginTop="-10dp"
-            android:layout_marginBottom="10dp"
-            android:text="The file exported with this option will generate readable text that could expose your password security"
+            android:hint="@string/password"
+            app:endIconMode="password_toggle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/settingsExportRadioGrp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/exportPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:textAppearance="?attr/textAppearanceCaption" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <TextView
+            android:id="@+id/exportDialogError"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/export_password_missing"
             android:textAppearance="?attr/textAppearanceCaption"
-            android:textColor="?attr/colorError" />
+            android:textColor="?attr/colorError"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/exportPasswordContainer"
+            tools:visibility="visible" />
 
-        <RadioButton
-            android:id="@+id/ysnpExportRadioButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="YSNP file" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="-10dp"
-            android:layout_marginBottom="10dp"
-            android:text="The file exported with this option will be encrypted and only readable from the YSNP app."
-            android:textAppearance="?attr/textAppearanceCaption" />
-    </RadioGroup>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
-import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
 import fr.jorisfavier.youshallnotpass.R
@@ -62,17 +61,13 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun exportPasswords(@IdRes option: Int): Flow<Result<Intent>> {
+    fun exportPasswords(encrypt: Boolean, password: String): Flow<Result<Intent>> {
         return flow {
             try {
                 val intent = Intent(Intent.ACTION_SEND)
                 intent.type = "plain/text"
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                val uri = if (option == R.id.ysnpExportRadioButton) {
-                    createYsnpExport()
-                } else {
-                    createCsvExport()
-                }
+                val uri = if (encrypt) createYsnpExport(password) else createCsvExport()
                 intent.putExtra(Intent.EXTRA_STREAM, uri)
                 emit(Result.success(intent))
             } catch (e: Exception) {
@@ -103,11 +98,11 @@ class SettingsViewModel @Inject constructor(
      * @param password the key to encrypt the file's content
      * @return an Uri to the encrypted file
      */
-    private suspend fun createYsnpExport(): Uri {
+    private suspend fun createYsnpExport(password: String): Uri {
         return withContext(Dispatchers.Default) {
             val items = itemRepository.getAllItems()
             var data = items.map { it.toByteArray() }.reduce { acc, bytes -> acc + bytes }
-            data = cryptoManager.encryptDataWithPassword("test", data)
+            data = cryptoManager.encryptDataWithPassword(password, data)
             fileManager.saveToYsnpFile(data)
         }
     }
