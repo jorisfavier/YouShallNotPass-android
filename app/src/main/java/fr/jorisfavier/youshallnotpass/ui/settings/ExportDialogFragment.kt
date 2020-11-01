@@ -34,7 +34,7 @@ class ExportDialogFragment(val onExport: (Boolean, String) -> Unit) : DialogFrag
             customView.parent?.let {
                 (it as? ViewGroup)?.removeView(customView)
             }
-            val dialog = MaterialAlertDialogBuilder(context)
+            val dialog = MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.export_password)
                 .setView(customView)
                 .setCancelable(false)

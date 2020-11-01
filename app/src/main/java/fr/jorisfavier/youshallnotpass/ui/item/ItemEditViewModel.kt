@@ -69,7 +69,7 @@ class ItemEditViewModel @Inject constructor(
                 val encryptedData = cryptoManager.encryptData(passwordValue)
 
                 if (id == 0 && itemRepository.searchItem(nameValue).isNotEmpty()) {
-                    emit(Result.failure(ItemAlreadyExistException()))
+                    emit(Result.failure<Int>(ItemAlreadyExistException()))
                 } else {
                     itemRepository.updateOrCreateItem(
                         Item(id, nameValue, encryptedData.ciphertext, encryptedData.initializationVector)
@@ -79,7 +79,7 @@ class ItemEditViewModel @Inject constructor(
                     emit(Result.success(successResourceId))
                 }
             } else {
-                emit(Result.failure(Exception()))
+                emit(Result.failure<Int>(Exception()))
             }
         }
     }

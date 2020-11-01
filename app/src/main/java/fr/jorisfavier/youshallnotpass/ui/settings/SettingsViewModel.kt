@@ -5,24 +5,26 @@ import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.manager.IFileManager
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
-import fr.jorisfavier.youshallnotpass.utils.toByteArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 class SettingsViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences,
     private val itemRepository: IItemRepository,
     private val cryptoManager: ICryptoManager,
-    private val fileManager: IFileManager
+    private val fileManager: IFileManager,
 ) : ViewModel() {
 
     val themeValues: Array<String>
@@ -71,7 +73,20 @@ class SettingsViewModel @Inject constructor(
                 intent.putExtra(Intent.EXTRA_STREAM, uri)
                 emit(Result.success(intent))
             } catch (e: Exception) {
-                emit(Result.failure(e))
+                emit(Result.failure<Intent>(e))
+            }
+        }
+    }
+
+
+    fun importPasswords(uri: Uri): Flow<Result<Unit>> {
+        return flow {
+            if (fileManager.isTextFile(uri)) {
+                fileManager.getImportedItemsFromTextFile(uri)
+            } else {
+                val content = fileManager.getDataFromYsnpFile(uri)
+                val items = cryptoManager.decryptItemsWithPassword("jojo", content)
+                Log.wtf("zbra", items.toString())
             }
         }
     }
@@ -84,6 +99,7 @@ class SettingsViewModel @Inject constructor(
         return withContext(Dispatchers.Default) {
             val items = itemRepository.getAllItems()
             val res = StringBuilder()
+            res.append("title,password")
             items.forEach {
                 val itemPassword = cryptoManager.decryptData(it.password, it.initializationVector)
                 res.append("${it.title},$itemPassword")
@@ -101,8 +117,8 @@ class SettingsViewModel @Inject constructor(
     private suspend fun createYsnpExport(password: String): Uri {
         return withContext(Dispatchers.Default) {
             val items = itemRepository.getAllItems()
-            var data = items.map { it.toByteArray() }.reduce { acc, bytes -> acc + bytes }
-            data = cryptoManager.encryptDataWithPassword(password, data)
+            val itemsJson = Json.encodeToString(items)
+            val data = cryptoManager.encryptDataWithPassword(password, itemsJson.toByteArray(Charsets.UTF_8))
             fileManager.saveToYsnpFile(data)
         }
     }

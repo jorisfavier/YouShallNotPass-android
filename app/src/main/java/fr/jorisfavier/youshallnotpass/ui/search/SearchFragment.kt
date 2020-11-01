@@ -107,7 +107,7 @@ class SearchFragment : Fragment() {
 
     @ExperimentalCoroutinesApi
     private fun deleteItem(item: Item) {
-        MaterialAlertDialogBuilder(context)
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.delete_title)
             .setMessage(R.string.delete_confirmation)
             .setNegativeButton(android.R.string.cancel, null)

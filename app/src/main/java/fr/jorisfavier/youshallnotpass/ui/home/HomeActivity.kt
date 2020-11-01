@@ -2,6 +2,7 @@ package fr.jorisfavier.youshallnotpass.ui.home
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -11,6 +12,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import dagger.android.AndroidInjection
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.ui.auth.AuthActivity
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import javax.inject.Inject
 
 class HomeActivity : AppCompatActivity() {

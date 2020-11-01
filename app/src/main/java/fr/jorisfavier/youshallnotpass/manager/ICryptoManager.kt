@@ -1,6 +1,7 @@
 package fr.jorisfavier.youshallnotpass.manager
 
 import fr.jorisfavier.youshallnotpass.manager.model.EncryptedData
+import fr.jorisfavier.youshallnotpass.model.Item
 
 interface ICryptoManager {
     /**
@@ -33,5 +34,13 @@ interface ICryptoManager {
      * @return the decrypted data as a String
      */
     fun decryptDataWithPassword(password: String, encryptedData: ByteArray): String
+
+    /**
+     * Decrypt the given data using a given password
+     * @param password the decryption key
+     * @param encryptedData the encrypted data as a byte array
+     * @return the decrypted data as a list of Item
+     */
+    fun decryptItemsWithPassword(password: String, encryptedData: ByteArray): List<Item>
 
 }

@@ -1,9 +1,11 @@
 package fr.jorisfavier.youshallnotpass.ui.settings
 
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -36,6 +38,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private val homeViewModel: HomeViewModel by activityViewModels { viewModelFactory }
 
+    val getContent = registerForActivityResult(GetContent()) { uri: Uri? ->
+        uri?.let {
+            lifecycleScope.launch {
+                viewModel.importPasswords(it).collect { }
+            }
+        }
+    }
+
     private lateinit var allItemsVisibilityPreference: SwitchPreferenceCompat
     private lateinit var importPreference: Preference
     private lateinit var exportPreference: Preference
@@ -60,6 +70,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         initAppThemePreference()
         initExportPreference()
+        initImportPreference()
     }
 
     private fun initAppThemePreference() {
@@ -82,6 +93,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
         exportPreference.setOnPreferenceClickListener {
             val dialog = ExportDialogFragment(::exportPasswords)
             dialog.show(requireActivity().supportFragmentManager, ExportDialogFragment::class.java.simpleName)
+            true
+        }
+    }
+
+    private fun initImportPreference() {
+        importPreference.setOnPreferenceClickListener {
+            homeViewModel.ignoreNextPause()
+            getContent.launch("*/*")
             true
         }
     }

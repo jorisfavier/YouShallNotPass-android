@@ -4,7 +4,10 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.manager.model.EncryptedData
+import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.utils.md5
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import java.nio.charset.Charset
 import java.security.KeyStore
 import javax.crypto.Cipher
@@ -34,7 +37,7 @@ class CryptoManager : ICryptoManager {
     override fun decryptData(ciphertext: ByteArray, initializationVector: ByteArray): String {
         val cipher = getInitializedCipherForDecryption(initializationVector)
         val plaintext = cipher.doFinal(ciphertext)
-        return String(plaintext, Charset.forName("UTF-8"))
+        return String(plaintext, Charsets.UTF_8)
     }
 
     override fun encryptDataWithPassword(password: String, data: ByteArray): ByteArray {
@@ -55,7 +58,18 @@ class CryptoManager : ICryptoManager {
         val cipher = Cipher.getInstance("PBEWITHSHA256AND256BITAES-CBC-BC")
         cipher.init(Cipher.DECRYPT_MODE, key, pbParamSpec)
         val decrypted = cipher.doFinal(encryptedData)
-        return decrypted.toString(Charset.forName("utf-8"))
+        return decrypted.toString(Charsets.UTF_8)
+    }
+
+    override fun decryptItemsWithPassword(password: String, encryptedData: ByteArray): List<Item> {
+        val pbParamSpec = PBEParameterSpec(password.md5(), COUNT)
+        val pbKeySpec = PBEKeySpec(password.toCharArray())
+        val secretKeyFactory = SecretKeyFactory.getInstance("PBEWITHSHA256AND256BITAES-CBC-BC")
+        val key = secretKeyFactory.generateSecret(pbKeySpec)
+        val cipher = Cipher.getInstance("PBEWITHSHA256AND256BITAES-CBC-BC")
+        cipher.init(Cipher.DECRYPT_MODE, key, pbParamSpec)
+        val decrypted = cipher.doFinal(encryptedData)
+        return Json.decodeFromString(decrypted.toString(Charsets.UTF_8))
     }
 
     /**

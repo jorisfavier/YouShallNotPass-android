@@ -38,7 +38,7 @@ class SearchViewModel @Inject constructor(
             ) {
                 emit(itemRepository.getAllItems())
             } else {
-                emit(listOf())
+                emit(listOf<Item>())
             }
         }
     }

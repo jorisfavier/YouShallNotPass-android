@@ -2,6 +2,7 @@ package fr.jorisfavier.youshallnotpass.di
 
 import android.app.Application
 import android.content.ClipboardManager
+import android.content.ContentResolver
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
@@ -69,7 +70,13 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun provideFileManager(app: Application): IFileManager {
-        return FileManager(app.applicationContext)
+    fun provideFileManager(app: Application, contentResolver: ContentResolver): IFileManager {
+        return FileManager(app.applicationContext, contentResolver)
+    }
+
+    @Singleton
+    @Provides
+    fun provideContentResolver(app: Application): ContentResolver {
+        return app.contentResolver
     }
 }
