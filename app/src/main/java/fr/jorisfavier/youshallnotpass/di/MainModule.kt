@@ -7,6 +7,11 @@ import fr.jorisfavier.youshallnotpass.ui.home.HomeActivity
 import fr.jorisfavier.youshallnotpass.ui.item.ItemFragment
 import fr.jorisfavier.youshallnotpass.ui.search.SearchFragment
 import fr.jorisfavier.youshallnotpass.ui.settings.SettingsFragment
+import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemActivity
+import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportResultFragment
+import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportSelectFileFragment
+import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ProvideImportPasswordFragment
+import fr.jorisfavier.youshallnotpass.ui.settings.importitem.review.ReviewImportedItemsFragment
 
 @Module
 abstract class MainModule {
@@ -26,4 +31,18 @@ abstract class MainModule {
     @ContributesAndroidInjector
     abstract fun contributeSettingsFragment(): SettingsFragment
 
+    @ContributesAndroidInjector
+    abstract fun contributeImportItemActivity(): ImportItemActivity
+
+    @ContributesAndroidInjector
+    abstract fun contributeImportSelectFileFragment(): ImportSelectFileFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeProvideImportPasswordFragment(): ProvideImportPasswordFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeReviewImportedItemsFragment(): ReviewImportedItemsFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeImportResultFragment(): ImportResultFragment
 }

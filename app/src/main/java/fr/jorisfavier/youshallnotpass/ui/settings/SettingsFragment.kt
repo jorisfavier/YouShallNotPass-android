@@ -1,16 +1,15 @@
 package fr.jorisfavier.youshallnotpass.ui.settings
 
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -37,14 +36,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
     val viewModel: SettingsViewModel by viewModels { viewModelFactory }
 
     private val homeViewModel: HomeViewModel by activityViewModels { viewModelFactory }
-
-    val getContent = registerForActivityResult(GetContent()) { uri: Uri? ->
-        uri?.let {
-            lifecycleScope.launch {
-                viewModel.importPasswords(it).collect { }
-            }
-        }
-    }
 
     private lateinit var allItemsVisibilityPreference: SwitchPreferenceCompat
     private lateinit var importPreference: Preference
@@ -100,14 +91,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun initImportPreference() {
         importPreference.setOnPreferenceClickListener {
             homeViewModel.ignoreNextPause()
-            getContent.launch("*/*")
+            val direction = SettingsFragmentDirections.actionSettingsFragmentToImportPasswordActivity()
+            findNavController().navigate(direction)
             true
         }
     }
 
-    private fun exportPasswords(encrypt: Boolean, password: String) {
+    private fun exportPasswords(password: String?) {
         lifecycleScope.launch {
-            viewModel.exportPasswords(encrypt, password).collect {
+            viewModel.exportPasswords(password).collect {
                 if (it.isFailure) {
                     Toast.makeText(requireContext(), R.string.password_export_failed, Toast.LENGTH_LONG).show()
                 } else {

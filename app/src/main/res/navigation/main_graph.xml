@@ -29,5 +29,14 @@
     <fragment
         android:id="@+id/settingsFragment"
         android:name="fr.jorisfavier.youshallnotpass.ui.settings.SettingsFragment"
-        android:label="@string/settings" />
+        android:label="@string/settings" >
+        <action
+            android:id="@+id/action_settingsFragment_to_importPasswordActivity"
+            app:destination="@id/importPasswordActivity" />
+    </fragment>
+    <activity
+        android:id="@+id/importPasswordActivity"
+        android:name="fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemActivity"
+        android:label="activity_import_password"
+        tools:layout="@layout/fragment_import_select_file" />
 </navigation>

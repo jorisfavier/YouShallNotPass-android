@@ -1,11 +1,11 @@
-package fr.jorisfavier.youshallnotpass.manager.impl
+package fr.jorisfavier.youshallnotpass.data.impl
 
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
-import fr.jorisfavier.youshallnotpass.manager.IFileManager
-import fr.jorisfavier.youshallnotpass.model.ImportedItem
+import fr.jorisfavier.youshallnotpass.data.IExternalItemDataSource
+import fr.jorisfavier.youshallnotpass.data.model.ItemDto
 import fr.jorisfavier.youshallnotpass.utils.FileUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -16,10 +16,10 @@ import java.io.InputStreamReader
 import java.util.*
 import javax.inject.Inject
 
-class FileManager @Inject constructor(
+class ExternalItemDataSource @Inject constructor(
     private val appContext: Context,
     private val contentResolver: ContentResolver
-) : IFileManager {
+) : IExternalItemDataSource {
     companion object {
         const val EXPORT_FOLDER = "exports"
         const val CSV_EXPORT_NAME = "ysnpExport.csv"
@@ -27,12 +27,19 @@ class FileManager @Inject constructor(
         const val AUTHORITY = "fr.jorisfavier.fileprovider"
     }
 
-    override suspend fun saveToCsv(data: String): Uri {
+    override suspend fun saveToCsv(items: List<ItemDto>): Uri {
         return withContext(Dispatchers.IO) {
+            val res = StringBuilder()
+            res.append("title,password\n")
+            items.forEach {
+                if (it.title != null && it.password != null) {
+                    res.append("${it.title},${it.password}\n")
+                }
+            }
             val exportPath = appContext.getExternalFilesDir(EXPORT_FOLDER)
             val file = File(exportPath, CSV_EXPORT_NAME)
             val writer = FileWriter(file)
-            writer.write(data)
+            writer.write(res.toString())
             writer.flush()
             writer.close()
             FileProvider.getUriForFile(appContext, AUTHORITY, file)
@@ -55,9 +62,9 @@ class FileManager @Inject constructor(
         }
     }
 
-    override suspend fun getImportedItemsFromTextFile(uri: Uri): List<ImportedItem> {
+    override suspend fun getItemsFromTextFile(uri: Uri): List<ItemDto> {
         return withContext(Dispatchers.IO) {
-            val items = mutableListOf<ImportedItem>()
+            val items = mutableListOf<ItemDto>()
             contentResolver.openInputStream(uri)?.use { inputStream ->
                 BufferedReader(InputStreamReader(inputStream)).use { reader ->
                     var i = 0
@@ -82,7 +89,7 @@ class FileManager @Inject constructor(
                                     }
                                 }
                         } else {
-                            items.add(ImportedItem(lineContent.getOrNull(titleIndex), lineContent.getOrNull(passwordIndex)))
+                            items.add(ItemDto(lineContent.getOrNull(titleIndex), lineContent.getOrNull(passwordIndex)))
                         }
                         line = reader.readLine()
                         i++

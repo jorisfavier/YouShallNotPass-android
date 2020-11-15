@@ -37,6 +37,7 @@ class AuthActivity : AppCompatActivity() {
         initAuthentication()
         displayAuthPrompt()
         redirectToHome = intent.getBooleanExtra(redirectToHomeExtraKey, true)
+        supportActionBar?.hide()
     }
 
     private fun initObserver() {
@@ -73,9 +74,9 @@ class AuthActivity : AppCompatActivity() {
 
     private fun initAuthentication() {
         biometricPromptInfo = BiometricPrompt.PromptInfo.Builder()
-                .setTitle(getString(R.string.authentication_required))
-                .setNegativeButtonText(getString(android.R.string.cancel))
-                .build()
+            .setTitle(getString(R.string.authentication_required))
+            .setNegativeButtonText(getString(android.R.string.cancel))
+            .build()
         val executor = ContextCompat.getMainExecutor(this)
         biometricPrompt = BiometricPrompt(this, executor, viewModel.authCallback)
     }

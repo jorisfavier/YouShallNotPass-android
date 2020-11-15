@@ -1,20 +1,20 @@
-package fr.jorisfavier.youshallnotpass.manager
+package fr.jorisfavier.youshallnotpass.data
 
 import android.net.Uri
-import fr.jorisfavier.youshallnotpass.model.ImportedItem
+import fr.jorisfavier.youshallnotpass.data.model.ItemDto
 
-interface IFileManager {
+interface IExternalItemDataSource {
     /**
-     * Save the given data to a csv file
-     * @param data
-     * @return the path of the file
+     * Save the given list of ItemDto to a csv file
+     * @param items
+     * @return the path of the csv file
      */
-    suspend fun saveToCsv(data: String): Uri
+    suspend fun saveToCsv(items: List<ItemDto>): Uri
 
     /**
      * Save the given data to a file with the .ysnp extension
      * @param data
-     * @return the path of the file
+     * @return the path of the ysnp file
      */
     suspend fun saveToYsnpFile(data: ByteArray): Uri
 
@@ -26,11 +26,11 @@ interface IFileManager {
     suspend fun isTextFile(uri: Uri): Boolean
 
     /**
-     * Retrieve the possible passwords from the given text file
+     * Retrieve the possible items from the given text file
      * @param uri the uri to the text file
-     * @return List<ImportedItem>
+     * @return List<ItemDto>
      */
-    suspend fun getImportedItemsFromTextFile(uri: Uri): List<ImportedItem>
+    suspend fun getItemsFromTextFile(uri: Uri): List<ItemDto>
 
     /**
      * Retrieve the content of a secure ysnp file

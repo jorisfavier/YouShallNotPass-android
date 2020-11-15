@@ -1,6 +1,5 @@
 package fr.jorisfavier.youshallnotpass.repository
 
-import android.net.Uri
 import fr.jorisfavier.youshallnotpass.model.Item
 
 interface IItemRepository {
@@ -37,4 +36,10 @@ interface IItemRepository {
      * @param item
      */
     suspend fun deleteItem(item: Item)
+
+    /**
+     * Persist a list of item into the app
+     * @param items
+     */
+    suspend fun insertItems(items: List<Item>)
 }

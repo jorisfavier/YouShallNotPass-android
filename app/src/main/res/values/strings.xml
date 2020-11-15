@@ -42,5 +42,16 @@
     <string name="ysnp_export_explanation">The file exported with this option will be encrypted and only readable from the YSNP app.</string>
     <string name="export">Export</string>
     <string name="password">Password</string>
+    <string name="import_items">Import items</string>
+    <string name="import_step1">You can import items from csv and ysnp file.</string>
+    <string name="import_step2">We detected an encrypted file please provide us the password to decrypt it.</string>
+    <string name="import_step3">Please review the items you want to import.</string>
+    <string name="import_completed">Import completed!</string>
+    <string name="import_failed">Sorry we were unable to import items from this file.</string>
+    <string name="select_file">Select a file to import</string>
+    <string name="please_select_file">Please select a file to import</string>
+    <string name="please_provide_password">Please provide a password to decrypt the file</string>
+    <string name="please_select_item">Please select at least one item to import</string>
+    <string name="app_intro_skip_button">Cancel</string>
 
 </resources>

@@ -3,6 +3,7 @@
     package="fr.jorisfavier.youshallnotpass">
 
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+
     <application
         android:name=".YSNPApplication"
         android:allowBackup="true"
@@ -11,16 +12,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.YouShallNotPass">
+        <activity
+            android:name=".ui.settings.importitem.ImportItemActivity"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="fr.jorisfavier.fileprovider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
-        <activity android:name=".ui.home.HomeActivity"/>
+
+        <activity android:name=".ui.home.HomeActivity" />
         <activity android:name=".ui.auth.AuthActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

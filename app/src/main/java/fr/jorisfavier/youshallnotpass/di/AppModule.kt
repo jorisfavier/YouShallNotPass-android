@@ -10,14 +10,16 @@ import androidx.room.Room
 import dagger.Module
 import dagger.Provides
 import fr.jorisfavier.youshallnotpass.YouShallNotPassDatabase
+import fr.jorisfavier.youshallnotpass.data.IExternalItemDataSource
 import fr.jorisfavier.youshallnotpass.data.ItemDataSource
+import fr.jorisfavier.youshallnotpass.data.impl.ExternalItemDataSource
 import fr.jorisfavier.youshallnotpass.manager.IAuthManager
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
-import fr.jorisfavier.youshallnotpass.manager.IFileManager
 import fr.jorisfavier.youshallnotpass.manager.impl.AuthManager
 import fr.jorisfavier.youshallnotpass.manager.impl.CryptoManager
-import fr.jorisfavier.youshallnotpass.manager.impl.FileManager
+import fr.jorisfavier.youshallnotpass.repository.IExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
+import fr.jorisfavier.youshallnotpass.repository.impl.ExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.impl.ItemRepository
 import javax.inject.Singleton
 
@@ -70,8 +72,14 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun provideFileManager(app: Application, contentResolver: ContentResolver): IFileManager {
-        return FileManager(app.applicationContext, contentResolver)
+    fun provideExternalItemDataSource(app: Application, contentResolver: ContentResolver): IExternalItemDataSource {
+        return ExternalItemDataSource(app.applicationContext, contentResolver)
+    }
+
+    @Singleton
+    @Provides
+    fun provideExternalItemRepository(externalItemDataSource: IExternalItemDataSource, cryptoManager: ICryptoManager): IExternalItemRepository {
+        return ExternalItemRepository(externalItemDataSource, cryptoManager)
     }
 
     @Singleton

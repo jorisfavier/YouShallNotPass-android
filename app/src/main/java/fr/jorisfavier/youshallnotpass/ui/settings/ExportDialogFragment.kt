@@ -13,7 +13,7 @@ import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import fr.jorisfavier.youshallnotpass.R
 
-class ExportDialogFragment(val onExport: (Boolean, String) -> Unit) : DialogFragment() {
+class ExportDialogFragment(val onExport: (String?) -> Unit) : DialogFragment() {
 
     private lateinit var radioGroup: RadioGroup
     private lateinit var errorView: View
@@ -55,15 +55,15 @@ class ExportDialogFragment(val onExport: (Boolean, String) -> Unit) : DialogFrag
 
 
     private fun onExportClicked() {
-        val password = passwordEditText.text?.toString()
-        if (password.isNullOrEmpty()) {
+        val needPassword = radioGroup.checkedRadioButtonId == R.id.ysnpExportRadioButton
+        val password = if (needPassword) passwordEditText.text?.toString() else null
+        if (needPassword && password.isNullOrEmpty()) {
             errorView.isVisible = true
             scrollView.post {
                 scrollView.fullScroll(View.FOCUS_DOWN)
             }
         } else {
-            val checkedId = radioGroup.checkedRadioButtonId
-            onExport(checkedId == R.id.ysnpExportRadioButton, password)
+            onExport(password)
             dismiss()
         }
     }
