@@ -4,10 +4,12 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
+import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
@@ -25,7 +27,7 @@ class SearchViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
-    val search = MutableLiveData<String>("")
+    val search = MutableLiveData("")
 
     val results: LiveData<List<Item>> = Transformations.switchMap(search) { query ->
         liveData {
@@ -42,9 +44,12 @@ class SearchViewModel @Inject constructor(
             }
         }
     }
+
     val hasNoResult: LiveData<Boolean> = Transformations.map(results) { listItem ->
         listItem.count() == 0
     }
+
+    val noResultTextIdRes = MediatorLiveData<Int>()
 
     val onSharedPreferenceChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
@@ -52,6 +57,16 @@ class SearchViewModel @Inject constructor(
                 search.value = search.value
             }
         }
+
+    private val isSearchEmpty: Boolean
+        get() = search.value.orEmpty().isEmpty() || search.value.orEmpty().isBlank()
+
+    init {
+        noResultTextIdRes.value = R.string.common_no_results_found
+        noResultTextIdRes.addSource(search) {
+            noResultTextIdRes.value = if (isSearchEmpty) R.string.use_the_search else R.string.common_no_results_found
+        }
+    }
 
     @ExperimentalCoroutinesApi
     fun deleteItem(item: Item): Flow<Result<Unit>> {
@@ -71,5 +86,12 @@ class SearchViewModel @Inject constructor(
     fun copyPasswordToClipboard(item: Item) {
         val clip = ClipData.newPlainText("password", decryptPassword(item))
         clipboardManager.setPrimaryClip(clip)
+    }
+
+    fun refreshItems() {
+        //If the user didn't search for something it will force an item refresh
+        if (isSearchEmpty) {
+            search.value = ""
+        }
     }
 }

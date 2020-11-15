@@ -11,7 +11,7 @@ interface ItemDataSource {
      * Returns all stored items
      * @return a list of item
      */
-    @Query("SELECT * from ItemEntity")
+    @Query("SELECT * from ItemEntity order by title asc")
     fun getAllItems(): List<ItemEntity>
 
     /***

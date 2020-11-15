@@ -44,6 +44,7 @@ class SearchResultAdapter(
 
     fun updateResults(newList: List<Item>) {
         results = newList
+        lastExpandedViewHolder?.toggleViewState(false)
         notifyDataSetChanged()
     }
 }

@@ -10,10 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -21,6 +19,7 @@ import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentSearchBinding
 import fr.jorisfavier.youshallnotpass.model.Item
+import fr.jorisfavier.youshallnotpass.utils.toast
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -64,7 +63,7 @@ class SearchFragment : Fragment() {
         initRecyclerView()
         initSettings()
         binding.addNewItemButton.setOnClickListener {
-            addNewItem(it)
+            addNewItem()
         }
         (activity as AppCompatActivity).supportActionBar?.hide()
     }
@@ -72,6 +71,7 @@ class SearchFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         sharedPreferences.registerOnSharedPreferenceChangeListener(viewModel.onSharedPreferenceChangeListener)
+        viewModel.refreshItems()
     }
 
     override fun onDestroy() {
@@ -90,14 +90,14 @@ class SearchFragment : Fragment() {
         searchRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
         searchRecyclerView.adapter = searchAdapter
         searchRecyclerView.setHasFixedSize(true)
-        viewModel.results.observe(viewLifecycleOwner, Observer { result ->
+        viewModel.results.observe(viewLifecycleOwner) { result ->
             searchAdapter.updateResults(result)
-        })
+        }
     }
 
-    private fun addNewItem(view: View) {
+    private fun addNewItem() {
         val action = SearchFragmentDirections.actionSearchFragmentToItemFragment()
-        view.findNavController().navigate(action)
+        findNavController().navigate(action)
     }
 
     private fun navigateToEditItemFragment(item: Item) {
@@ -131,6 +131,6 @@ class SearchFragment : Fragment() {
 
     private fun copyToClipboard(item: Item) {
         viewModel.copyPasswordToClipboard(item)
-        Toast.makeText(context, R.string.copy_to_clipboard_success, Toast.LENGTH_LONG).show()
+        context?.toast(R.string.copy_to_clipboard_success)
     }
 }

@@ -53,5 +53,6 @@
     <string name="please_provide_password">Please provide a password to decrypt the file</string>
     <string name="please_select_item">Please select at least one item to import</string>
     <string name="app_intro_skip_button">Cancel</string>
+    <string name="use_the_search">Use the search field above to find items.</string>
 
 </resources>
