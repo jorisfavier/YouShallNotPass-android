@@ -3,14 +3,106 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="fr.jorisfavier.youshallnotpass.ui.item.ItemEditViewModel" />
+
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingStart="20dp"
-        android:paddingTop="40dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="40dp"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="40dp"
         tools:context=".features.item.ItemActivity">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/itemview_name"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/item_name"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:text="@={viewModel.name}" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/itemview_login"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/item_edit_margin_top_textfields"
+            android:hint="@string/item_login"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/itemview_name">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:text="@={viewModel.login}" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/itemview_password"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/item_edit_margin_top_textfields"
+            android:hint="@string/item_password"
+            app:endIconMode="password_toggle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/itemview_login">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textVisiblePassword"
+                android:paddingHorizontal="20dp"
+                android:text="@={viewModel.password}" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/passwordLengthTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/item_edit_margin_top_textfields"
+            android:text="@string/password_length"
+            android:textAppearance="?attr/textAppearanceBody1"
+            app:layout_constraintStart_toStartOf="@id/itemview_password"
+            app:layout_constraintTop_toBottomOf="@id/itemview_password" />
+
+        <TextView
+            android:id="@+id/passwordLengthValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:text="@{viewModel.passwordLength.toString()}"
+            android:textAppearance="?attr/textAppearanceBody1"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/passwordLengthTitle"
+            app:layout_constraintTop_toTopOf="@id/passwordLengthTitle"
+            tools:text="256" />
+
+        <SeekBar
+            android:id="@+id/passwordLengthBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:layout_constraintStart_toStartOf="@id/itemview_password"
+            app:layout_constraintTop_toBottomOf="@id/passwordLengthTitle" />
 
         <CheckBox
             android:id="@+id/uppercaseCheckbox"
@@ -42,35 +134,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/numberCheckbox" />
 
-        <SeekBar
-            android:id="@+id/passwordLengthBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            app:layout_constraintStart_toStartOf="@id/itemview_password"
-            app:layout_constraintTop_toBottomOf="@id/passwordLengthTitle" />
-
-        <TextView
-            android:id="@+id/passwordLengthTitle"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/generatePasswordButton"
+            style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/password_length"
-            android:textAppearance="?attr/textAppearanceBody1"
-            app:layout_constraintStart_toStartOf="@id/itemview_password"
-            app:layout_constraintTop_toBottomOf="@id/itemview_password" />
-
-        <TextView
-            android:id="@+id/passwordLengthValue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:text="@{viewModel.passwordLength.toString()}"
-            android:textAppearance="?attr/textAppearanceBody1"
-            android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@id/passwordLengthTitle"
-            app:layout_constraintTop_toTopOf="@id/passwordLengthTitle"
-            tools:text="256" />
+            android:layout_marginEnd="20dp"
+            android:text="@string/item_generate_password"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/createOrUpdateItemButton" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/createOrUpdateItemButton"
@@ -82,61 +154,6 @@
             app:layout_constraintRight_toRightOf="parent"
             tools:text="Create" />
 
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/generatePasswordButton"
-            style="?attr/materialButtonOutlinedStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:text="@string/item_generate_password"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/createOrUpdateItemButton" />
-
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/itemview_name"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/item_name"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:text="@={viewModel.name}" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/itemview_password"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:hint="@string/item_password"
-            app:layout_constraintTop_toBottomOf="@id/itemview_name">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textVisiblePassword"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                android:text="@={viewModel.password}" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <data>
-
-        <import type="android.view.View" />
-
-        <variable
-            name="viewModel"
-            type="fr.jorisfavier.youshallnotpass.ui.item.ItemEditViewModel" />
-    </data>
 </layout>

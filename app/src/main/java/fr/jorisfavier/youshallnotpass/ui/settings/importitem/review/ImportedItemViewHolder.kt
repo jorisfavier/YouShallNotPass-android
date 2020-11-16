@@ -9,7 +9,8 @@ import fr.jorisfavier.youshallnotpass.R
 class ImportedItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     fun bind(item: ExternalItemViewModel) {
-        itemView.findViewById<TextView>(R.id.importedItemValues).text = "${item.externalItem.title} - ${item.externalItem.password}"
+        itemView.findViewById<TextView>(R.id.importedItemValues).text =
+            "${item.externalItem.title} - ${item.externalItem.login} - ${item.externalItem.password}"
         itemView.findViewById<CheckBox>(R.id.importItemCheckbox).apply {
             isChecked = item.selected
             setOnCheckedChangeListener { _, checked -> item.selected = checked }

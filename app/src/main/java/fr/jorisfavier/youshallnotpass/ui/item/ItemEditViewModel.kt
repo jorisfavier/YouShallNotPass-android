@@ -22,6 +22,7 @@ class ItemEditViewModel @Inject constructor(
 ) : ViewModel() {
 
     val name = MutableLiveData<String>()
+    val login = MutableLiveData<String>()
     val password = MutableLiveData<String>()
     val passwordLength = MutableLiveData(PasswordUtil.defaultSize)
     val hasUppercase = MutableLiveData(true)
@@ -49,6 +50,7 @@ class ItemEditViewModel @Inject constructor(
                     _createOrUpdateText.value = R.string.item_update
                     name.value = it.title
                     password.value = cryptoManager.decryptData(it.password, it.initializationVector)
+                    login.value = it.login.orEmpty()
                 }
             }
         }
@@ -72,7 +74,13 @@ class ItemEditViewModel @Inject constructor(
                     emit(Result.failure<Int>(ItemAlreadyExistException()))
                 } else {
                     itemRepository.updateOrCreateItem(
-                        Item(id, nameValue, encryptedData.ciphertext, encryptedData.initializationVector)
+                        Item(
+                            id = id,
+                            title = nameValue,
+                            login = login.value,
+                            password = encryptedData.ciphertext,
+                            initializationVector = encryptedData.initializationVector
+                        )
                     )
                     val successResourceId =
                         if (id == 0) R.string.item_creation_success else R.string.item_update_success

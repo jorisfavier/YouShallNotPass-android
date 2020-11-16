@@ -1,3 +1,3 @@
 package fr.jorisfavier.youshallnotpass.model
 
-data class ExternalItem(val title: String, val password: String)
+data class ExternalItem(val title: String, val login: String? = null, val password: String)

@@ -12,6 +12,7 @@ import androidx.lifecycle.liveData
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
+import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.ui.settings.SettingsFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -83,8 +84,12 @@ class SearchViewModel @Inject constructor(
         return cryptoManager.decryptData(item.password, item.initializationVector)
     }
 
-    fun copyPasswordToClipboard(item: Item) {
-        val clip = ClipData.newPlainText("password", decryptPassword(item))
+    fun copyToClipboard(item: Item, type: ItemDataType) {
+        val data = when (type) {
+            ItemDataType.PASSWORD -> decryptPassword(item)
+            ItemDataType.LOGIN -> item.login
+        }
+        val clip = ClipData.newPlainText(type.name, data)
         clipboardManager.setPrimaryClip(clip)
     }
 

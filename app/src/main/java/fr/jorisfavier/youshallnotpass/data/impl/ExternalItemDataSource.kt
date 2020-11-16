@@ -30,10 +30,10 @@ class ExternalItemDataSource @Inject constructor(
     override suspend fun saveToCsv(items: List<ItemDto>): Uri {
         return withContext(Dispatchers.IO) {
             val res = StringBuilder()
-            res.append("title,password\n")
+            res.append("title,username,password\n")
             items.forEach {
                 if (it.title != null && it.password != null) {
-                    res.append("${it.title},${it.password}\n")
+                    res.append("${it.title},${it.login.orEmpty()},${it.password}\n")
                 }
             }
             val exportPath = appContext.getExternalFilesDir(EXPORT_FOLDER)
@@ -71,6 +71,8 @@ class ExternalItemDataSource @Inject constructor(
                     var line: String? = reader.readLine()
                     var passwordIndex = 5 //default dashlane password position
                     var titleIndex = 0
+                    var loginIndex = 2
+                    var loginIndexBis = 2
                     while (line != null) {
                         val lineContent = line.split(",")
                         if (i == 0) {
@@ -86,10 +88,13 @@ class ExternalItemDataSource @Inject constructor(
                                         header == "title" -> titleIndex = index
                                         header == "name" -> titleIndex = index
                                         header.contains("pass") -> passwordIndex = index
+                                        header.contains("username") -> loginIndex = index
+                                        header == "login" -> loginIndex = index
                                     }
                                 }
                         } else {
-                            items.add(ItemDto(lineContent.getOrNull(titleIndex), lineContent.getOrNull(passwordIndex)))
+                            val login = lineContent.getOrNull(loginIndex) ?: lineContent.getOrNull(loginIndexBis)
+                            items.add(ItemDto(lineContent.getOrNull(titleIndex), login, lineContent.getOrNull(passwordIndex)))
                         }
                         line = reader.readLine()
                         i++

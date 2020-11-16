@@ -116,7 +116,7 @@ class ImportItemViewModel @Inject constructor(
                 } else {
                     val itemsToImport = selectedItems.map { externalItem ->
                         val password = cryptoManager.encryptData(externalItem.password)
-                        Item(0, externalItem.title, password.ciphertext, password.initializationVector)
+                        Item(0, externalItem.title, externalItem.login, password.ciphertext, password.initializationVector)
                     }
                     itemRepository.insertItems(itemsToImport)
                     _importItemsState.postValue(Event(State.Success))

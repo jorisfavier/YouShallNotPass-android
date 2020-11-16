@@ -66,7 +66,7 @@ class SettingsViewModel @Inject constructor(
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 val items = itemRepository.getAllItems().map {
                     val itemPassword = cryptoManager.decryptData(it.password, it.initializationVector)
-                    ExternalItem(it.title, itemPassword)
+                    ExternalItem(it.title, it.login, itemPassword)
                 }
                 val uri = externalItemRepository.saveExternalItems(items, password)
                 intent.putExtra(Intent.EXTRA_STREAM, uri)

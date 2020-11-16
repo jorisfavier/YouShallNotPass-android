@@ -19,6 +19,7 @@ import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentSearchBinding
 import fr.jorisfavier.youshallnotpass.model.Item
+import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.utils.toast
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -129,8 +130,12 @@ class SearchFragment : Fragment() {
         return viewModel.decryptPassword(item)
     }
 
-    private fun copyToClipboard(item: Item) {
-        viewModel.copyPasswordToClipboard(item)
-        context?.toast(R.string.copy_to_clipboard_success)
+    private fun copyToClipboard(item: Item, type: ItemDataType) {
+        viewModel.copyToClipboard(item, type)
+        val content = when (type) {
+            ItemDataType.PASSWORD -> R.string.copy_password_to_clipboard_success
+            ItemDataType.LOGIN -> R.string.copy_login_to_clipboard_success
+        }
+        context?.toast(content)
     }
 }

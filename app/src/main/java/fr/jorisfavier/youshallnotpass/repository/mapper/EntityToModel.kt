@@ -5,6 +5,6 @@ import fr.jorisfavier.youshallnotpass.model.Item
 
 object EntityToModel {
     fun itemEntityToItem(entity: ItemEntity): Item {
-        return Item(entity.id, entity.title, entity.password, entity.initializationVector)
+        return Item(entity.id, entity.title, entity.login, entity.password, entity.initializationVector)
     }
 }

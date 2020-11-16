@@ -5,6 +5,6 @@ import fr.jorisfavier.youshallnotpass.model.ExternalItem
 
 object ModelToDto {
     fun externalItemToItemDto(externalItem: ExternalItem): ItemDto {
-        return ItemDto(externalItem.title, externalItem.password)
+        return ItemDto(externalItem.title, externalItem.login, externalItem.password)
     }
 }

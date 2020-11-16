@@ -4,7 +4,8 @@
     <string name="search_placeholder">Search</string>
     <string name="new_string">New</string>
     <string name="item_create_title">New Item</string>
-    <string name="item_name">Item\'s name</string>
+    <string name="item_name">Name</string>
+    <string name="item_login">Login</string>
     <string name="item_password">Password</string>
     <string name="item_create">Create</string>
     <string name="item_update">Update</string>
@@ -22,7 +23,8 @@
     <string name="delete">Delete</string>
     <string name="delete_title">Delete item</string>
     <string name="delete_confirmation">Do you really want to delete this item?</string>
-    <string name="copy_to_clipboard_success">Password copied</string>
+    <string name="copy_password_to_clipboard_success">Password copied</string>
+    <string name="copy_login_to_clipboard_success">Login copied</string>
     <string name="delete_success">The item has been successfully deleted</string>
     <string name="error_occurred">An error occurred</string>
     <string name="settings">Settings</string>
@@ -54,5 +56,4 @@
     <string name="please_select_item">Please select at least one item to import</string>
     <string name="app_intro_skip_button">Cancel</string>
     <string name="use_the_search">Use the search field above to find items.</string>
-
 </resources>
