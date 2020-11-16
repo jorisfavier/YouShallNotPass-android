@@ -4,6 +4,7 @@
     <string name="search_placeholder">Search</string>
     <string name="new_string">New</string>
     <string name="item_create_title">New Item</string>
+    <string name="item_edit_title">Edit Item</string>
     <string name="item_name">Name</string>
     <string name="item_login">Login</string>
     <string name="item_password">Password</string>

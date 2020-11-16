@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -17,7 +16,8 @@ import androidx.navigation.fragment.navArgs
 import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentItemBinding
-import fr.jorisfavier.youshallnotpass.model.exception.ItemAlreadyExistException
+import fr.jorisfavier.youshallnotpass.model.exception.ItemAlreadyExistsException
+import fr.jorisfavier.youshallnotpass.utils.toast
 import kotlinx.android.synthetic.main.fragment_item.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -47,7 +47,10 @@ class ItemFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as AppCompatActivity).supportActionBar?.show()
+        (activity as AppCompatActivity).supportActionBar?.apply {
+            title = getString(if (args.itemId == 0) R.string.item_create_title else R.string.item_edit_title)
+            show()
+        }
 
         viewModel.initData(args.itemId)
 
@@ -72,17 +75,12 @@ class ItemFragment : Fragment() {
     private fun createOrUpdateItem() {
         lifecycleScope.launch {
             viewModel.updateOrCreateItem().collect {
-                var messageResourceId = R.string.item_name_or_password_missing
-                if (it.isSuccess) {
-                    messageResourceId = it.getOrDefault(R.string.item_creation_success)
-                } else if (it.exceptionOrNull() is ItemAlreadyExistException) {
-                    messageResourceId = R.string.item_already_exist
+                val messageResourceId = when {
+                    it.isSuccess -> it.getOrDefault(R.string.item_creation_success)
+                    it.exceptionOrNull() is ItemAlreadyExistsException -> R.string.item_already_exist
+                    else -> R.string.item_name_or_password_missing
                 }
-
-                Toast.makeText(context,
-                        getString(messageResourceId),
-                        Toast.LENGTH_LONG
-                ).show()
+                context?.toast(messageResourceId)
                 if (it.isSuccess) {
                     findNavController().popBackStack()
                 }

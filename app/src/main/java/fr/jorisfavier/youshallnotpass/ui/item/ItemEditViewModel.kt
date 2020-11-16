@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
-import fr.jorisfavier.youshallnotpass.model.exception.ItemAlreadyExistException
+import fr.jorisfavier.youshallnotpass.model.exception.ItemAlreadyExistsException
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.utils.PasswordOptions
 import fr.jorisfavier.youshallnotpass.utils.PasswordUtil
@@ -71,7 +71,7 @@ class ItemEditViewModel @Inject constructor(
                 val encryptedData = cryptoManager.encryptData(passwordValue)
 
                 if (id == 0 && itemRepository.searchItem(nameValue).isNotEmpty()) {
-                    emit(Result.failure<Int>(ItemAlreadyExistException()))
+                    emit(Result.failure<Int>(ItemAlreadyExistsException()))
                 } else {
                     itemRepository.updateOrCreateItem(
                         Item(
