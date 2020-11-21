@@ -16,6 +16,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="?android:attr/colorBackground"
         android:paddingHorizontal="20dp"
         android:paddingVertical="40dp"
         tools:context=".features.item.ItemActivity">
@@ -151,12 +152,12 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/itemview_button_container"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:background="?android:colorBackground"
             android:paddingVertical="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/generatePasswordButton"
@@ -177,7 +178,6 @@
                 app:layout_constraintRight_toRightOf="parent"
                 tools:text="Create" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

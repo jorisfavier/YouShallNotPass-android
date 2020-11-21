@@ -11,7 +11,11 @@
         android:label="">
         <action
             android:id="@+id/action_searchFragment_to_itemFragment"
-            app:destination="@id/itemFragment" />
+            app:destination="@id/itemFragment"
+            app:enterAnim="@anim/bottom_up"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@anim/bottom_down" />
         <action
             android:id="@+id/action_searchFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
