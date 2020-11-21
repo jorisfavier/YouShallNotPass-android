@@ -7,7 +7,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.github.appintro.AppIntro
 import com.github.appintro.AppIntroPageTransformerType
 import dagger.android.AndroidInjection
+import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.ui.settings.importitem.review.ReviewImportedItemsFragment
+import fr.jorisfavier.youshallnotpass.utils.getThemeColor
 import javax.inject.Inject
 
 class ImportItemActivity : AppIntro() {
@@ -31,6 +33,8 @@ class ImportItemActivity : AppIntro() {
         setScrollDurationFactor(4)
         setTransformer(AppIntroPageTransformerType.Depth)
         initObserver()
+        setNextArrowColor(getThemeColor(R.attr.colorOnBackground))
+        setColorSkipButton(getThemeColor(R.attr.colorOnBackground))
         supportActionBar?.hide()
     }
 
