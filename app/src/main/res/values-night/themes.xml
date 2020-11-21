@@ -15,9 +15,11 @@
 -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!--Top level DayNight theme to be used in AndroidManifest.xml-->
-    <style name="Theme.YouShallNotPass" parent="Base.Theme.YouShallNotPass">
+    <style name="Theme.YouShallNotPass" parent="Theme.Light.YouShallNotPass">
         <!--Material color attributes (dark theme) -->
-
+        <item name="android:statusBarColor" tools:ignore="NewApi">
+            @color/black_800
+        </item>
         <item name="android:colorBackground">@color/night_rider</item>
         <item name="colorSurface">@color/black_800</item>
         <item name="colorError">@color/totem_pole</item>

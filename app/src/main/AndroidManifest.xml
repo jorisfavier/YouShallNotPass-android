@@ -12,9 +12,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.YouShallNotPass">
-        <activity
-            android:name=".ui.settings.importitem.ImportItemActivity"
-            android:windowSoftInputMode="stateVisible|adjustResize" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -27,7 +24,13 @@
         </provider>
 
         <activity android:name=".ui.home.HomeActivity" />
-        <activity android:name=".ui.auth.AuthActivity">
+        <activity android:name=".ui.auth.AuthActivity" />
+        <activity
+            android:name=".ui.settings.importitem.ImportItemActivity"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
+        <activity
+            android:name=".ui.SplashActivity"
+            android:theme="@style/Theme.YouShallNotPass.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

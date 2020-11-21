@@ -1,17 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!--Top level DayNight theme to be used in AndroidManifest.xml-->
-    <style name="Theme.YouShallNotPass" parent="Base.Theme.YouShallNotPass" />
+    <style name="Theme.YouShallNotPass" parent="Theme.Light.YouShallNotPass" />
+
+    <style name="Theme.YouShallNotPass.Splash" parent="Theme.YouShallNotPass">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
     <!--Base custom theme which will be shared between both light and dark theme variants-->
-    <style name="Base.Theme.YouShallNotPass" parent="Base.Theme.MaterialThemeBuilder">
+    <style name="Theme.Light.YouShallNotPass" parent="Base.Theme.YouShallNotPass">
         <!--Material color attributes (light theme) -->
         <!--colorPrimary colors map to components and elements, such as app bars and buttons. -->
         <!--colorSecondary colors are most often used as accents on components, such as FABs and -->
         <!--selection controls.-->
         <item name="colorPrimary">@color/mojo</item>
         <item name="colorPrimaryVariant">@color/burnt_sienna</item>
-        <item name="colorSecondary">@color/san_juan</item>
-        <item name="colorSecondaryVariant">@color/waikawa_gray</item>
+        <item name="colorSecondary">@color/san_marino</item>
+        <item name="colorSecondaryVariant">@color/cerulean_frost</item>
         <!--colorBackground appears behind scrollable content and is used for the default window-->
         <!--background. colorSurface is mapped to the surface of components such as cards, sheets-->
         <!--and menus. colorError is used to indicate an error state for components such as-->
@@ -36,7 +43,7 @@
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.PrimarySurface</item>
     </style>
 
-    <style name="Base.Theme.MaterialThemeBuilder" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Base.Theme.YouShallNotPass" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <item name="android:statusBarColor" tools:ignore="NewApi">?attr/colorPrimary</item>
         <item name="android:windowLightStatusBar" tools:ignore="NewApi">false</item>
         <item name="android:navigationBarColor" tools:ignore="NewApi">
