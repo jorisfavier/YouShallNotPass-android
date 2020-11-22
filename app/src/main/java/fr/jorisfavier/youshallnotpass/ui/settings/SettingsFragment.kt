@@ -15,6 +15,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import dagger.android.support.AndroidSupportInjection
+import fr.jorisfavier.youshallnotpass.BuildConfig
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.ui.home.HomeViewModel
 import fr.jorisfavier.youshallnotpass.utils.getEntryforValue
@@ -41,6 +42,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var importPreference: Preference
     private lateinit var exportPreference: Preference
     private lateinit var appThemePreference: ListPreference
+    private lateinit var versionPreference: Preference
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -58,10 +60,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         importPreference = findPreference("import")!!
         exportPreference = findPreference("export")!!
         appThemePreference = findPreference("theme")!!
+        versionPreference = findPreference("appVersion")!!
 
         initAppThemePreference()
         initExportPreference()
         initImportPreference()
+        initAboutPreference()
     }
 
     private fun initAppThemePreference() {
@@ -95,6 +99,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
             findNavController().navigate(direction)
             true
         }
+    }
+
+    private fun initAboutPreference() {
+        versionPreference.summary = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
     }
 
     private fun exportPasswords(password: String?) {

@@ -13,6 +13,10 @@
     <ListPreference
         app:key="theme"
         app:title="@string/app_theme" />
+    <PreferenceCategory app:title="@string/about" />
+    <Preference
+        app:key="appVersion"
+        app:title="@string/version" />
 
 
 </PreferenceScreen>

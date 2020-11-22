@@ -57,4 +57,6 @@
     <string name="please_select_item">Please select at least one item to import</string>
     <string name="app_intro_skip_button">Cancel</string>
     <string name="use_the_search">Use the search field above to find items.</string>
+    <string name="about">About this app</string>
+    <string name="version">Version</string>
 </resources>
