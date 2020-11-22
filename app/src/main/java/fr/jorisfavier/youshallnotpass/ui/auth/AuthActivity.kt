@@ -3,10 +3,10 @@ package fr.jorisfavier.youshallnotpass.ui.auth
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.AndroidInjection
@@ -41,17 +41,21 @@ class AuthActivity : AppCompatActivity() {
     }
 
     private fun initObserver() {
-        viewModel.authSuccess.observe(this, Observer { success ->
+        viewModel.authSuccess.observe(this) { success ->
             if (success) {
                 redirectToSearchPage()
             } else {
                 displayErrorModal()
             }
-        })
+        }
     }
 
     private fun displayAuthPrompt() {
-        biometricPrompt.authenticate(biometricPromptInfo)
+        if (viewModel.isDeviceSecure()) {
+            biometricPrompt.authenticate(biometricPromptInfo)
+        } else {
+            displayErrorModal(titleResId = R.string.device_not_secure, messageResId = R.string.device_not_secure_message)
+        }
     }
 
     private fun redirectToSearchPage() {
@@ -62,11 +66,14 @@ class AuthActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun displayErrorModal() {
+    private fun displayErrorModal(
+        @StringRes titleResId: Int = R.string.auth_fail,
+        @StringRes messageResId: Int = R.string.auth_fail_try_again
+    ) {
         val builder = MaterialAlertDialogBuilder(this)
-        builder.setTitle("Authentication failed")
-        builder.setMessage("Authentication failed please try again.")
-        builder.setPositiveButton(android.R.string.yes) { _, _ ->
+        builder.setTitle(getString(titleResId))
+        builder.setMessage(getString(messageResId))
+        builder.setPositiveButton(android.R.string.ok) { _, _ ->
             displayAuthPrompt()
         }
         builder.show()
@@ -75,7 +82,7 @@ class AuthActivity : AppCompatActivity() {
     private fun initAuthentication() {
         biometricPromptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(getString(R.string.authentication_required))
-            .setNegativeButtonText(getString(android.R.string.cancel))
+            .setDeviceCredentialAllowed(true)
             .build()
         val executor = ContextCompat.getMainExecutor(this)
         biometricPrompt = BiometricPrompt(this, executor, viewModel.authCallback)

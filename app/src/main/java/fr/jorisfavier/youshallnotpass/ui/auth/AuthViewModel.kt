@@ -1,12 +1,16 @@
 package fr.jorisfavier.youshallnotpass.ui.auth
 
+import android.app.KeyguardManager
 import androidx.biometric.BiometricPrompt
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import fr.jorisfavier.youshallnotpass.manager.IAuthManager
 import javax.inject.Inject
 
-class AuthViewModel @Inject constructor(private val authManager: IAuthManager) : ViewModel() {
+class AuthViewModel @Inject constructor(
+    private val authManager: IAuthManager,
+    private val keyguardManager: KeyguardManager
+) : ViewModel() {
     var authSuccess = MutableLiveData<Boolean>()
 
     val authCallback = object : BiometricPrompt.AuthenticationCallback() {
@@ -26,6 +30,8 @@ class AuthViewModel @Inject constructor(private val authManager: IAuthManager) :
             authSuccess.value = true
         }
     }
+
+    fun isDeviceSecure() = keyguardManager.isDeviceSecure
 
 
 }

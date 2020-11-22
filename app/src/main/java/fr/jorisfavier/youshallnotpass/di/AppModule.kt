@@ -1,6 +1,7 @@
 package fr.jorisfavier.youshallnotpass.di
 
 import android.app.Application
+import android.app.KeyguardManager
 import android.content.ClipboardManager
 import android.content.ContentResolver
 import android.content.Context
@@ -87,4 +88,11 @@ class AppModule {
     fun provideContentResolver(app: Application): ContentResolver {
         return app.contentResolver
     }
+
+    @Singleton
+    @Provides
+    fun provideKeyguardManager(app: Application): KeyguardManager {
+        return app.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+    }
+
 }
