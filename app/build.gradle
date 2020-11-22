@@ -85,6 +85,7 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:26.1.0')
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
+    implementation 'jp.wasabeef:recyclerview-animators:4.0.1'
 
 
 }

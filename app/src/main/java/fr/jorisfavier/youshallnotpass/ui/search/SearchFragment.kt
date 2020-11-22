@@ -21,6 +21,7 @@ import fr.jorisfavier.youshallnotpass.databinding.FragmentSearchBinding
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.utils.toast
+import jp.wasabeef.recyclerview.animators.FadeInRightAnimator
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -91,6 +92,7 @@ class SearchFragment : Fragment() {
         searchRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
         searchRecyclerView.adapter = searchAdapter
         searchRecyclerView.setHasFixedSize(true)
+        searchRecyclerView.itemAnimator = FadeInRightAnimator()
         viewModel.results.observe(viewLifecycleOwner) { result ->
             searchAdapter.updateResults(result)
         }
@@ -117,6 +119,7 @@ class SearchFragment : Fragment() {
                     viewModel.deleteItem(item).collect {
                         var message = R.string.error_occurred
                         if (it.isSuccess) {
+                            searchAdapter.removeItem(item)
                             message = R.string.delete_success
                         }
                         Toast.makeText(context, getString(message), Toast.LENGTH_LONG).show()

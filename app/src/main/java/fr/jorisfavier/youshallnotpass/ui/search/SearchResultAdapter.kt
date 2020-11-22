@@ -48,4 +48,13 @@ class SearchResultAdapter(
         lastExpandedViewHolder?.toggleViewState(false)
         notifyDataSetChanged()
     }
+
+    fun removeItem(item: Item) {
+        val position = results.indexOf(item)
+        val newList = results.toMutableList().apply {
+            remove(item)
+        }
+        results = newList
+        notifyItemRemoved(position)
+    }
 }

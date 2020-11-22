@@ -73,7 +73,6 @@ class SearchViewModel @Inject constructor(
     fun deleteItem(item: Item): Flow<Result<Unit>> {
         return flow {
             itemRepository.deleteItem(item)
-            search.value = search.value
             emit(Result.success(Unit))
         }.catch {
             emit(Result.failure(Exception()))
