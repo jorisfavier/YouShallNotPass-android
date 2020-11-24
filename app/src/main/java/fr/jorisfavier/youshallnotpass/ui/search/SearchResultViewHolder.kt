@@ -29,9 +29,7 @@ class SearchResultViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     private var hasLoginField = false
 
     private val detailHeight
-        get() = 150.px + if (hasLoginField) 70.px else 0
-    private val detailPadding = (-10).px
-    private val animDuration = 500L
+        get() = if (hasLoginField) DETAIL_HEIGHT_WITH_LOGIN else DETAIL_HEIGHT_WITHOUT_LOGIN
 
     private val searchResultItemTitle: TextView by lazy { itemView.findViewById(R.id.searchResultItemTitle) }
     private val searchResultItemLoginLabel: TextView by lazy { itemView.findViewById(R.id.searchResultItemLoginTitle) }
@@ -73,13 +71,13 @@ class SearchResultViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         if (isExpanded != expand) {
             isExpanded = expand
             val anim = ValueAnimator.ofFloat(0f, 1f).apply {
-                duration = animDuration
+                duration = ANIMATION_DURATION
                 interpolator = AccelerateDecelerateInterpolator()
                 addUpdateListener {
                     (it.animatedValue as Float).let { progress ->
                         searchResultItemCard.layoutParams.height =
                             currentHeight + (detailHeight.toFloat() * progress * coeff).toInt()
-                        val padding = currentSidePadding + (detailPadding.toFloat() * progress * coeff).toInt()
+                        val padding = currentSidePadding + (DETAIL_PADDING * progress * coeff).toInt()
                         searchResultMainContainer.updatePadding(
                             left = padding,
                             right = padding
@@ -89,9 +87,9 @@ class SearchResultViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
                 }
                 doOnStart {
                     if (isExpanded) {
-                        searchResultItemDetail.fadeIn(animDuration)
+                        searchResultItemDetail.fadeIn(ANIMATION_DURATION)
                     } else {
-                        searchResultItemDetail.fadeOut(animDuration)
+                        searchResultItemDetail.fadeOut(ANIMATION_DURATION)
                     }
                 }
             }
@@ -110,6 +108,13 @@ class SearchResultViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
             searchResultItemPassword.inputType = InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_PASSWORD
         }
         searchResultItemPassword.text = text
+    }
+
+    companion object {
+        private val DETAIL_HEIGHT_WITH_LOGIN = 220.px
+        private val DETAIL_HEIGHT_WITHOUT_LOGIN = 150.px
+        private val DETAIL_PADDING = (-10).px.toFloat()
+        private const val ANIMATION_DURATION = 500L
     }
 
 }

@@ -17,18 +17,10 @@ import javax.crypto.spec.PBEParameterSpec
 
 class CryptoManager : ICryptoManager {
 
-    private val KEY_SIZE: Int = 256
-    val ANDROID_KEYSTORE = "AndroidKeyStore"
-    private val ENCRYPTION_BLOCK_MODE = KeyProperties.BLOCK_MODE_GCM
-    private val ENCRYPTION_PADDING = KeyProperties.ENCRYPTION_PADDING_NONE
-    private val ENCRYPTION_ALGORITHM = KeyProperties.KEY_ALGORITHM_AES
-    private val KEY_NAME = "ysnp_encryption_key"
-    private val COUNT = 999;
-
     override fun encryptData(plaintext: String): EncryptedData {
         val cipher = getInitializedCipherForEncryption()
-        val ciphertext = cipher.doFinal(plaintext.toByteArray(Charset.forName("UTF-8")))
-        return EncryptedData(ciphertext, cipher.iv)
+        val cipherText = cipher.doFinal(plaintext.toByteArray(Charset.forName("UTF-8")))
+        return EncryptedData(cipherText, cipher.iv)
     }
 
     override fun decryptData(ciphertext: ByteArray, initializationVector: ByteArray): String {
@@ -40,9 +32,9 @@ class CryptoManager : ICryptoManager {
     override fun encryptDataWithPassword(password: String, data: ByteArray): ByteArray {
         val pbParamSpec = PBEParameterSpec(password.md5(), COUNT)
         val pbKeySpec = PBEKeySpec(password.toCharArray())
-        val secretKeyFactory = SecretKeyFactory.getInstance("PBEWITHSHA256AND256BITAES-CBC-BC")
+        val secretKeyFactory = SecretKeyFactory.getInstance(ENCRYPTION_WITH_PASSWORD_ALGORITHM)
         val key = secretKeyFactory.generateSecret(pbKeySpec)
-        val cipher = Cipher.getInstance("PBEWITHSHA256AND256BITAES-CBC-BC")
+        val cipher = Cipher.getInstance(ENCRYPTION_WITH_PASSWORD_ALGORITHM)
         cipher.init(Cipher.ENCRYPT_MODE, key, pbParamSpec)
         return cipher.doFinal(data)
     }
@@ -50,9 +42,9 @@ class CryptoManager : ICryptoManager {
     override fun decryptDataWithPassword(password: String, encryptedData: ByteArray): ByteArray {
         val pbParamSpec = PBEParameterSpec(password.md5(), COUNT)
         val pbKeySpec = PBEKeySpec(password.toCharArray())
-        val secretKeyFactory = SecretKeyFactory.getInstance("PBEWITHSHA256AND256BITAES-CBC-BC")
+        val secretKeyFactory = SecretKeyFactory.getInstance(ENCRYPTION_WITH_PASSWORD_ALGORITHM)
         val key = secretKeyFactory.generateSecret(pbKeySpec)
-        val cipher = Cipher.getInstance("PBEWITHSHA256AND256BITAES-CBC-BC")
+        val cipher = Cipher.getInstance(ENCRYPTION_WITH_PASSWORD_ALGORITHM)
         cipher.init(Cipher.DECRYPT_MODE, key, pbParamSpec)
         return cipher.doFinal(encryptedData)
     }
@@ -112,5 +104,16 @@ class CryptoManager : ICryptoManager {
         )
         keyGenerator.init(keyGenParams)
         return keyGenerator.generateKey()
+    }
+
+    companion object {
+        private const val KEY_SIZE: Int = 256
+        private const val ANDROID_KEYSTORE = "AndroidKeyStore"
+        private const val ENCRYPTION_BLOCK_MODE = KeyProperties.BLOCK_MODE_GCM
+        private const val ENCRYPTION_PADDING = KeyProperties.ENCRYPTION_PADDING_NONE
+        private const val ENCRYPTION_ALGORITHM = KeyProperties.KEY_ALGORITHM_AES
+        private const val ENCRYPTION_WITH_PASSWORD_ALGORITHM = "PBEWITHSHA256AND256BITAES-CBC-BC"
+        private const val KEY_NAME = "ysnp_encryption_key"
+        private const val COUNT = 999
     }
 }

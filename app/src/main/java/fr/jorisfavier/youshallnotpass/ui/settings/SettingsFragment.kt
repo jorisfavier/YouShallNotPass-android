@@ -3,7 +3,6 @@ package fr.jorisfavier.youshallnotpass.ui.settings
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -19,8 +18,8 @@ import fr.jorisfavier.youshallnotpass.BuildConfig
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.ui.home.HomeViewModel
 import fr.jorisfavier.youshallnotpass.utils.getEntryforValue
+import fr.jorisfavier.youshallnotpass.utils.toast
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -106,10 +105,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun exportPasswords(password: String?) {
-        lifecycleScope.launch {
+        lifecycleScope.launchWhenStarted {
             viewModel.exportPasswords(password).collect {
                 if (it.isFailure) {
-                    Toast.makeText(requireContext(), R.string.password_export_failed, Toast.LENGTH_LONG).show()
+                    context?.toast(R.string.password_export_failed)
                 } else {
                     homeViewModel.ignoreNextPause()
                     requireActivity().startActivity(it.getOrThrow())

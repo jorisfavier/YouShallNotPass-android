@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -14,7 +13,7 @@ import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.ui.auth.AuthActivity
 import javax.inject.Inject
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity(R.layout.activity_home) {
 
     private val navController by lazy { findNavController(R.id.nav_host_fragment) }
 
@@ -24,7 +23,6 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
         AndroidInjection.inject(this)
         setupActionBarWithNavController(navController)
         window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
@@ -51,11 +49,11 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun initObserver() {
-        viewModel.requireAuthentication.observe(this, Observer {
+        viewModel.requireAuthentication.observe(this) {
             Intent(this, AuthActivity::class.java).let {
-                it.putExtra(AuthActivity.redirectToHomeExtraKey, false)
+                it.putExtra(AuthActivity.REDIRECT_TO_HOME_EXTRA, false)
                 startActivity(it)
             }
-        })
+        }
     }
 }

@@ -13,7 +13,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.R
@@ -65,7 +64,7 @@ class SearchFragment : Fragment() {
         initRecyclerView()
         initSettings()
         binding.addNewItemButton.setOnClickListener {
-            addNewItem()
+            navigateToCreateNewItem()
         }
         (activity as AppCompatActivity).supportActionBar?.hide()
     }
@@ -89,7 +88,6 @@ class SearchFragment : Fragment() {
     }
 
     private fun initRecyclerView() {
-        searchRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
         searchRecyclerView.adapter = searchAdapter
         searchRecyclerView.setHasFixedSize(true)
         searchRecyclerView.itemAnimator = FadeInRightAnimator()
@@ -98,7 +96,7 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private fun addNewItem() {
+    private fun navigateToCreateNewItem() {
         val action = SearchFragmentDirections.actionSearchFragmentToItemFragment()
         findNavController().navigate(action)
     }
@@ -115,7 +113,7 @@ class SearchFragment : Fragment() {
             .setMessage(R.string.delete_confirmation)
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                lifecycleScope.launch {
+                lifecycleScope.launchWhenStarted {
                     viewModel.deleteItem(item).collect {
                         var message = R.string.error_occurred
                         if (it.isSuccess) {
@@ -129,9 +127,7 @@ class SearchFragment : Fragment() {
             .show()
     }
 
-    private fun decryptPassword(item: Item): String {
-        return viewModel.decryptPassword(item)
-    }
+    private fun decryptPassword(item: Item) = viewModel.decryptPassword(item)
 
     private fun copyToClipboard(item: Item, type: ItemDataType) {
         viewModel.copyToClipboard(item, type)

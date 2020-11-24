@@ -25,7 +25,7 @@ class ItemEditViewModel @Inject constructor(
     val name = MutableLiveData<String>()
     val login = MutableLiveData<String>()
     val password = MutableLiveData<String>()
-    val passwordLength = MutableLiveData(PasswordUtil.defaultSize)
+    val passwordLength = MutableLiveData(PasswordUtil.DEFAULT_SIZE)
     val hasUppercase = MutableLiveData(true)
     val hasSymbol = MutableLiveData(true)
     val hasNumber = MutableLiveData(true)
@@ -94,7 +94,7 @@ class ItemEditViewModel @Inject constructor(
     }
 
     fun setPasswordLength(newValue: Int) {
-        passwordLength.value = PasswordUtil.defaultSize + newValue
+        passwordLength.value = PasswordUtil.DEFAULT_SIZE + newValue
     }
 
 

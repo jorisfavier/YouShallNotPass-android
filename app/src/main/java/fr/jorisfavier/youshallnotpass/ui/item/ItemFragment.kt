@@ -73,7 +73,7 @@ class ItemFragment : Fragment() {
     }
 
     private fun createOrUpdateItem() {
-        lifecycleScope.launch {
+        lifecycleScope.launchWhenStarted {
             viewModel.updateOrCreateItem().collect {
                 val messageResourceId = when {
                     it.isSuccess -> it.getOrDefault(R.string.item_creation_success)

@@ -8,6 +8,8 @@ import javax.inject.Inject
 
 class HomeViewModel @Inject constructor(private val authManager: IAuthManager) : ViewModel() {
 
+    //indicates that the user didn't put the app in background
+    //but the app started an intent
     private var ignoreNextPause = false
     private val _requireAuthentication = MutableLiveData<Unit>()
     val requireAuthentication: LiveData<Unit> = _requireAuthentication

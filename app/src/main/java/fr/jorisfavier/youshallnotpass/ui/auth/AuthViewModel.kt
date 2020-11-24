@@ -2,6 +2,7 @@ package fr.jorisfavier.youshallnotpass.ui.auth
 
 import android.app.KeyguardManager
 import androidx.biometric.BiometricPrompt
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import fr.jorisfavier.youshallnotpass.manager.IAuthManager
@@ -11,23 +12,25 @@ class AuthViewModel @Inject constructor(
     private val authManager: IAuthManager,
     private val keyguardManager: KeyguardManager
 ) : ViewModel() {
-    var authSuccess = MutableLiveData<Boolean>()
+
+    private var _authSuccess = MutableLiveData<Boolean>()
+    var authSuccess: LiveData<Boolean> = _authSuccess
 
     val authCallback = object : BiometricPrompt.AuthenticationCallback() {
         override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
             super.onAuthenticationError(errorCode, errString)
-            authSuccess.value = false
+            _authSuccess.postValue(false)
         }
 
         override fun onAuthenticationFailed() {
             super.onAuthenticationFailed()
-            authSuccess.value = false
+            _authSuccess.postValue(false)
         }
 
         override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
             super.onAuthenticationSucceeded(result)
             authManager.isUserAuthenticated = true
-            authSuccess.value = true
+            _authSuccess.postValue(true)
         }
     }
 

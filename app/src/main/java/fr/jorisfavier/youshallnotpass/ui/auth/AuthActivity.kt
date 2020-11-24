@@ -14,11 +14,7 @@ import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.ui.home.HomeActivity
 import javax.inject.Inject
 
-class AuthActivity : AppCompatActivity() {
-
-    companion object {
-        const val redirectToHomeExtraKey = "redirectToHome"
-    }
+class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
 
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var biometricPromptInfo: BiometricPrompt.PromptInfo
@@ -31,12 +27,11 @@ class AuthActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_auth)
         AndroidInjection.inject(this)
         initObserver()
         initAuthentication()
         displayAuthPrompt()
-        redirectToHome = intent.getBooleanExtra(redirectToHomeExtraKey, true)
+        redirectToHome = intent.getBooleanExtra(REDIRECT_TO_HOME_EXTRA, true)
         supportActionBar?.hide()
     }
 
@@ -88,4 +83,7 @@ class AuthActivity : AppCompatActivity() {
         biometricPrompt = BiometricPrompt(this, executor, viewModel.authCallback)
     }
 
+    companion object {
+        const val REDIRECT_TO_HOME_EXTRA = "redirectToHome"
+    }
 }

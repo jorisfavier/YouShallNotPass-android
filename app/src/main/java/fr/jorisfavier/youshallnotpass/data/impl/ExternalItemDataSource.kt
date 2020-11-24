@@ -20,12 +20,6 @@ class ExternalItemDataSource @Inject constructor(
     private val appContext: Context,
     private val contentResolver: ContentResolver
 ) : IExternalItemDataSource {
-    companion object {
-        const val EXPORT_FOLDER = "exports"
-        const val CSV_EXPORT_NAME = "ysnpExport.csv"
-        const val YSNP_EXPORT_NAME = "export.ysnp"
-        const val AUTHORITY = "fr.jorisfavier.fileprovider"
-    }
 
     override suspend fun saveToCsv(items: List<ItemDto>): Uri {
         return withContext(Dispatchers.IO) {
@@ -113,5 +107,12 @@ class ExternalItemDataSource @Inject constructor(
             }
             bytes
         }
+    }
+
+    companion object {
+        private const val EXPORT_FOLDER = "exports"
+        private const val CSV_EXPORT_NAME = "ysnpExport.csv"
+        private const val YSNP_EXPORT_NAME = "export.ysnp"
+        private const val AUTHORITY = "fr.jorisfavier.fileprovider"
     }
 }

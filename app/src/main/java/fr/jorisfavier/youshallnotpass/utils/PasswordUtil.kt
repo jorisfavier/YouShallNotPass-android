@@ -8,56 +8,51 @@ enum class PasswordOptions(val value: Int) {
     SYMBOL(4)
 }
 
-class PasswordUtil {
+object PasswordUtil {
 
-    companion object {
+    private const val UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    private const val LOWERCASE = "abcdefghijklmnopqrstuvwxyz"
+    private const val NUMBERS = "0123456789"
+    private const val SYMBOLS = "!#$%&()*+,-./:;<=>?@^[\\]_{|}~"
 
-        private const val uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        private const val lowercase = "abcdefghijklmnopqrstuvwxyz"
-        private const val numbers = "0123456789"
-        private const val symbols = "!#$%&()*+,-./:;<=>?@^[\\]_{|}~"
+    const val DEFAULT_SIZE = 12
 
-        const val defaultSize = 12
+    /**
+     * Generates a secure password String based on the given options
+     * @param options combines the values from the PasswordOptions enum
+     * @param passwordSize indicates the password length
+     */
+    fun getSecurePassword(options: Int, passwordSize: Int = DEFAULT_SIZE): String {
+        val builder = StringBuilder()
+        val random = SecureRandom()
+        var bound: Int
+        val maxBoundForOptions = (passwordSize * 0.33).toInt()
 
-        /**
-         * Generates a secure password String based on the given options
-         * @param options combines the values from the PasswordOptions enum
-         * @param passwordSize indicates the password length
-         */
-        fun getSecurePassword(options: Int, passwordSize: Int = defaultSize): String {
-            val builder = StringBuilder()
-            val random = SecureRandom()
-            var bound: Int
-            val maxBoundForOptions = (passwordSize * 0.33).toInt()
-
-            if (options and PasswordOptions.UPPERCASE.value != 0) {
-                bound = random.nextInt(maxBoundForOptions)
-                for (i in 0..bound) {
-                    builder.append(uppercase[random.nextInt(uppercase.length)])
-                }
+        if (options and PasswordOptions.UPPERCASE.value != 0) {
+            bound = random.nextInt(maxBoundForOptions)
+            for (i in 0..bound) {
+                builder.append(UPPERCASE[random.nextInt(UPPERCASE.length)])
             }
-
-            if (options and PasswordOptions.NUMBER.value != 0) {
-                bound = random.nextInt(maxBoundForOptions)
-                for (i in 0..bound) {
-                    builder.append(numbers[random.nextInt(numbers.length)])
-                }
-            }
-
-            if (options and PasswordOptions.SYMBOL.value != 0) {
-                bound = random.nextInt(maxBoundForOptions)
-                for (i in 0..bound) {
-                    builder.append(symbols[random.nextInt(symbols.length)])
-                }
-            }
-            for (i in builder.length until passwordSize) {
-                builder.append(lowercase[random.nextInt(lowercase.length)])
-            }
-            val res = builder.toList() as MutableList<Char>
-            res.shuffle()
-            return res.joinToString("")
         }
+
+        if (options and PasswordOptions.NUMBER.value != 0) {
+            bound = random.nextInt(maxBoundForOptions)
+            for (i in 0..bound) {
+                builder.append(NUMBERS[random.nextInt(NUMBERS.length)])
+            }
+        }
+
+        if (options and PasswordOptions.SYMBOL.value != 0) {
+            bound = random.nextInt(maxBoundForOptions)
+            for (i in 0..bound) {
+                builder.append(SYMBOLS[random.nextInt(SYMBOLS.length)])
+            }
+        }
+        for (i in builder.length until passwordSize) {
+            builder.append(LOWERCASE[random.nextInt(LOWERCASE.length)])
+        }
+        val res = builder.toList() as MutableList<Char>
+        res.shuffle()
+        return res.joinToString("")
     }
-
-
 }
