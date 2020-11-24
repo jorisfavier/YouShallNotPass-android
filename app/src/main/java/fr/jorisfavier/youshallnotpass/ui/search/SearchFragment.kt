@@ -24,7 +24,6 @@ import jp.wasabeef.recyclerview.animators.FadeInRightAnimator
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SearchFragment : Fragment() {

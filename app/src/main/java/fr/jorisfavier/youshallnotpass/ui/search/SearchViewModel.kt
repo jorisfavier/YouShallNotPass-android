@@ -6,9 +6,10 @@ import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
@@ -30,7 +31,7 @@ class SearchViewModel @Inject constructor(
 
     val search = MutableLiveData("")
 
-    val results: LiveData<List<Item>> = Transformations.switchMap(search) { query ->
+    val results: LiveData<List<Item>> = search.switchMap { query ->
         liveData {
             if (query.isNotBlank() && query.isNotEmpty()) {
                 emit(itemRepository.searchItem("$query%"))
@@ -46,7 +47,7 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    val hasNoResult: LiveData<Boolean> = Transformations.map(results) { listItem ->
+    val hasNoResult: LiveData<Boolean> = results.map { listItem ->
         listItem.count() == 0
     }
 
