@@ -41,9 +41,9 @@ class SearchResultViewHolder(
     ) {
         binding.item = result
         hasLoginField = result.hasLogin
-        binding.searchResultShowHideButton.setOnClickListener { togglePasswordVisibility(decryptPassword(result)) }
-        binding.searchResultCopyPasswordButton.setOnClickListener { copyToClipboard(result, ItemDataType.PASSWORD) }
-        binding.searchResultCopyLoginButton.setOnClickListener { copyToClipboard(result, ItemDataType.LOGIN) }
+        binding.searchResultItemShowHideButton.setOnClickListener { togglePasswordVisibility(decryptPassword(result)) }
+        binding.searchResultItemCopyPasswordButton.setOnClickListener { copyToClipboard(result, ItemDataType.PASSWORD) }
+        binding.searchResultItemCopyLoginButton.setOnClickListener { copyToClipboard(result, ItemDataType.LOGIN) }
         binding.searchResultItemEditButton.setOnClickListener { onEditItemClicked.invoke(result) }
         binding.searchResultItemDeleteButton.setOnClickListener { onDeleteItemClicked.invoke(result) }
         binding.executePendingBindings()

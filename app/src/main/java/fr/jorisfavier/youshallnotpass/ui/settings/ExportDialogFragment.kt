@@ -25,11 +25,11 @@ class ExportDialogFragment(val onExport: (String?) -> Unit) : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return requireActivity().let {
             val customView = layoutInflater.inflate(R.layout.dialog_settings_export, null)
-            radioGroup = customView.findViewById(R.id.settingsExportRadioGrp)
-            errorView = customView.findViewById(R.id.exportDialogError)
-            passwordEditText = customView.findViewById(R.id.exportPassword)
+            radioGroup = customView.findViewById(R.id.settings_export_radioGrp)
+            errorView = customView.findViewById(R.id.settings_export_dialogError)
+            passwordEditText = customView.findViewById(R.id.settings_export_password)
             scrollView = customView.findViewById(R.id.exportDialogScrollView)
-            passwordContainer = customView.findViewById(R.id.exportPasswordContainer)
+            passwordContainer = customView.findViewById(R.id.settings_export_password_container)
 
             customView.parent?.let {
                 (it as? ViewGroup)?.removeView(customView)
@@ -47,7 +47,7 @@ class ExportDialogFragment(val onExport: (String?) -> Unit) : DialogFragment() {
                 }
             }
             radioGroup.setOnCheckedChangeListener { _, _ ->
-                passwordContainer.isVisible = radioGroup.checkedRadioButtonId == R.id.ysnpExportRadioButton
+                passwordContainer.isVisible = radioGroup.checkedRadioButtonId == R.id.settings_export_ysnp_button
             }
             dialog
         }
@@ -55,7 +55,7 @@ class ExportDialogFragment(val onExport: (String?) -> Unit) : DialogFragment() {
 
 
     private fun onExportClicked() {
-        val needPassword = radioGroup.checkedRadioButtonId == R.id.ysnpExportRadioButton
+        val needPassword = radioGroup.checkedRadioButtonId == R.id.settings_export_ysnp_button
         val password = if (needPassword) passwordEditText.text?.toString() else null
         if (needPassword && password.isNullOrEmpty()) {
             errorView.isVisible = true

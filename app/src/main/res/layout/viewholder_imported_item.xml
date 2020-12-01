@@ -7,20 +7,20 @@
     android:padding="10dp">
 
     <CheckBox
-        android:id="@+id/importItemCheckbox"
+        android:id="@+id/imported_item_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/importedItemValues"
+        android:id="@+id/imported_item_values"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@id/importItemCheckbox"
+        app:layout_constraintBottom_toBottomOf="@id/imported_item_checkbox"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/importItemCheckbox"
-        app:layout_constraintTop_toTopOf="@id/importItemCheckbox"
+        app:layout_constraintStart_toEndOf="@id/imported_item_checkbox"
+        app:layout_constraintTop_toTopOf="@id/imported_item_checkbox"
         tools:text="Item's title - Password" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

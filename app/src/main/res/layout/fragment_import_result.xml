@@ -12,7 +12,7 @@
         tools:context=".ui.settings.importitem.ImportItemActivity">
 
         <TextView
-            android:id="@+id/importTitle"
+            android:id="@+id/import_result_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -25,19 +25,19 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/importImage"
+            android:id="@+id/import_result_image"
             android:layout_width="@dimen/import_image_width"
             android:layout_height="@dimen/import_image_height"
             android:scaleType="fitCenter"
-            app:layout_constraintBottom_toTopOf="@+id/importDescription"
+            app:layout_constraintBottom_toTopOf="@+id/import_result_description"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/importTitle"
+            app:layout_constraintTop_toBottomOf="@id/import_result_title"
             app:tint="?attr/colorOnBackground"
             tools:src="@drawable/key_ysnp_broken" />
 
         <ProgressBar
-            android:id="@+id/importInProgress"
+            android:id="@+id/import_result_progress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:indeterminate="true"
@@ -47,7 +47,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/importDescription"
+            android:id="@+id/import_result_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="@dimen/appintro_desc_padding"
@@ -56,7 +56,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/importImage"
+            app:layout_constraintTop_toBottomOf="@id/import_result_image"
             tools:text="@string/import_completed" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

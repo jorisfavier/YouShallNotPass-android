@@ -59,7 +59,7 @@ class SearchFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initRecyclerView()
         initSettings()
-        binding.addNewItemButton.setOnClickListener {
+        binding.searchAddNewItemButton.setOnClickListener {
             navigateToCreateNewItem()
         }
         (activity as AppCompatActivity).supportActionBar?.hide()
@@ -77,14 +77,14 @@ class SearchFragment : Fragment() {
     }
 
     private fun initSettings() {
-        binding.settingsButton.setOnClickListener {
+        binding.searchSettingsButton.setOnClickListener {
             val action = SearchFragmentDirections.actionSearchFragmentToSettingsFragment()
             findNavController().navigate(action)
         }
     }
 
     private fun initRecyclerView() {
-        binding.searchRecyclerView.apply {
+        binding.searchRecyclerview.apply {
             adapter = searchAdapter
             setHasFixedSize(true)
             itemAnimator = FadeInRightAnimator()

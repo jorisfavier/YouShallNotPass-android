@@ -23,7 +23,7 @@
         tools:context=".ui.search.SearchFragment">
 
         <Button
-            android:id="@+id/settingsButton"
+            android:id="@+id/search_settings_button"
             style="@style/Widget.App.Button.IconOnly"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/searchEditContainer"
+            android:id="@+id/search_edit_text_container"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -43,27 +43,27 @@
             android:inputType="textAutoComplete"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/settingsButton"
+            app:layout_constraintTop_toBottomOf="@id/search_settings_button"
             app:layout_constraintWidth_percent="0.8">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/searchEditField"
+                android:id="@+id/search_edit_field"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@={viewModel.search}" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/searchRecyclerView"
+            android:id="@+id/search_recyclerview"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:visibility="@{viewModel.hasNoResult ? View.GONE : View.VISIBLE}"
-            app:layout_constraintBottom_toTopOf="@id/searchSeparator"
-            app:layout_constraintTop_toBottomOf="@id/searchEditContainer">
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@id/search_separator"
+            app:layout_constraintTop_toBottomOf="@id/search_edit_text_container">
 
         </androidx.recyclerview.widget.RecyclerView>
 
@@ -73,21 +73,21 @@
             android:text="@{viewModel.noResultTextIdRes}"
             android:textAlignment="center"
             android:visibility="@{viewModel.hasNoResult ? View.VISIBLE : View.GONE}"
-            app:layout_constraintBottom_toTopOf="@id/searchSeparator"
-            app:layout_constraintTop_toBottomOf="@id/searchEditContainer"
+            app:layout_constraintBottom_toTopOf="@id/search_separator"
+            app:layout_constraintTop_toBottomOf="@id/search_edit_text_container"
             tools:text="@string/common_no_results_found" />
 
         <View
-            android:id="@+id/searchSeparator"
+            android:id="@+id/search_separator"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
             android:background="?attr/dividerHorizontal"
-            app:layout_constraintBottom_toTopOf="@id/addNewItemButton" />
+            app:layout_constraintBottom_toTopOf="@id/search_add_new_item_button" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/addNewItemButton"
+            android:id="@+id/search_add_new_item_button"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

@@ -12,7 +12,7 @@
         tools:context=".ui.settings.importitem.ImportItemActivity">
 
         <TextView
-            android:id="@+id/importTitle"
+            android:id="@+id/import_select_file_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -25,7 +25,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/importImage"
+            android:id="@+id/import_select_file_image"
             android:layout_width="@dimen/import_image_width"
             android:layout_height="@dimen/import_image_height"
             android:layout_marginTop="@dimen/import_image_margin_top"
@@ -33,12 +33,12 @@
             android:src="@drawable/chest"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/importTitle"
+            app:layout_constraintTop_toBottomOf="@id/import_select_file_title"
             app:tint="?attr/colorOnBackground" />
 
 
         <TextView
-            android:id="@+id/importDescription"
+            android:id="@+id/import_select_file_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -49,10 +49,10 @@
             android:textAppearance="?attr/textAppearanceHeadline6"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/importImage" />
+            app:layout_constraintTop_toBottomOf="@id/import_select_file_image" />
 
         <Button
-            android:id="@+id/importButton"
+            android:id="@+id/import_select_file_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginVertical="20dp"
@@ -60,7 +60,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/importDescription" />
+            app:layout_constraintTop_toBottomOf="@id/import_select_file_description" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

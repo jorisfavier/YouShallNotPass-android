@@ -55,16 +55,16 @@ class ReviewImportedItemsFragment : Fragment(R.layout.fragment_import_review_ite
         }
         viewModel.loadFromUriState.observe(viewLifecycleOwner) {
             it.getContentIfNotHandled()?.let { state ->
-                binding.importList.isVisible = state is State.Success
-                binding.importDescription.isVisible = state is State.Success
-                binding.importImage.isVisible = state is State.Success
-                binding.importListLoading.isVisible = state is State.Loading
+                binding.importReviewList.isVisible = state is State.Success
+                binding.importReviewDescription.isVisible = state is State.Success
+                binding.importReviewImage.isVisible = state is State.Success
+                binding.importReviewLoading.isVisible = state is State.Loading
             }
         }
     }
 
     private fun initList() {
-        binding.importList.adapter = adapter
+        binding.importReviewList.adapter = adapter
     }
 
     companion object {

@@ -15,19 +15,19 @@
         android:paddingTop="0dp">
 
         <RadioGroup
-            android:id="@+id/settingsExportRadioGrp"
+            android:id="@+id/settings_export_radioGrp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:checkedButton="@id/ysnpExportRadioButton"
+            android:checkedButton="@id/settings_export_ysnp_button"
             android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <RadioButton
-                android:id="@+id/csvExportRadioButton"
+                android:id="@+id/settings_export_csv_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="CSV file" />
+                android:text="@string/csv_file" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -40,7 +40,7 @@
                 android:textColor="?attr/colorError" />
 
             <RadioButton
-                android:id="@+id/ysnpExportRadioButton"
+                android:id="@+id/settings_export_ysnp_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/ysnp_file" />
@@ -56,7 +56,7 @@
         </RadioGroup>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/exportPasswordContainer"
+            android:id="@+id/settings_export_password_container"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -64,10 +64,10 @@
             android:hint="@string/password"
             app:endIconMode="password_toggle"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/settingsExportRadioGrp">
+            app:layout_constraintTop_toBottomOf="@id/settings_export_radioGrp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/exportPassword"
+                android:id="@+id/settings_export_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
@@ -76,7 +76,7 @@
 
 
         <TextView
-            android:id="@+id/exportDialogError"
+            android:id="@+id/settings_export_dialogError"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -86,7 +86,7 @@
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/exportPasswordContainer"
+            app:layout_constraintTop_toBottomOf="@id/settings_export_password_container"
             tools:visibility="visible" />
 
 

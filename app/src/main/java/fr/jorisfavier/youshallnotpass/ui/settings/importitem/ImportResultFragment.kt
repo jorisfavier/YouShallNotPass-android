@@ -50,12 +50,12 @@ class ImportResultFragment : Fragment(R.layout.fragment_import_result) {
                     imageResId = R.drawable.ysnp_small
                     colorResId = R.attr.colorOnBackground
                 }
-                binding.importImage.isVisible = state !is State.Loading
-                binding.importDescription.isVisible = state !is State.Loading
-                binding.importInProgress.isVisible = state is State.Loading
-                binding.importImage.setImageDrawable(AppCompatResources.getDrawable(requireContext(), imageResId))
-                binding.importDescription.text = getString(descriptionTextId)
-                binding.importDescription.setTextColor(requireContext().getThemeColor(colorResId))
+                binding.importResultImage.isVisible = state !is State.Loading
+                binding.importResultDescription.isVisible = state !is State.Loading
+                binding.importResultProgress.isVisible = state is State.Loading
+                binding.importResultImage.setImageDrawable(AppCompatResources.getDrawable(requireContext(), imageResId))
+                binding.importResultDescription.text = getString(descriptionTextId)
+                binding.importResultDescription.setTextColor(requireContext().getThemeColor(colorResId))
             }
         }
     }

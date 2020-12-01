@@ -12,7 +12,7 @@
         tools:context=".ui.settings.importitem.ImportItemActivity">
 
         <TextView
-            android:id="@+id/importTitle"
+            android:id="@+id/import_review_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/import_items"
@@ -25,7 +25,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/importImage"
+            android:id="@+id/import_review_image"
             android:layout_width="@dimen/import_image_width"
             android:layout_height="@dimen/import_image_height"
             android:layout_marginTop="@dimen/import_image_margin_top"
@@ -33,11 +33,11 @@
             android:src="@drawable/chest_open"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/importTitle"
+            app:layout_constraintTop_toBottomOf="@id/import_review_title"
             app:tint="?attr/colorOnBackground" />
 
         <TextView
-            android:id="@+id/importDescription"
+            android:id="@+id/import_review_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -48,10 +48,10 @@
             android:textAppearance="?attr/textAppearanceHeadline6"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/importImage" />
+            app:layout_constraintTop_toBottomOf="@id/import_review_image" />
 
         <ProgressBar
-            android:id="@+id/importListLoading"
+            android:id="@+id/import_review_loading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:indeterminate="true"
@@ -61,7 +61,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/importList"
+            android:id="@+id/import_review_list"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:padding="@dimen/appintro_desc_padding"
@@ -70,7 +70,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/importDescription" />
+            app:layout_constraintTop_toBottomOf="@id/import_review_description" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

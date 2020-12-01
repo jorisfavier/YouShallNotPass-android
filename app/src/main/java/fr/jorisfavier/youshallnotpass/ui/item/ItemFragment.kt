@@ -50,11 +50,11 @@ class ItemFragment : Fragment(R.layout.fragment_item) {
 
         viewModel.initData(args.itemId)
 
-        binding.createOrUpdateItemButton.setOnClickListener {
+        binding.itemviewCreateOrUpdateItemButton.setOnClickListener {
             createOrUpdateItem()
         }
 
-        binding.generatePasswordButton.setOnClickListener {
+        binding.itemviewGeneratePasswordButton.setOnClickListener {
             viewModel.generateSecurePassword()
         }
     }

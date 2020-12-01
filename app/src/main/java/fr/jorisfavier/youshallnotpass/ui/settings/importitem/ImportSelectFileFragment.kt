@@ -42,7 +42,7 @@ class ImportSelectFileFragment : Fragment(R.layout.fragment_import_select_file),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.importButton.setOnClickListener { getContent.launch("*/*") }
+        binding.importSelectFileButton.setOnClickListener { getContent.launch("*/*") }
     }
 
     override val isPolicyRespected: Boolean

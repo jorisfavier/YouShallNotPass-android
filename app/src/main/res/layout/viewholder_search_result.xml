@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
+
     <data>
-        <import type="android.view.View"/>
+
+        <import type="android.view.View" />
+
         <variable
             name="item"
             type="fr.jorisfavier.youshallnotpass.model.Item" />
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
@@ -16,7 +20,7 @@
         android:padding="10dp">
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/searchResultItemCard"
+            android:id="@+id/search_result_item_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
@@ -28,114 +32,114 @@
                 android:padding="10dp">
 
                 <TextView
-                    android:id="@+id/searchResultItemTitle"
+                    android:id="@+id/search_result_item_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:text="@{item.title}"
                     android:textAppearance="?attr/textAppearanceHeadline6"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    android:text="@{item.title}"
                     tools:text="Vente privee" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/searchResultItemDetail"
+                    android:id="@+id/search_result_item_detail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="gone"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/searchResultItemTitle"
+                    app:layout_constraintTop_toBottomOf="@id/search_result_item_title"
                     tools:visibility="visible">
 
                     <TextView
-                        android:id="@+id/searchResultItemLoginTitle"
+                        android:id="@+id/search_result_item_login_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
                         android:text="@string/item_login"
-                        android:visibility="@{item.hasLogin ? View.VISIBLE : View.GONE}"
                         android:textAppearance="?attr/textAppearanceCaption"
+                        android:visibility="@{item.hasLogin ? View.VISIBLE : View.GONE}"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
-                        android:id="@+id/searchResultItemLogin"
+                        android:id="@+id/search_result_item_login"
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
-                        android:visibility="@{item.hasLogin ? View.VISIBLE : View.GONE}"
-                        android:textAppearance="?attr/textAppearanceBody1"
-                        app:layout_constraintBaseline_toBaselineOf="@id/searchResultCopyLoginButton"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/searchResultItemLoginTitle"
                         android:text="@{item.login}"
+                        android:textAppearance="?attr/textAppearanceBody1"
+                        android:visibility="@{item.hasLogin ? View.VISIBLE : View.GONE}"
+                        app:layout_constraintBaseline_toBaselineOf="@id/search_result_item_copy_login_button"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/search_result_item_login_title"
                         tools:text="test@google.com" />
 
                     <Button
-                        android:id="@+id/searchResultCopyLoginButton"
+                        android:id="@+id/search_result_item_copy_login_button"
                         style="@style/Widget.App.Button.IconOnly"
                         android:layout_width="wrap_content"
-                        android:visibility="@{item.hasLogin ? View.VISIBLE : View.GONE}"
                         android:layout_height="wrap_content"
+                        android:visibility="@{item.hasLogin ? View.VISIBLE : View.GONE}"
                         app:icon="@drawable/ic_outline_copy"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/searchResultItemLoginTitle" />
+                        app:layout_constraintTop_toBottomOf="@id/search_result_item_login_title" />
 
                     <TextView
-                        android:id="@+id/searchResultItemPasswordTitle"
+                        android:id="@+id/search_result_item_password_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
                         android:text="@string/item_password"
                         android:textAppearance="?attr/textAppearanceCaption"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/searchResultItemLogin" />
+                        app:layout_constraintTop_toBottomOf="@id/search_result_item_login" />
 
                     <TextView
-                        android:id="@+id/searchResultItemPassword"
+                        android:id="@+id/search_result_item_password"
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:inputType="textPassword"
                         android:text="@string/item_password"
                         android:textAppearance="?attr/textAppearanceBody1"
-                        app:layout_constraintBaseline_toBaselineOf="@id/searchResultCopyPasswordButton"
+                        app:layout_constraintBaseline_toBaselineOf="@id/search_result_item_copy_password_button"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/searchResultItemPasswordTitle" />
+                        app:layout_constraintTop_toBottomOf="@id/search_result_item_password_title" />
 
                     <Button
-                        android:id="@+id/searchResultCopyPasswordButton"
+                        android:id="@+id/search_result_item_copy_password_button"
                         style="@style/Widget.App.Button.IconOnly"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_outline_copy"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/searchResultItemPasswordTitle" />
+                        app:layout_constraintTop_toBottomOf="@id/search_result_item_password_title" />
 
                     <Button
-                        android:id="@+id/searchResultShowHideButton"
+                        android:id="@+id/search_result_item_show_hide_button"
                         style="@style/Widget.App.Button.IconOnly"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_visibility"
-                        app:layout_constraintEnd_toStartOf="@id/searchResultCopyPasswordButton"
-                        app:layout_constraintTop_toTopOf="@id/searchResultCopyPasswordButton" />
+                        app:layout_constraintEnd_toStartOf="@id/search_result_item_copy_password_button"
+                        app:layout_constraintTop_toTopOf="@id/search_result_item_copy_password_button" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/searchResultItemEditButton"
+                        android:id="@+id/search_result_item_edit_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
                         android:text="@string/edit"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/searchResultCopyPasswordButton" />
+                        app:layout_constraintTop_toBottomOf="@id/search_result_item_copy_password_button" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/searchResultItemDeleteButton"
+                        android:id="@+id/search_result_item_delete_button"
                         style="?attr/materialButtonOutlinedStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="10dp"
                         android:text="@string/delete"
-                        app:layout_constraintEnd_toStartOf="@id/searchResultItemEditButton"
-                        app:layout_constraintTop_toTopOf="@id/searchResultItemEditButton" />
+                        app:layout_constraintEnd_toStartOf="@id/search_result_item_edit_button"
+                        app:layout_constraintTop_toTopOf="@id/search_result_item_edit_button" />
 
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -146,4 +150,5 @@
         </com.google.android.material.card.MaterialCardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>
