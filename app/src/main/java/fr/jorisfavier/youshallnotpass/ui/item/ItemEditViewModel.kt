@@ -3,6 +3,7 @@ package fr.jorisfavier.youshallnotpass.ui.item
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
@@ -25,7 +26,8 @@ class ItemEditViewModel @Inject constructor(
     val name = MutableLiveData<String>()
     val login = MutableLiveData<String>()
     val password = MutableLiveData<String>()
-    val passwordLength = MutableLiveData(PasswordUtil.DEFAULT_SIZE)
+    val passwordLength = MutableLiveData(0)
+    val passwordLengthValue = passwordLength.map { it + PasswordUtil.DEFAULT_SIZE }
     val hasUppercase = MutableLiveData(true)
     val hasSymbol = MutableLiveData(true)
     val hasNumber = MutableLiveData(true)
@@ -58,7 +60,7 @@ class ItemEditViewModel @Inject constructor(
     }
 
     fun generateSecurePassword() {
-        passwordLength.value?.let {
+        passwordLengthValue.value?.let {
             password.value = PasswordUtil.getSecurePassword(passwordOptions, it)
         }
     }
@@ -91,10 +93,6 @@ class ItemEditViewModel @Inject constructor(
                 emit(Result.failure<Int>(Exception()))
             }
         }
-    }
-
-    fun setPasswordLength(newValue: Int) {
-        passwordLength.value = PasswordUtil.DEFAULT_SIZE + newValue
     }
 
 

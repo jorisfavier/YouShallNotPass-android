@@ -1,18 +1,20 @@
 package fr.jorisfavier.youshallnotpass.ui.settings.importitem
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.core.widget.doOnTextChanged
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.github.appintro.SlidePolicy
 import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.R
+import fr.jorisfavier.youshallnotpass.databinding.FragmentImportPasswordNeededBinding
 import fr.jorisfavier.youshallnotpass.utils.hideKeyboard
 import fr.jorisfavier.youshallnotpass.utils.toast
-import kotlinx.android.synthetic.main.fragment_import_password_needed.*
 import javax.inject.Inject
 
 class ProvideImportPasswordFragment : Fragment(R.layout.fragment_import_password_needed), SlidePolicy {
@@ -27,6 +29,13 @@ class ProvideImportPasswordFragment : Fragment(R.layout.fragment_import_password
         AndroidSupportInjection.inject(this)
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val binding = DataBindingUtil.inflate<FragmentImportPasswordNeededBinding>(inflater, R.layout.fragment_import_password_needed, container, false)
+        binding.lifecycleOwner = this
+        binding.password = viewModel.password
+        return binding.root
+    }
+
     override val isPolicyRespected: Boolean
         get() {
             activity?.hideKeyboard()
@@ -39,7 +48,6 @@ class ProvideImportPasswordFragment : Fragment(R.layout.fragment_import_password
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initPasswordEditText()
         initObserver()
     }
 
@@ -47,11 +55,6 @@ class ProvideImportPasswordFragment : Fragment(R.layout.fragment_import_password
         viewModel.isSecureFile.observe(viewLifecycleOwner) {
             view?.isVisible = it
         }
-    }
-
-    private fun initPasswordEditText() {
-        importPasswordEditText.setText(viewModel.password)
-        importPasswordEditText.doOnTextChanged { text, _, _, _ -> viewModel.password = text.toString() }
     }
 
     companion object {

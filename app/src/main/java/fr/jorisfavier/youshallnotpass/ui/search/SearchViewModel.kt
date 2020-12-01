@@ -16,9 +16,7 @@ import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.ui.settings.SettingsFragment
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -70,13 +68,14 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    @ExperimentalCoroutinesApi
     fun deleteItem(item: Item): Flow<Result<Unit>> {
         return flow {
-            itemRepository.deleteItem(item)
-            emit(Result.success(Unit))
-        }.catch {
-            emit(Result.failure(Exception()))
+            try {
+                itemRepository.deleteItem(item)
+                emit(Result.success(Unit))
+            } catch (e: Exception) {
+                emit(Result.failure<Unit>(e))
+            }
         }
     }
 

@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -18,12 +16,10 @@ import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentItemBinding
 import fr.jorisfavier.youshallnotpass.model.exception.ItemAlreadyExistsException
 import fr.jorisfavier.youshallnotpass.utils.toast
-import kotlinx.android.synthetic.main.fragment_item.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ItemFragment : Fragment() {
+class ItemFragment : Fragment(R.layout.fragment_item) {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -39,7 +35,7 @@ class ItemFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_item, container, false)
+        binding = FragmentItemBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         return binding.root
@@ -54,22 +50,13 @@ class ItemFragment : Fragment() {
 
         viewModel.initData(args.itemId)
 
-        createOrUpdateItemButton.setOnClickListener {
+        binding.createOrUpdateItemButton.setOnClickListener {
             createOrUpdateItem()
         }
 
-        generatePasswordButton.setOnClickListener {
+        binding.generatePasswordButton.setOnClickListener {
             viewModel.generateSecurePassword()
         }
-
-        passwordLengthBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
-                viewModel.setPasswordLength(p1)
-            }
-
-            override fun onStartTrackingTouch(p0: SeekBar?) {}
-            override fun onStopTrackingTouch(p0: SeekBar?) {}
-        })
     }
 
     private fun createOrUpdateItem() {

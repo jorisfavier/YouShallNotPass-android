@@ -1,74 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?android:colorBackground"
-    android:paddingTop="@dimen/appintro_statusbar_height"
-    android:paddingBottom="@dimen/appintro2_bottombar_height"
-    tools:context=".ui.settings.importitem.ImportItemActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
-        android:id="@+id/importTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/import_items"
-        android:textAlignment="center"
-        android:textAllCaps="true"
-        android:textAppearance="?attr/textAppearanceHeadline5"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?android:colorBackground"
+        android:paddingTop="@dimen/appintro_statusbar_height"
+        android:paddingBottom="@dimen/appintro2_bottombar_height"
+        tools:context=".ui.settings.importitem.ImportItemActivity">
 
-    <ImageView
-        android:id="@+id/importImage"
-        android:layout_width="@dimen/import_image_width"
-        android:layout_height="@dimen/import_image_height"
-        android:layout_marginTop="@dimen/import_image_margin_top"
-        android:scaleType="fitCenter"
-        android:src="@drawable/chest_open"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/importTitle"
-        app:tint="?attr/colorOnBackground" />
+        <TextView
+            android:id="@+id/importTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/import_items"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textAppearance="?attr/textAppearanceHeadline5"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/importDescription"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:autoLink="web"
-        android:padding="@dimen/appintro_desc_padding"
-        android:text="@string/import_step3"
-        android:textAlignment="center"
-        android:textAppearance="?attr/textAppearanceHeadline6"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/importImage" />
+        <ImageView
+            android:id="@+id/importImage"
+            android:layout_width="@dimen/import_image_width"
+            android:layout_height="@dimen/import_image_height"
+            android:layout_marginTop="@dimen/import_image_margin_top"
+            android:scaleType="fitCenter"
+            android:src="@drawable/chest_open"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/importTitle"
+            app:tint="?attr/colorOnBackground" />
 
-    <ProgressBar
-        android:id="@+id/importListLoading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:indeterminate="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/importDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:autoLink="web"
+            android:padding="@dimen/appintro_desc_padding"
+            android:text="@string/import_step3"
+            android:textAlignment="center"
+            android:textAppearance="?attr/textAppearanceHeadline6"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/importImage" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/importList"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:padding="@dimen/appintro_desc_padding"
-        android:textAppearance="?attr/textAppearanceBody1"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/importDescription" />
+        <ProgressBar
+            android:id="@+id/importListLoading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/importList"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:padding="@dimen/appintro_desc_padding"
+            android:textAppearance="?attr/textAppearanceBody1"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/importDescription" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

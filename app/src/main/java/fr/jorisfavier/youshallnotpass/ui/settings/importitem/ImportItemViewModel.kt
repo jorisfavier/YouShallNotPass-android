@@ -43,12 +43,12 @@ class ImportItemViewModel @Inject constructor(
         get() = currentUri != null
 
     val isPasswordProvided: Boolean
-        get() = !password.isNullOrEmpty()
+        get() = !password.value.isNullOrEmpty()
 
     val isAtLeastOneItemSelected: Boolean
         get() = _importedItems.value.orEmpty().any { it.selected }
 
-    var password: String? = null
+    val password = MutableLiveData<String>()
 
     private var currentUri: Uri? = null
 
@@ -92,7 +92,7 @@ class ImportItemViewModel @Inject constructor(
         viewModelScope.launch(exceptionHandler) {
             _loadFromUriState.postValue(Event(State.Loading))
             currentUri?.let { uri ->
-                val items = externalItemRepository.getExternalItemsFromUri(uri, password)
+                val items = externalItemRepository.getExternalItemsFromUri(uri, password.value)
                 if (items.isNullOrEmpty()) {
                     _loadFromUriState.postValue(Event(State.Error))
                 } else {

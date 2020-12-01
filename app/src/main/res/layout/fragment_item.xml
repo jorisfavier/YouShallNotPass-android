@@ -101,7 +101,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:text="@{viewModel.passwordLength.toString()}"
+                    android:text="@{String.valueOf(viewModel.passwordLengthValue)}"
                     android:textAppearance="?attr/textAppearanceBody1"
                     android:textStyle="bold"
                     app:layout_constraintStart_toEndOf="@id/passwordLengthTitle"
@@ -113,6 +113,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
+                    android:progress="@={viewModel.passwordLength}"
                     app:layout_constraintStart_toStartOf="@id/itemview_password"
                     app:layout_constraintTop_toBottomOf="@id/passwordLengthTitle" />
 

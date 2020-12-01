@@ -6,4 +6,7 @@ class Item(
     val login: String? = null,
     val password: ByteArray,
     val initializationVector: ByteArray
-)
+) {
+    val hasLogin: Boolean
+        get() = !login.isNullOrEmpty()
+}

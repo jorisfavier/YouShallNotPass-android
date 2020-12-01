@@ -35,8 +35,8 @@ android {
     }
     productFlavors {
     }
-    dataBinding {
-        enabled = true
+    buildFeatures {
+        dataBinding true
     }
 }
 

@@ -1,8 +1,10 @@
 package fr.jorisfavier.youshallnotpass.ui.search
 
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import fr.jorisfavier.youshallnotpass.R
+import fr.jorisfavier.youshallnotpass.databinding.ViewholderSearchResultBinding
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.utils.inflate
@@ -18,8 +20,8 @@ class SearchResultAdapter(
     private var lastExpandedViewHolder: SearchResultViewHolder? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchResultViewHolder {
-        val view = parent.inflate(R.layout.viewholder_search_result, false)
-        return SearchResultViewHolder(view)
+        val binding = ViewholderSearchResultBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return SearchResultViewHolder(binding.root, binding)
     }
 
     override fun getItemCount(): Int {
