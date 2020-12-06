@@ -1,7 +1,7 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <SwitchPreferenceCompat
-        app:key="allItems"
+        app:key="hideItems"
         app:summary="@string/all_items_settings_description"
         app:title="@string/display_all_items" />
     <Preference

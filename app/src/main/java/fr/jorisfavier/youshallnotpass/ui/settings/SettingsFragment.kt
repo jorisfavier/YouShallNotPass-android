@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -27,7 +28,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     companion object {
         const val THEME_PREFERENCE_KEY = "theme"
-        const val ALL_ITEMS_PREFERENCE_KEY = "allItems"
+        const val HIDE_ITEMS_PREFERENCE_KEY = "hideItems"
     }
 
     @Inject
@@ -55,7 +56,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (activity as AppCompatActivity).supportActionBar?.show()
-        allItemsVisibilityPreference = findPreference("allItems")!!
+        allItemsVisibilityPreference = findPreference(HIDE_ITEMS_PREFERENCE_KEY)!!
         importPreference = findPreference("import")!!
         exportPreference = findPreference("export")!!
         appThemePreference = findPreference("theme")!!
@@ -78,7 +79,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         appThemePreference.summary = appThemePreference.getEntryforValue(appThemePreference.value)
         appThemePreference.onPreferenceChangeListener =
             Preference.OnPreferenceChangeListener { _, newValue ->
-                appThemePreference.summary = appThemePreference.getEntryforValue(newValue)
+                (newValue as? String)?.toIntOrNull()?.let {
+                    AppCompatDelegate.setDefaultNightMode(it)
+                    appThemePreference.summary = appThemePreference.getEntryforValue(newValue)
+                } ?: run {
+                    context?.toast(R.string.error_changing_theme)
+                }
                 true
             }
     }

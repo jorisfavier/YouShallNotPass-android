@@ -34,8 +34,8 @@ class SearchViewModel @Inject constructor(
         liveData {
             if (query.isNotBlank() && query.isNotEmpty()) {
                 emit(itemRepository.searchItem("$query%"))
-            } else if (sharedPreferences.getBoolean(
-                    SettingsFragment.ALL_ITEMS_PREFERENCE_KEY,
+            } else if (!sharedPreferences.getBoolean(
+                    SettingsFragment.HIDE_ITEMS_PREFERENCE_KEY,
                     false
                 )
             ) {
@@ -54,7 +54,7 @@ class SearchViewModel @Inject constructor(
 
     val onSharedPreferenceChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key == SettingsFragment.ALL_ITEMS_PREFERENCE_KEY) {
+            if (key == SettingsFragment.HIDE_ITEMS_PREFERENCE_KEY) {
                 search.value = search.value
             }
         }
