@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import fr.jorisfavier.youshallnotpass.manager.IAuthManager
+import timber.log.Timber
 import javax.inject.Inject
 
 class AuthViewModel @Inject constructor(
@@ -20,6 +21,7 @@ class AuthViewModel @Inject constructor(
         override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
             super.onAuthenticationError(errorCode, errString)
             _authSuccess.postValue(false)
+            Timber.e("Error during authentication: $errorCode - $errString")
         }
 
         override fun onAuthenticationFailed() {

@@ -18,6 +18,7 @@ import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.ui.settings.SettingsFragment
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import timber.log.Timber
 import javax.inject.Inject
 
 class SearchViewModel @Inject constructor(
@@ -74,6 +75,7 @@ class SearchViewModel @Inject constructor(
                 itemRepository.deleteItem(item)
                 emit(Result.success(Unit))
             } catch (e: Exception) {
+                Timber.e(e, "Error during item deletion")
                 emit(Result.failure<Unit>(e))
             }
         }

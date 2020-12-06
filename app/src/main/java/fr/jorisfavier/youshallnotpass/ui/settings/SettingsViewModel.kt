@@ -13,6 +13,7 @@ import fr.jorisfavier.youshallnotpass.repository.IExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import timber.log.Timber
 import javax.inject.Inject
 
 class SettingsViewModel @Inject constructor(
@@ -54,6 +55,7 @@ class SettingsViewModel @Inject constructor(
                 else -> AppCompatDelegate.MODE_NIGHT_YES.toString()
             }
         } else {
+            Timber.d("No preference found for theme")
             null
         }
     }
@@ -72,6 +74,7 @@ class SettingsViewModel @Inject constructor(
                 intent.putExtra(Intent.EXTRA_STREAM, uri)
                 emit(Result.success(intent))
             } catch (e: Exception) {
+                Timber.e(e, "Error while exporting items")
                 emit(Result.failure<Intent>(e))
             }
         }

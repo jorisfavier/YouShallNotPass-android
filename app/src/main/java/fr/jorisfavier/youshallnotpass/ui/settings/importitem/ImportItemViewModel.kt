@@ -15,6 +15,7 @@ import fr.jorisfavier.youshallnotpass.utils.Event
 import fr.jorisfavier.youshallnotpass.utils.State
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 class ImportItemViewModel @Inject constructor(
@@ -67,6 +68,7 @@ class ImportItemViewModel @Inject constructor(
     }
 
     fun onSlideChanged(position: Int) {
+        Timber.d("Slide changed to $position")
         when (position) {
             PASSWORD_NEEDED_SLIDE -> {
                 if (!_isSecureFile.value!!) {
@@ -84,7 +86,7 @@ class ImportItemViewModel @Inject constructor(
 
     private fun loadExternalItemsFromUri() {
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-            Log.w(this::class.java.simpleName, throwable)
+            Timber.w(throwable, "An error occurred while loading items from uri")
             _loadFromUriState.postValue(Event(State.Error))
             _navigate.postValue(Event(Unit))
         }
@@ -105,7 +107,7 @@ class ImportItemViewModel @Inject constructor(
 
     private fun importItems() {
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-            Log.w(this::class.java.simpleName, throwable)
+            Timber.w(throwable, "An error occurred while importing items")
             _importItemsState.postValue(Event(State.Error))
         }
         viewModelScope.launch(exceptionHandler) {

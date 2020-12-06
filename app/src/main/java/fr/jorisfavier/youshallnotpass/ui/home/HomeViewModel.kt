@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import fr.jorisfavier.youshallnotpass.manager.IAuthManager
+import timber.log.Timber
 import javax.inject.Inject
 
 class HomeViewModel @Inject constructor(private val authManager: IAuthManager) : ViewModel() {
@@ -32,6 +33,7 @@ class HomeViewModel @Inject constructor(private val authManager: IAuthManager) :
     }
 
     fun ignoreNextPause() {
+        Timber.d("Ignore next pause")
         ignoreNextPause = true
     }
 

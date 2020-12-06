@@ -85,6 +85,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'jp.wasabeef:recyclerview-animators:4.0.1'
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 
 
 }
