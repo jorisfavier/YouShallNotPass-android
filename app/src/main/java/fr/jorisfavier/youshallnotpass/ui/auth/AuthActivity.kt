@@ -6,6 +6,7 @@ import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -58,7 +59,7 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
             val searchPageIntent = Intent(this, HomeActivity::class.java)
             startActivity(searchPageIntent)
         }
-        finish()
+        ActivityCompat.finishAffinity(this)
     }
 
     private fun displayErrorModal(
