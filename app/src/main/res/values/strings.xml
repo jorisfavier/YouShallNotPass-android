@@ -58,8 +58,9 @@
     <string name="use_the_search">Use the search field above to find items.</string>
     <string name="about">About this app</string>
     <string name="version">Version</string>
-    <string name="auth_fail_try_again">"Authentication failed please try again."</string>
-    <string name="auth_fail">"Authentication failed"</string>
+    <string name="auth_fail_try_again">Authentication failed please try again</string>
+    <string name="auth_fail_no_biometrics">This app cannot be used without a biometric setup. Please go to your settings to add one.</string>
+    <string name="auth_fail">Authentication failed</string>
     <string name="device_not_secure">Your device is not secure!</string>
     <string name="device_not_secure_message">In order to use this application you need to add a lock screen to your device.\nPlease go to Settings > Security > Screen lock to setup one.</string>
     <string name="csv_file">CSV file</string>

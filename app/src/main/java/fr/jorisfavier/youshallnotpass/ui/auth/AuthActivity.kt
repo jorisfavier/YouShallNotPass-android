@@ -36,12 +36,21 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
         supportActionBar?.hide()
     }
 
+    override fun onBackPressed() {
+        ActivityCompat.finishAffinity(this)
+    }
+
     private fun initObserver() {
-        viewModel.authSuccess.observe(this) { success ->
-            if (success) {
-                redirectToSearchPage()
-            } else {
-                displayErrorModal()
+        viewModel.authSuccess.observe(this) { event ->
+            event.getContentIfNotHandled()?.let { authResult ->
+                when (authResult) {
+                    is AuthViewModel.AuthResult.Failure -> {
+                        displayErrorModal(messageResId = authResult.errorMessage)
+                    }
+                    is AuthViewModel.AuthResult.Success -> {
+                        redirectToSearchPage()
+                    }
+                }
             }
         }
     }
@@ -78,7 +87,8 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
     private fun initAuthentication() {
         biometricPromptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle(getString(R.string.authentication_required))
-            .setDeviceCredentialAllowed(true)
+            .setDeviceCredentialAllowed(false)
+            .setNegativeButtonText(getString(android.R.string.cancel))
             .build()
         val executor = ContextCompat.getMainExecutor(this)
         biometricPrompt = BiometricPrompt(this, executor, viewModel.authCallback)
