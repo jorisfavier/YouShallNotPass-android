@@ -8,11 +8,12 @@ import androidx.lifecycle.viewModelScope
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
-import fr.jorisfavier.youshallnotpass.model.exception.ItemAlreadyExistsException
+import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.utils.PasswordOptions
 import fr.jorisfavier.youshallnotpass.utils.PasswordUtil
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -28,7 +29,7 @@ class ItemEditViewModel @Inject constructor(
     val login = MutableLiveData<String>()
     val password = MutableLiveData<String>()
     val passwordLength = MutableLiveData(0)
-    val passwordLengthValue = passwordLength.map { it + PasswordUtil.DEFAULT_SIZE }
+    val passwordLengthValue = passwordLength.map { it + PasswordUtil.MINIMUM_SECURE_SIZE }
     val hasUppercase = MutableLiveData(true)
     val hasSymbol = MutableLiveData(true)
     val hasNumber = MutableLiveData(true)
@@ -76,7 +77,7 @@ class ItemEditViewModel @Inject constructor(
                 val encryptedData = cryptoManager.encryptData(passwordValue)
 
                 if (id == 0 && itemRepository.searchItem(nameValue).isNotEmpty()) {
-                    emit(Result.failure<Int>(ItemAlreadyExistsException()))
+                    emit(Result.failure<Int>(YsnpException(R.string.item_already_exist)))
                 } else {
                     itemRepository.updateOrCreateItem(
                         Item(
@@ -92,8 +93,10 @@ class ItemEditViewModel @Inject constructor(
                     emit(Result.success(successResourceId))
                 }
             } else {
-                emit(Result.failure<Int>(Exception()))
+                emit(Result.failure<Int>(YsnpException(R.string.item_name_or_password_missing)))
             }
+        }.catch {
+            emit(Result.failure(YsnpException(R.string.error_occurred)))
         }
     }
 

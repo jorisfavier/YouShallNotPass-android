@@ -14,7 +14,7 @@ import androidx.navigation.fragment.navArgs
 import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentItemBinding
-import fr.jorisfavier.youshallnotpass.model.exception.ItemAlreadyExistsException
+import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.utils.toast
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
@@ -64,8 +64,8 @@ class ItemFragment : Fragment(R.layout.fragment_item) {
             viewModel.updateOrCreateItem().collect {
                 val messageResourceId = when {
                     it.isSuccess -> it.getOrDefault(R.string.item_creation_success)
-                    it.exceptionOrNull() is ItemAlreadyExistsException -> R.string.item_already_exist
-                    else -> R.string.item_name_or_password_missing
+                    it.isFailure -> (it.exceptionOrNull() as? YsnpException)?.messageResId ?: R.string.error_occurred
+                    else -> R.string.error_occurred
                 }
                 context?.toast(messageResourceId)
                 if (it.isSuccess) {

@@ -10,19 +10,19 @@ enum class PasswordOptions(val value: Int) {
 
 object PasswordUtil {
 
-    private const val UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    private const val LOWERCASE = "abcdefghijklmnopqrstuvwxyz"
-    private const val NUMBERS = "0123456789"
-    private const val SYMBOLS = "!#$%&()*+,-./:;<=>?@^[\\]_{|}~"
+    const val UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    const val LOWERCASE = "abcdefghijklmnopqrstuvwxyz"
+    const val NUMBERS = "0123456789"
+    const val SYMBOLS = "!#$%&()*+,-./:;<=>?@^[\\]_{|}~"
 
-    const val DEFAULT_SIZE = 12
+    const val MINIMUM_SECURE_SIZE = 12
 
     /**
      * Generates a secure password String based on the given options
      * @param options combines the values from the PasswordOptions enum
      * @param passwordSize indicates the password length
      */
-    fun getSecurePassword(options: Int, passwordSize: Int = DEFAULT_SIZE): String {
+    fun getSecurePassword(options: Int, passwordSize: Int = MINIMUM_SECURE_SIZE): String {
         val builder = StringBuilder()
         val random = SecureRandom()
         var bound: Int
