@@ -14,6 +14,8 @@ import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.utils.fadeIn
 import fr.jorisfavier.youshallnotpass.utils.fadeOut
 import fr.jorisfavier.youshallnotpass.utils.px
+import fr.jorisfavier.youshallnotpass.utils.toast
+import timber.log.Timber
 
 class SearchResultViewHolder(
     itemView: View,
@@ -36,12 +38,20 @@ class SearchResultViewHolder(
         result: Item,
         onEditItemClicked: (Item) -> Unit,
         onDeleteItemClicked: (Item) -> Unit,
-        decryptPassword: (Item) -> String,
+        decryptPassword: (Item) -> Result<String>,
         copyToClipboard: (Item, ItemDataType) -> Unit
     ) {
         binding.item = result
         hasLoginField = result.hasLogin
-        binding.searchResultItemShowHideButton.setOnClickListener { togglePasswordVisibility(decryptPassword(result)) }
+        binding.searchResultItemShowHideButton.setOnClickListener {
+            decryptPassword(result)
+                .onSuccess { togglePasswordVisibility(it) }
+                .onFailure {
+                    Timber.e(it, "An error occurred while decrypting password")
+                    view.context.toast(R.string.error_occurred)
+                }
+
+        }
         binding.searchResultItemCopyPasswordButton.setOnClickListener { copyToClipboard(result, ItemDataType.PASSWORD) }
         binding.searchResultItemCopyLoginButton.setOnClickListener { copyToClipboard(result, ItemDataType.LOGIN) }
         binding.searchResultItemEditButton.setOnClickListener { onEditItemClicked.invoke(result) }

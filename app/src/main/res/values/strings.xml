@@ -1,5 +1,5 @@
 <resources>
-    <string name="common_no_results_found">No results found.</string>
+    <string name="no_results_found">No results found.</string>
     <string name="search_placeholder">Search</string>
     <string name="new_string">New</string>
     <string name="item_create_title">New Item</string>
@@ -56,6 +56,7 @@
     <string name="please_select_item">Please select at least one item to import</string>
     <string name="app_intro_skip_button">Cancel</string>
     <string name="use_the_search">Use the search field above to find items.</string>
+    <string name="no_item_yet">You have no item yet, use the button below to add one.</string>
     <string name="about">About this app</string>
     <string name="version">Version</string>
     <string name="auth_fail_try_again">Authentication failed please try again</string>

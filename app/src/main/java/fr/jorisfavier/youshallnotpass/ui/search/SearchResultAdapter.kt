@@ -3,16 +3,14 @@ package fr.jorisfavier.youshallnotpass.ui.search
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.ViewholderSearchResultBinding
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
-import fr.jorisfavier.youshallnotpass.utils.inflate
 
 class SearchResultAdapter(
     private val onItemEditClicked: (Item) -> Unit,
     private val onDeleteItemClicked: (Item) -> Unit,
-    private val decryptPassword: (Item) -> String,
+    private val decryptPassword: (Item) -> Result<String>,
     private val copyPasswordToClipboard: (Item, ItemDataType) -> Unit
 ) : RecyclerView.Adapter<SearchResultViewHolder>() {
 

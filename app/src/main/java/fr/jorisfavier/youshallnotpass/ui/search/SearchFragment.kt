@@ -128,10 +128,7 @@ class SearchFragment : Fragment() {
 
     private fun copyToClipboard(item: Item, type: ItemDataType) {
         viewModel.copyToClipboard(item, type)
-        val content = when (type) {
-            ItemDataType.PASSWORD -> R.string.copy_password_to_clipboard_success
-            ItemDataType.LOGIN -> R.string.copy_login_to_clipboard_success
-        }
-        context?.toast(content)
+            .onSuccess { context?.toast(it) }
+            .onFailure { context?.toast(R.string.error_occurred) }
     }
 }

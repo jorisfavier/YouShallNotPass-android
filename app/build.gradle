@@ -24,6 +24,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs = ["-Xallow-result-return-type"]
     }
     buildTypes {
         release {

@@ -5,10 +5,22 @@ import android.security.keystore.KeyProperties
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.manager.model.EncryptedData
 import fr.jorisfavier.youshallnotpass.utils.md5
+import java.io.IOException
 import java.nio.charset.Charset
+import java.security.InvalidAlgorithmParameterException
+import java.security.InvalidKeyException
 import java.security.KeyStore
+import java.security.KeyStoreException
+import java.security.NoSuchAlgorithmException
+import java.security.NoSuchProviderException
+import java.security.UnrecoverableKeyException
+import java.security.cert.CertificateException
+import java.security.spec.InvalidKeySpecException
+import javax.crypto.BadPaddingException
 import javax.crypto.Cipher
+import javax.crypto.IllegalBlockSizeException
 import javax.crypto.KeyGenerator
+import javax.crypto.NoSuchPaddingException
 import javax.crypto.SecretKey
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.GCMParameterSpec
@@ -17,18 +29,50 @@ import javax.crypto.spec.PBEParameterSpec
 
 class CryptoManager : ICryptoManager {
 
+    @Throws(
+        BadPaddingException::class,
+        IllegalBlockSizeException::class,
+        NoSuchAlgorithmException::class,
+        NoSuchPaddingException::class,
+        CertificateException::class,
+        IOException::class,
+        KeyStoreException::class,
+        UnrecoverableKeyException::class,
+        NoSuchProviderException::class,
+        InvalidAlgorithmParameterException::class
+    )
     override fun encryptData(plaintext: String): EncryptedData {
         val cipher = getInitializedCipherForEncryption()
         val cipherText = cipher.doFinal(plaintext.toByteArray(Charset.forName("UTF-8")))
         return EncryptedData(cipherText, cipher.iv)
     }
 
+    @Throws(
+        BadPaddingException::class,
+        IllegalBlockSizeException::class,
+        NoSuchAlgorithmException::class,
+        NoSuchPaddingException::class,
+        CertificateException::class,
+        IOException::class,
+        KeyStoreException::class,
+        UnrecoverableKeyException::class,
+        NoSuchProviderException::class,
+        InvalidAlgorithmParameterException::class
+    )
     override fun decryptData(ciphertext: ByteArray, initializationVector: ByteArray): String {
         val cipher = getInitializedCipherForDecryption(initializationVector)
         val plaintext = cipher.doFinal(ciphertext)
         return String(plaintext, Charsets.UTF_8)
     }
 
+    @Throws(
+        NoSuchAlgorithmException::class,
+        InvalidKeySpecException::class,
+        NoSuchPaddingException::class,
+        InvalidAlgorithmParameterException::class,
+        InvalidKeyException::class,
+        IllegalBlockSizeException::class
+    )
     override fun encryptDataWithPassword(password: String, data: ByteArray): ByteArray {
         val pbParamSpec = PBEParameterSpec(password.md5(), COUNT)
         val pbKeySpec = PBEKeySpec(password.toCharArray())
@@ -39,6 +83,14 @@ class CryptoManager : ICryptoManager {
         return cipher.doFinal(data)
     }
 
+    @Throws(
+        NoSuchAlgorithmException::class,
+        InvalidKeySpecException::class,
+        NoSuchPaddingException::class,
+        InvalidAlgorithmParameterException::class,
+        InvalidKeyException::class,
+        IllegalBlockSizeException::class
+    )
     override fun decryptDataWithPassword(password: String, encryptedData: ByteArray): ByteArray {
         val pbParamSpec = PBEParameterSpec(password.md5(), COUNT)
         val pbKeySpec = PBEKeySpec(password.toCharArray())
@@ -53,6 +105,17 @@ class CryptoManager : ICryptoManager {
      * This method first gets or generates an instance of SecretKey and then initializes the Cipher
      * with the key. The secret key uses [ENCRYPT_MODE][Cipher.ENCRYPT_MODE] is used.
      */
+    @Throws(
+        NoSuchAlgorithmException::class,
+        NoSuchPaddingException::class,
+        CertificateException::class,
+        NoSuchAlgorithmException::class,
+        IOException::class,
+        KeyStoreException::class,
+        UnrecoverableKeyException::class,
+        NoSuchProviderException::class,
+        InvalidAlgorithmParameterException::class,
+    )
     private fun getInitializedCipherForEncryption(): Cipher {
         val cipher = getCipher()
         val secretKey = getOrCreateSecretKey()
@@ -64,6 +127,16 @@ class CryptoManager : ICryptoManager {
      * This method first gets or generates an instance of SecretKey and then initializes the Cipher
      * with the key. The secret key uses [DECRYPT_MODE][Cipher.DECRYPT_MODE] is used.
      */
+    @Throws(
+        NoSuchAlgorithmException::class,
+        NoSuchPaddingException::class,
+        CertificateException::class,
+        IOException::class,
+        KeyStoreException::class,
+        UnrecoverableKeyException::class,
+        NoSuchProviderException::class,
+        InvalidAlgorithmParameterException::class
+    )
     private fun getInitializedCipherForDecryption(initializationVector: ByteArray): Cipher {
         val cipher = getCipher()
         val secretKey = getOrCreateSecretKey()
@@ -71,11 +144,21 @@ class CryptoManager : ICryptoManager {
         return cipher
     }
 
+    @Throws(NoSuchAlgorithmException::class, NoSuchPaddingException::class)
     private fun getCipher(): Cipher {
         val transformation = "$ENCRYPTION_ALGORITHM/$ENCRYPTION_BLOCK_MODE/$ENCRYPTION_PADDING"
         return Cipher.getInstance(transformation)
     }
 
+    @Throws(
+        CertificateException::class,
+        IOException::class,
+        NoSuchAlgorithmException::class,
+        KeyStoreException::class,
+        UnrecoverableKeyException::class,
+        NoSuchProviderException::class,
+        InvalidAlgorithmParameterException::class
+    )
     private fun getOrCreateSecretKey(): SecretKey {
         // If Secretkey was previously created for that keyName, then grab and return it.
         val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE)
