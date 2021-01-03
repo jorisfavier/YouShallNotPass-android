@@ -79,6 +79,21 @@ class ItemEditViewModelTest {
     }
 
     @Test
+    fun `on initData should init as a normal item creation when an exception is raised by the itemRepository`() = runBlocking {
+        //given
+        coEvery { itemRepo.getItemById(1) } throws Exception()
+        every { cryptoManager.decryptData(fakeItem.password, fakeItem.initializationVector) } returns fakeDecryptedPassword
+
+        val viewModel = ItemEditViewModel(cryptoManager, itemRepo)
+
+        //when
+        viewModel.initData(1)
+
+        //then
+        assertEquals(R.string.item_create, viewModel.createOrUpdateText.getOrAwaitValue())
+    }
+
+    @Test
     fun `generateSecurePassword with symbol disabled should emit a password without symbols`() {
         //given
         viewModel.hasSymbol.value = false

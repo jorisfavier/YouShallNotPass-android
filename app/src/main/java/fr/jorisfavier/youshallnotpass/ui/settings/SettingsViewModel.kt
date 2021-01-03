@@ -12,6 +12,7 @@ import fr.jorisfavier.youshallnotpass.model.ExternalItem
 import fr.jorisfavier.youshallnotpass.repository.IExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
 import javax.inject.Inject
@@ -62,21 +63,19 @@ class SettingsViewModel @Inject constructor(
 
     fun exportPasswords(password: String?): Flow<Result<Intent>> {
         return flow {
-            try {
-                val intent = Intent(Intent.ACTION_SEND)
-                intent.type = "plain/text"
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                val items = itemRepository.getAllItems().map {
-                    val itemPassword = cryptoManager.decryptData(it.password, it.initializationVector)
-                    ExternalItem(it.title, it.login, itemPassword)
-                }
-                val uri = externalItemRepository.saveExternalItems(items, password)
-                intent.putExtra(Intent.EXTRA_STREAM, uri)
-                emit(Result.success(intent))
-            } catch (e: Exception) {
-                Timber.e(e, "Error while exporting items")
-                emit(Result.failure<Intent>(e))
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.type = "plain/text"
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            val items = itemRepository.getAllItems().map {
+                val itemPassword = cryptoManager.decryptData(it.password, it.initializationVector)
+                ExternalItem(it.title, it.login, itemPassword)
             }
+            val uri = externalItemRepository.saveExternalItems(items, password)
+            intent.putExtra(Intent.EXTRA_STREAM, uri)
+            emit(Result.success(intent))
+        }.catch { e ->
+            Timber.e(e, "Error while exporting items")
+            emit(Result.failure(e))
         }
     }
 }

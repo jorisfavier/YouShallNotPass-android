@@ -51,7 +51,7 @@ class ItemEditViewModel @Inject constructor(
     fun initData(itemId: Int) {
         if (itemId > 0) {
             viewModelScope.launch {
-                currentItem = itemRepository.getItemById(itemId)
+                currentItem = runCatching { itemRepository.getItemById(itemId) }.getOrNull()
                 currentItem?.let {
                     _createOrUpdateText.value = R.string.item_update
                     name.value = it.title
