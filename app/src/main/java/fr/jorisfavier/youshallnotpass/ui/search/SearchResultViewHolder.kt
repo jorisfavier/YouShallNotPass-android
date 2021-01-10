@@ -41,6 +41,8 @@ class SearchResultViewHolder(
         decryptPassword: (Item) -> Result<String>,
         copyToClipboard: (Item, ItemDataType) -> Unit
     ) {
+        toggleViewState(false, animate = false)
+        isExpanded = false
         binding.item = result
         hasLoginField = result.hasLogin
         binding.searchResultItemShowHideButton.setOnClickListener {
@@ -59,14 +61,15 @@ class SearchResultViewHolder(
         binding.executePendingBindings()
     }
 
-    fun toggleViewState(expand: Boolean) {
+    fun toggleViewState(expand: Boolean, animate: Boolean = true) {
         val currentHeight = binding.searchResultItemCard.measuredHeight
         val currentSidePadding = binding.searchResultMainContainer.paddingStart
         val coeff = if (expand) 1f else -1f
+        val animationDuration = if (animate) ANIMATION_DURATION else 0L
         if (isExpanded != expand) {
             isExpanded = expand
             val anim = ValueAnimator.ofFloat(0f, 1f).apply {
-                duration = ANIMATION_DURATION
+                duration = animationDuration
                 interpolator = AccelerateDecelerateInterpolator()
                 addUpdateListener {
                     (it.animatedValue as Float).let { progress ->
@@ -82,9 +85,9 @@ class SearchResultViewHolder(
                 }
                 doOnStart {
                     if (isExpanded) {
-                        binding.searchResultItemDetail.fadeIn(ANIMATION_DURATION)
+                        binding.searchResultItemDetail.fadeIn(animationDuration)
                     } else {
-                        binding.searchResultItemDetail.fadeOut(ANIMATION_DURATION)
+                        binding.searchResultItemDetail.fadeOut(animationDuration)
                     }
                 }
             }
