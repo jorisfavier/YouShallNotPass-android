@@ -66,4 +66,5 @@
     <string name="device_not_secure_message">In order to use this application you need to add a lock screen to your device.\nPlease go to Settings > Security > Screen lock to setup one.</string>
     <string name="csv_file">CSV file</string>
     <string name="error_changing_theme">An error occurred while changing the app theme</string>
+    <string name="error_no_header_found">No header has been found in this file so we can\'t import items</string>
 </resources>

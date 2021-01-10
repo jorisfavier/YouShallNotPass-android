@@ -3,7 +3,6 @@ package fr.jorisfavier.youshallnotpass.di
 import android.app.Application
 import android.app.KeyguardManager
 import android.content.ClipboardManager
-import android.content.ContentResolver
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
@@ -15,8 +14,10 @@ import fr.jorisfavier.youshallnotpass.data.IExternalItemDataSource
 import fr.jorisfavier.youshallnotpass.data.ItemDataSource
 import fr.jorisfavier.youshallnotpass.data.impl.ExternalItemDataSource
 import fr.jorisfavier.youshallnotpass.manager.IAuthManager
+import fr.jorisfavier.youshallnotpass.manager.IContentResolverManager
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.manager.impl.AuthManager
+import fr.jorisfavier.youshallnotpass.manager.impl.ContentResolverManager
 import fr.jorisfavier.youshallnotpass.manager.impl.CryptoManager
 import fr.jorisfavier.youshallnotpass.repository.IExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
@@ -73,7 +74,7 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun provideExternalItemDataSource(app: Application, contentResolver: ContentResolver): IExternalItemDataSource {
+    fun provideExternalItemDataSource(app: Application, contentResolver: IContentResolverManager): IExternalItemDataSource {
         return ExternalItemDataSource(app.applicationContext, contentResolver)
     }
 
@@ -85,8 +86,8 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun provideContentResolver(app: Application): ContentResolver {
-        return app.contentResolver
+    fun provideContentResolver(app: Application): IContentResolverManager {
+        return ContentResolverManager(app.contentResolver)
     }
 
     @Singleton

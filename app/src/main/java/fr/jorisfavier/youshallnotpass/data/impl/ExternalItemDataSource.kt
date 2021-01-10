@@ -1,24 +1,26 @@
 package fr.jorisfavier.youshallnotpass.data.impl
 
-import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
+import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.data.IExternalItemDataSource
 import fr.jorisfavier.youshallnotpass.data.model.ItemDto
+import fr.jorisfavier.youshallnotpass.manager.IContentResolverManager
+import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.utils.FileUtil
+import fr.jorisfavier.youshallnotpass.utils.firstNotNull
+import fr.jorisfavier.youshallnotpass.utils.getDomainIfUrl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.BufferedReader
 import java.io.File
 import java.io.FileWriter
-import java.io.InputStreamReader
 import java.util.*
 import javax.inject.Inject
 
 class ExternalItemDataSource @Inject constructor(
     private val appContext: Context,
-    private val contentResolver: ContentResolver
+    private val contentResolver: IContentResolverManager
 ) : IExternalItemDataSource {
 
     override suspend fun saveToCsv(items: List<ItemDto>): Uri {
@@ -51,7 +53,7 @@ class ExternalItemDataSource @Inject constructor(
 
     override suspend fun isTextFile(uri: Uri): Boolean {
         return withContext(Dispatchers.IO) {
-            val mimeType = contentResolver.getType(uri)
+            val mimeType = contentResolver.getMimeType(uri)
             return@withContext FileUtil.isTextFile(mimeType)
         }
     }
@@ -59,40 +61,41 @@ class ExternalItemDataSource @Inject constructor(
     override suspend fun getItemsFromTextFile(uri: Uri): List<ItemDto> {
         return withContext(Dispatchers.IO) {
             val items = mutableListOf<ItemDto>()
-            contentResolver.openInputStream(uri)?.use { inputStream ->
-                BufferedReader(InputStreamReader(inputStream)).use { reader ->
-                    var i = 0
-                    var line: String? = reader.readLine()
-                    var passwordIndex = 5 //default dashlane password position
-                    var titleIndex = 0
-                    var loginIndex = 2
-                    var loginIndexBis = 2
-                    while (line != null) {
-                        val lineContent = line.split(",")
-                        if (i == 0) {
-                            lineContent
-                                .asSequence()
-                                .map {
-                                    it.toLowerCase(Locale.ROOT)
-                                        .replace("\"", "")
-                                        .replace("'", "")
-                                }
-                                .forEachIndexed { index, header ->
-                                    when {
-                                        header == "title" -> titleIndex = index
-                                        header == "name" -> titleIndex = index
-                                        header.contains("pass") -> passwordIndex = index
-                                        header.contains("username") -> loginIndex = index
-                                        header == "login" -> loginIndex = index
-                                    }
-                                }
-                        } else {
-                            val login = lineContent.getOrNull(loginIndex) ?: lineContent.getOrNull(loginIndexBis)
-                            items.add(ItemDto(lineContent.getOrNull(titleIndex), login, lineContent.getOrNull(passwordIndex)))
+            val fileContent = contentResolver.getFileContent(uri)
+            var passwordIndex: Int? = null
+            var titleIndex: Int? = null
+            var loginIndex: Int? = null
+            var urlIndex: Int? = null
+            fileContent.forEachIndexed { i, line ->
+                val lineContent = line
+                    .split(",", "\n")
+                    .map { it.removePrefix("\"").removeSuffix("\"") }
+                if (i == 0) {
+                    lineContent
+                        .asSequence()
+                        .map { it.toLowerCase(Locale.ROOT) }
+                        .forEachIndexed { index, header ->
+                            when {
+                                header == "title" -> titleIndex = index
+                                header == "name" -> titleIndex = index
+                                header == "login_password" -> passwordIndex = index
+                                header.contains("username") -> loginIndex = index
+                                header == "login" -> loginIndex = index
+                                header == "password" -> passwordIndex = index
+                                header == "url" -> urlIndex = index
+                            }
                         }
-                        line = reader.readLine()
-                        i++
+                    if (titleIndex == null && passwordIndex == null && loginIndex == null) {
+                        throw YsnpException(R.string.error_no_header_found)
                     }
+                } else {
+                    items.add(
+                        ItemDto(
+                            title = lineContent.getOrNull(firstNotNull(defaultValue = DEFAULT_TITLE_INDEX, titleIndex, urlIndex))?.getDomainIfUrl(),
+                            login = lineContent.getOrNull(firstNotNull(defaultValue = DEFAULT_LOGIN_INDEX, loginIndex)),
+                            password = lineContent.getOrNull(firstNotNull(defaultValue = DEFAULT_PASSWORD_INDEX, passwordIndex)),
+                        )
+                    )
                 }
             }
             items
@@ -100,13 +103,7 @@ class ExternalItemDataSource @Inject constructor(
     }
 
     override suspend fun getDataFromYsnpFile(uri: Uri): ByteArray {
-        return withContext(Dispatchers.IO) {
-            var bytes = ByteArray(0)
-            contentResolver.openInputStream(uri)?.use { inputStream ->
-                bytes = inputStream.readBytes()
-            }
-            bytes
-        }
+        return contentResolver.getFileBytes(uri)
     }
 
     companion object {
@@ -114,5 +111,8 @@ class ExternalItemDataSource @Inject constructor(
         private const val CSV_EXPORT_NAME = "ysnpExport.csv"
         private const val YSNP_EXPORT_NAME = "export.ysnp"
         private const val AUTHORITY = "fr.jorisfavier.fileprovider"
+        private const val DEFAULT_LOGIN_INDEX = 1
+        private const val DEFAULT_PASSWORD_INDEX = 2
+        private const val DEFAULT_TITLE_INDEX = 0
     }
 }
