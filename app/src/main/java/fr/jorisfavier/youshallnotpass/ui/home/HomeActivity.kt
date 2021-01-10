@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -31,6 +32,14 @@ class HomeActivity : AppCompatActivity(R.layout.activity_home) {
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp()
+    }
+
+    override fun onBackPressed() {
+        if (navController.previousBackStackEntry == null) {
+            ActivityCompat.finishAffinity(this)
+        } else {
+            super.onBackPressed()
+        }
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {

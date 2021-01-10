@@ -68,7 +68,7 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
             val searchPageIntent = Intent(this, HomeActivity::class.java)
             startActivity(searchPageIntent)
         }
-        ActivityCompat.finishAffinity(this)
+        finish()
     }
 
     private fun displayErrorModal(
