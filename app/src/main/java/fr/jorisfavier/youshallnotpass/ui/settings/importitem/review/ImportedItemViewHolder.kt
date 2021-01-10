@@ -13,7 +13,7 @@ class ImportedItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
             "${item.externalItem.title} - ${item.externalItem.login} - ${item.externalItem.password}"
         itemView.findViewById<CheckBox>(R.id.imported_item_checkbox).apply {
             isChecked = item.selected
-            setOnCheckedChangeListener { _, checked -> item.selected = checked }
+            setOnClickListener { item.selected = isChecked }
         }
     }
 }
