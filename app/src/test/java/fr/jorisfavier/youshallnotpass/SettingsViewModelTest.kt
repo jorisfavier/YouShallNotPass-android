@@ -8,10 +8,7 @@ import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.repository.IExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.ui.settings.SettingsViewModel
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.slot
+import io.mockk.*
 import junit.framework.TestCase
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -76,5 +73,29 @@ class SettingsViewModelTest {
         TestCase.assertEquals(fakeItem.title, externalItemSlot.captured.first().title)
         TestCase.assertEquals(fakeItem.login, externalItemSlot.captured.first().login)
         TestCase.assertEquals(fakePassword, externalItemSlot.captured.first().password)
+    }
+
+    @Test
+    fun `deleteAllItems should delete all items`() = runBlocking {
+        //given
+        coEvery { itemRepository.deleteAllItems() } just runs
+
+        //when
+        val result = viewModel.deleteAllItems().first()
+
+        //then
+        TestCase.assertTrue(result.isSuccess)
+    }
+
+    @Test
+    fun `deleteAllItems with an exception thrown from the repository should emit a failure`() = runBlocking {
+        //given
+        coEvery { itemRepository.deleteAllItems() } throws Exception()
+
+        //when
+        val result = viewModel.deleteAllItems().first()
+
+        //then
+        TestCase.assertTrue(result.isFailure)
     }
 }

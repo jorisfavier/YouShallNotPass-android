@@ -42,4 +42,9 @@ interface IItemRepository {
      * @param items
      */
     suspend fun insertItems(items: List<Item>)
+
+    /**
+     * Delete all the items from the app
+     */
+    suspend fun deleteAllItems()
 }

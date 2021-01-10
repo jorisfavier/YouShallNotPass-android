@@ -51,4 +51,11 @@ interface ItemDataSource {
      */
     @Delete
     fun deleteItems(vararg items: ItemEntity)
+
+    /**
+     * Delete all the items from the database
+     */
+    @Query("DELETE FROM ItemEntity")
+    fun deleteAllItems()
+
 }

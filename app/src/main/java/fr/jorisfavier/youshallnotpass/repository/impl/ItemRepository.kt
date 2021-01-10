@@ -55,4 +55,10 @@ class ItemRepository @Inject constructor(private var itemDataSource: ItemDataSou
         }
     }
 
+    override suspend fun deleteAllItems() {
+        withContext(Dispatchers.IO) {
+            itemDataSource.deleteAllItems()
+        }
+    }
+
 }

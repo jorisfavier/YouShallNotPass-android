@@ -14,6 +14,7 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.BuildConfig
 import fr.jorisfavier.youshallnotpass.R
@@ -43,6 +44,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var exportPreference: Preference
     private lateinit var appThemePreference: ListPreference
     private lateinit var versionPreference: Preference
+    private lateinit var deleteAllPreference: Preference
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -61,11 +63,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
         exportPreference = findPreference("export")!!
         appThemePreference = findPreference("theme")!!
         versionPreference = findPreference("appVersion")!!
+        deleteAllPreference = findPreference("deleteAll")!!
 
         initAppThemePreference()
         initExportPreference()
         initImportPreference()
         initAboutPreference()
+        initDeleteAllPreference()
     }
 
     private fun initAppThemePreference() {
@@ -108,6 +112,26 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun initAboutPreference() {
         versionPreference.summary = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+    }
+
+    private fun initDeleteAllPreference() {
+        deleteAllPreference.setOnPreferenceClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.delete_all)
+                .setMessage(R.string.delete_all_confirmation)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    lifecycleScope.launchWhenCreated {
+                        viewModel.deleteAllItems().collect {
+                            val messageResId = if (it.isSuccess) R.string.delete_all_successful else R.string.error_occurred
+                            requireContext().toast(messageResId)
+                        }
+                    }
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .create()
+                .show()
+            true
+        }
     }
 
     private fun exportPasswords(password: String?) {

@@ -78,4 +78,14 @@ class SettingsViewModel @Inject constructor(
             emit(Result.failure(e))
         }
     }
+
+    fun deleteAllItems(): Flow<Result<Unit>> {
+        return flow {
+            itemRepository.deleteAllItems()
+            emit(Result.success(Unit))
+        }.catch {
+            Timber.e(it, "An error occurred while deleting all the items")
+            emit(Result.failure(it))
+        }
+    }
 }
