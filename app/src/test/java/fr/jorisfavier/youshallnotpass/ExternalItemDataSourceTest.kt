@@ -25,8 +25,9 @@ class ExternalItemDataSourceTest {
     private val appContext: Context = mockk()
     private val contentResolver: IContentResolverManager = mockk()
     private val dataSource = ExternalItemDataSource(appContext, contentResolver)
-    private val fakeItemDto = ItemDto(title = "fakeTitle", login = "fakeLogin", password = "fakePassword")
-    private val fakeItemDtoWithUrl = ItemDto(title = "test", login = "fakeLogin", password = "fakePassword")
+    private val fakeItemDto = ItemDto(title = "FakeTitle", login = "fakeLogin", password = "fakePassword")
+    private val fakeItemDtoWithUrl = ItemDto(title = "Test", login = "fakeLogin", password = "fakePassword")
+    private val fakeItemDtoWithLocalUrl = ItemDto(title = "Http://localhost:8080", login = "fakeLogin", password = "fakePassword")
 
     private val onePasswordExport = listOf(
         "\"Notes\",\"Password\",\"Title\",\"Type\",\"URL\",\"Username\",\n",
@@ -59,6 +60,7 @@ class ExternalItemDataSourceTest {
         "\"https://www.test.test\",\"fakeLogin\",\"fakePassword\",,\"https://test.test\",\"{44596609-8731-f587-9141-nabba2343}\",\"13719493108328\",\"1534133619628\",\"1378893108328\"",
         "\"http://test.test\",\"fakeLogin\",\"fakePassword\",,\"https://test.test\",\"{44596609-8731-f587-9141-nabba2343}\",\"13719493108328\",\"1534133619628\",\"1378893108328\"",
         "\"http://www.test.test\",\"fakeLogin\",\"fakePassword\",,\"https://test.test\",\"{44596609-8731-f587-9141-nabba2343}\",\"13719493108328\",\"1534133619628\",\"1378893108328\"",
+        "\"http://localhost:8080\",\"fakeLogin\",\"fakePassword\",,\"https://test.test\",\"{44596609-8731-f587-9141-nabba2343}\",\"13719493108328\",\"1534133619628\",\"1378893108328\"",
     )
 
 
@@ -152,11 +154,12 @@ class ExternalItemDataSourceTest {
         val items = dataSource.getItemsFromTextFile(mockk())
 
         //then
-        TestCase.assertEquals(5, items.size)
+        TestCase.assertEquals(6, items.size)
         TestCase.assertEquals(fakeItemDtoWithUrl, items.first())
         TestCase.assertEquals(fakeItemDtoWithUrl, items[2])
         TestCase.assertEquals(fakeItemDtoWithUrl, items[3])
         TestCase.assertEquals(fakeItemDtoWithUrl, items[4])
+        TestCase.assertEquals(fakeItemDtoWithLocalUrl, items[5])
         TestCase.assertTrue(items[1].login.isNullOrEmpty())
     }
 

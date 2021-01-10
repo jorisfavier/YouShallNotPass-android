@@ -67,4 +67,6 @@
     <string name="csv_file">Fichier CSV</string>
     <string name="error_changing_theme">Une erreur s\'est produite lors du changement de thème</string>
     <string name="error_no_header_found">Ce fichier ne dispose pas d\'un en-tête, nous ne pouvons donc pas importer d\'items.</string>
+    <string name="item_found">Items trouvés: %d</string>
+    <string name="select_all">Tout sélectionner</string>
 </resources>

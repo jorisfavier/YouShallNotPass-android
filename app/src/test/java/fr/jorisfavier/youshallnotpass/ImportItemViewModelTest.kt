@@ -296,4 +296,21 @@ class ImportItemViewModelTest {
         TestCase.assertTrue(states[0] is State.Loading)
         TestCase.assertTrue(states[1] is State.Error)
     }
+
+    @Test
+    fun `selectAllItems should select all importedItems`() = runBlocking {
+        //given
+        val uri: Uri = mockk()
+        coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns false
+        coEvery { externalItemRepository.getExternalItemsFromUri(any(), any()) } returns listOf(fakeItem)
+
+        //when
+        viewModel.setUri(uri)
+        viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
+        viewModel.importedItems.value?.forEach { it.selected = false }
+        viewModel.selectAllItems()
+
+        //then
+        TestCase.assertTrue(viewModel.importedItems.getOrAwaitValue().filter { it.selected }.size == 1)
+    }
 }

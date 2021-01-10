@@ -39,10 +39,15 @@ class ReviewImportedItemsFragment : Fragment(R.layout.fragment_import_review_ite
         binding = FragmentImportReviewItemBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initList()
         initObserver()
+        binding.itemTotalCount = 0
+        binding.importReviewSelectAll.setOnClickListener {
+            viewModel.selectAllItems()
+        }
     }
 
     override fun onUserIllegallyRequestedNextPage() {
@@ -51,6 +56,7 @@ class ReviewImportedItemsFragment : Fragment(R.layout.fragment_import_review_ite
 
     private fun initObserver() {
         viewModel.importedItems.observe(viewLifecycleOwner) {
+            binding.itemTotalCount = it.size
             adapter.updateData(it)
         }
         viewModel.loadFromUriState.observe(viewLifecycleOwner) {
@@ -58,6 +64,8 @@ class ReviewImportedItemsFragment : Fragment(R.layout.fragment_import_review_ite
                 binding.importReviewList.isVisible = state is State.Success
                 binding.importReviewDescription.isVisible = state is State.Success
                 binding.importReviewImage.isVisible = state is State.Success
+                binding.importReviewSelectAll.isVisible = state is State.Success
+                binding.importReviewItemCount.isVisible = state is State.Success
                 binding.importReviewLoading.isVisible = state is State.Loading
             }
         }
@@ -65,6 +73,7 @@ class ReviewImportedItemsFragment : Fragment(R.layout.fragment_import_review_ite
 
     private fun initList() {
         binding.importReviewList.adapter = adapter
+        binding.importReviewList.setHasFixedSize(true)
     }
 
     companion object {

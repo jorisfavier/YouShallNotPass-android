@@ -67,4 +67,6 @@
     <string name="csv_file">CSV file</string>
     <string name="error_changing_theme">An error occurred while changing the app theme</string>
     <string name="error_no_header_found">No header has been found in this file so we can\'t import items</string>
+    <string name="item_found">Items found: %d</string>
+    <string name="select_all">Select all</string>
 </resources>

@@ -1,7 +1,6 @@
 package fr.jorisfavier.youshallnotpass.ui.settings.importitem
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -82,6 +81,11 @@ class ImportItemViewModel @Inject constructor(
                 importItems()
             }
         }
+    }
+
+    fun selectAllItems() {
+        _importedItems.value?.forEach { it.selected = true }
+        _importedItems.postValue(_importedItems.value)
     }
 
     private fun loadExternalItemsFromUri() {

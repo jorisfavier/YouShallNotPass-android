@@ -25,7 +25,7 @@ fun String.getDomainIfUrl(): String {
                 .removePrefix("http://www")
                 .removePrefix("https://")
                 .removePrefix("https://wwww")
-        } else segments[1]
+        } else segments.getOrElse(1) { segments.first() }
     }
     return this
 }

@@ -3,6 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+        
+        <variable
+            name="itemTotalCount"
+            type="int" />
+
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -50,6 +58,42 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/import_review_image" />
 
+        <Button
+            android:id="@+id/import_review_select_all"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/appintro_desc_padding"
+            android:text="@string/select_all"
+            app:layout_constraintBottom_toTopOf="@id/import_review_list"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/import_review_description" />
+
+        <TextView
+            android:id="@+id/import_review_item_count"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="@dimen/appintro_desc_padding"
+            android:text="@{@string/item_found(itemTotalCount)}"
+            android:textAppearance="?textAppearanceSubtitle2"
+            app:layout_constraintBottom_toTopOf="@id/import_review_list"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/import_review_description"
+            tools:text="Item found: 1200" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/import_review_list"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:paddingHorizontal="@dimen/appintro_desc_padding"
+            android:textAppearance="?attr/textAppearanceBody1"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/import_review_select_all"
+            tools:listitem="@layout/viewholder_imported_item" />
+
         <ProgressBar
             android:id="@+id/import_review_loading"
             android:layout_width="wrap_content"
@@ -59,18 +103,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/import_review_list"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:padding="@dimen/appintro_desc_padding"
-            android:textAppearance="?attr/textAppearanceBody1"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/import_review_description" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
