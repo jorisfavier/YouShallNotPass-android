@@ -3,13 +3,7 @@ package fr.jorisfavier.youshallnotpass.ui.search
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.SharedPreferences
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
+import androidx.lifecycle.*
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
@@ -106,9 +100,6 @@ class SearchViewModel @Inject constructor(
     }
 
     fun refreshItems() {
-        //If the user didn't search for something it will force an item refresh
-        if (isSearchEmpty) {
-            search.value = ""
-        }
+        search.value = search.value
     }
 }

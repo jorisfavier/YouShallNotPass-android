@@ -11,14 +11,7 @@ import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.ui.search.SearchViewModel
 import fr.jorisfavier.youshallnotpass.ui.settings.SettingsFragment
 import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.just
-import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.runs
-import io.mockk.slot
-import io.mockk.verify
+import io.mockk.*
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.flow.first
@@ -178,25 +171,6 @@ class SearchViewModelTest {
 
         //then
         assertTrue(viewModel.results.value?.isNotEmpty() ?: false)
-    }
-
-    @Test
-    fun `when refreshItems called we should emit items unless there is a search in progress`() = runBlocking {
-        //given
-        every { sharedPreferences.getBoolean(SettingsFragment.HIDE_ITEMS_PREFERENCE_KEY, any()) } returns false
-        coEvery { itemRepository.getAllItems() } returns listOf()
-        coEvery { itemRepository.searchItem(any()) } returns listOf(fakeItem)
-        var count = 0
-        //when
-        viewModel.results.observeForever {
-            count++
-        }
-        viewModel.search.value = "test"
-        viewModel.refreshItems()
-
-        //then
-        assertTrue(viewModel.results.value?.isNotEmpty() ?: false)
-        assertEquals(2, count)
     }
 
     @Test
