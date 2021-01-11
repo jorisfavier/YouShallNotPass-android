@@ -30,7 +30,7 @@ class SearchViewModel @Inject constructor(
             try {
                 when {
                     query.isNotBlank() && query.isNotEmpty() -> {
-                        emit(itemRepository.searchItem("$query%"))
+                        emit(itemRepository.searchItem("%$query%"))
                     }
                     !hideAllItems -> {
                         emit(itemRepository.getAllItems())
