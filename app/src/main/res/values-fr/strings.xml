@@ -72,5 +72,11 @@
     <string name="delete_all">Supprimer tous les items</string>
     <string name="delete_all_confirmation">Voulez-vous vraiment supprimer tous les items ?</string>
     <string name="delete_all_successful">Tous les items ont été supprimés !</string>
+    <string name="ysnp_desktop">YouShallNotPass PC</string>
+    <string name="camera_permission_title">Permission appareil photo</string>
+    <string name="camera_permission_explanation">Afin de connecter votre téléphone et votre ordinateur nous avons besoin d\'utiliser votre appareil photo afin de scanner le QR code de l\'application de bureau YSNP.</string>
+    <string name="unable_to_read_qr_code">Impossible de lire ce QR code. Merci de réessayer en utilisant un code provenant de l\'application PC YouShallNotPass</string>
+    <string name="qr_code_success">Vous êtes maintenant connecter avec l\'application YouShallNotPass PC !</string>
+    <string name="ysnp_desktop_summary">Vous pouvez envoyer vos items à votre ordinateur avec l\'application YouShallNotPass PC: https://urtodefine.com</string>
 
 </resources>

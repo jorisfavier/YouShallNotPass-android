@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
 import fr.jorisfavier.youshallnotpass.R
-import fr.jorisfavier.youshallnotpass.data.IExternalItemDataSource
+import fr.jorisfavier.youshallnotpass.data.ExternalItemDataSource
 import fr.jorisfavier.youshallnotpass.data.model.ItemDto
 import fr.jorisfavier.youshallnotpass.manager.IContentResolverManager
 import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
@@ -18,10 +18,10 @@ import java.io.FileWriter
 import java.util.*
 import javax.inject.Inject
 
-class ExternalItemDataSource @Inject constructor(
+class ExternalItemDataSourceImpl @Inject constructor(
     private val appContext: Context,
     private val contentResolver: IContentResolverManager
-) : IExternalItemDataSource {
+) : ExternalItemDataSource {
 
     override suspend fun saveToCsv(items: List<ItemDto>): Uri {
         return withContext(Dispatchers.IO) {

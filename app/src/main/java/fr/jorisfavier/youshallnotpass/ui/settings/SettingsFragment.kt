@@ -45,6 +45,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var appThemePreference: ListPreference
     private lateinit var versionPreference: Preference
     private lateinit var deleteAllPreference: Preference
+    private lateinit var desktopPreference: Preference
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -64,12 +65,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
         appThemePreference = findPreference("theme")!!
         versionPreference = findPreference("appVersion")!!
         deleteAllPreference = findPreference("deleteAll")!!
+        desktopPreference = findPreference("desktop")!!
 
         initAppThemePreference()
         initExportPreference()
         initImportPreference()
         initAboutPreference()
         initDeleteAllPreference()
+        initDesktopPreference()
     }
 
     private fun initAppThemePreference() {
@@ -130,6 +133,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 .setNegativeButton(android.R.string.cancel, null)
                 .create()
                 .show()
+            true
+        }
+    }
+
+    private fun initDesktopPreference() {
+        desktopPreference.setOnPreferenceClickListener {
+            homeViewModel.ignoreNextPause()
+            val direction = SettingsFragmentDirections.actionSettingsFragmentToDesktopConnectionActivity()
+            findNavController().navigate(direction)
             true
         }
     }

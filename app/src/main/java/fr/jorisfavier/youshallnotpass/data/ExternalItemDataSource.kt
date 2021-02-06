@@ -3,7 +3,7 @@ package fr.jorisfavier.youshallnotpass.data
 import android.net.Uri
 import fr.jorisfavier.youshallnotpass.data.model.ItemDto
 
-interface IExternalItemDataSource {
+interface ExternalItemDataSource {
     /**
      * Save the given list of ItemDto to a csv file
      * @param items

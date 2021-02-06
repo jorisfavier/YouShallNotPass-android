@@ -3,7 +3,7 @@ package fr.jorisfavier.youshallnotpass
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.content.FileProvider
-import fr.jorisfavier.youshallnotpass.data.impl.ExternalItemDataSource
+import fr.jorisfavier.youshallnotpass.data.impl.ExternalItemDataSourceImpl
 import fr.jorisfavier.youshallnotpass.data.model.ItemDto
 import fr.jorisfavier.youshallnotpass.manager.IContentResolverManager
 import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
@@ -15,7 +15,7 @@ import org.junit.Rule
 import org.junit.Test
 import java.io.FileWriter
 
-class ExternalItemDataSourceTest {
+class ExternalItemDataSourceImplTest {
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
@@ -24,7 +24,7 @@ class ExternalItemDataSourceTest {
 
     private val appContext: Context = mockk()
     private val contentResolver: IContentResolverManager = mockk()
-    private val dataSource = ExternalItemDataSource(appContext, contentResolver)
+    private val dataSource = ExternalItemDataSourceImpl(appContext, contentResolver)
     private val fakeItemDto = ItemDto(title = "FakeTitle", login = "fakeLogin", password = "fakePassword")
     private val fakeItemDtoWithUrl = ItemDto(title = "Test", login = "fakeLogin", password = "fakePassword")
     private val fakeItemDtoWithLocalUrl = ItemDto(title = "Http://localhost:8080", login = "fakeLogin", password = "fakePassword")

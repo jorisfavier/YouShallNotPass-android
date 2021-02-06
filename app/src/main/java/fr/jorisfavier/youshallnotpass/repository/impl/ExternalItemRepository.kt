@@ -1,7 +1,7 @@
 package fr.jorisfavier.youshallnotpass.repository.impl
 
 import android.net.Uri
-import fr.jorisfavier.youshallnotpass.data.IExternalItemDataSource
+import fr.jorisfavier.youshallnotpass.data.ExternalItemDataSource
 import fr.jorisfavier.youshallnotpass.data.model.ItemDto
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.model.ExternalItem
@@ -15,7 +15,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class ExternalItemRepository(
-    private val externalItemDataSource: IExternalItemDataSource,
+    private val externalItemDataSource: ExternalItemDataSource,
     private val cryptoManager: ICryptoManager
 ) : IExternalItemRepository {
 

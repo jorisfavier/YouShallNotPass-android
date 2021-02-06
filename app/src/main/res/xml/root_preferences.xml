@@ -13,6 +13,10 @@
     <Preference
         app:key="export"
         app:title="@string/export_password" />
+    <Preference
+        app:key="desktop"
+        app:summary="You can directly send you items to your computer using the YouShallNotPass desktop app: https://urltodefine.com"
+        app:title="@string/ysnp_desktop" />
     <ListPreference
         app:key="theme"
         app:title="@string/app_theme" />

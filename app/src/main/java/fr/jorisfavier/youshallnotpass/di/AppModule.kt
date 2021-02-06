@@ -7,12 +7,16 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import androidx.room.Room
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import dagger.Module
 import dagger.Provides
 import fr.jorisfavier.youshallnotpass.YouShallNotPassDatabase
-import fr.jorisfavier.youshallnotpass.data.IExternalItemDataSource
+import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
+import fr.jorisfavier.youshallnotpass.data.ExternalItemDataSource
 import fr.jorisfavier.youshallnotpass.data.ItemDataSource
-import fr.jorisfavier.youshallnotpass.data.impl.ExternalItemDataSource
+import fr.jorisfavier.youshallnotpass.data.impl.AppPreferenceDataSourceImpl
+import fr.jorisfavier.youshallnotpass.data.impl.ExternalItemDataSourceImpl
 import fr.jorisfavier.youshallnotpass.manager.IAuthManager
 import fr.jorisfavier.youshallnotpass.manager.IContentResolverManager
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
@@ -23,6 +27,7 @@ import fr.jorisfavier.youshallnotpass.repository.IExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.repository.impl.ExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.impl.ItemRepository
+import javax.inject.Named
 import javax.inject.Singleton
 
 
@@ -74,13 +79,46 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun provideExternalItemDataSource(app: Application, contentResolver: IContentResolverManager): IExternalItemDataSource {
-        return ExternalItemDataSource(app.applicationContext, contentResolver)
+    @Named("SecuredSharedPreferences")
+    fun provideSecureSharedPreference(app: Application): SharedPreferences {
+        val masterKey = MasterKey.Builder(app, "storage-master-key")
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+
+        return EncryptedSharedPreferences.create(
+            app,
+            "secure_preferences.pref",
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
     }
 
     @Singleton
     @Provides
-    fun provideExternalItemRepository(externalItemDataSource: IExternalItemDataSource, cryptoManager: ICryptoManager): IExternalItemRepository {
+    fun provideAppDataSource(
+        sharedPreferences: SharedPreferences,
+        @Named("SecuredSharedPreferences")
+        securedSharedPreferences: SharedPreferences
+    ): AppPreferenceDataSource {
+        return AppPreferenceDataSourceImpl(sharedPreferences, securedSharedPreferences)
+    }
+
+    @Singleton
+    @Provides
+    fun provideExternalItemDataSource(
+        app: Application,
+        contentResolver: IContentResolverManager
+    ): ExternalItemDataSource {
+        return ExternalItemDataSourceImpl(app.applicationContext, contentResolver)
+    }
+
+    @Singleton
+    @Provides
+    fun provideExternalItemRepository(
+        externalItemDataSource: ExternalItemDataSource,
+        cryptoManager: ICryptoManager
+    ): IExternalItemRepository {
         return ExternalItemRepository(externalItemDataSource, cryptoManager)
     }
 

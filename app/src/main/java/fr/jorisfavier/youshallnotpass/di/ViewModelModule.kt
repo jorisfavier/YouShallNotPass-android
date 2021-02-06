@@ -6,6 +6,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
 import fr.jorisfavier.youshallnotpass.ui.auth.AuthViewModel
+import fr.jorisfavier.youshallnotpass.ui.desktop.DesktopConnectionViewModel
 import fr.jorisfavier.youshallnotpass.ui.home.HomeViewModel
 import fr.jorisfavier.youshallnotpass.ui.item.ItemEditViewModel
 import fr.jorisfavier.youshallnotpass.ui.search.SearchViewModel
@@ -43,6 +44,11 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(ImportItemViewModel::class)
     abstract fun bindImportItemViewModel(importItemViewModel: ImportItemViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(DesktopConnectionViewModel::class)
+    abstract fun bindDesktopConnectionViewModel(desktopConnectionViewModel: DesktopConnectionViewModel): ViewModel
 
     @Binds
     abstract fun bindViewModelFactory(factory: MainViewModelFactory): ViewModelProvider.Factory

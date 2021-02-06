@@ -10,4 +10,5 @@
     <color name="gray_nurse">#E1E2E1</color>
     <color name="night_rider">#2C2C2C</color>
     <color name="black_800">#121212</color>
+    <color name="black_50_opacity">#80000000</color>
 </resources>
