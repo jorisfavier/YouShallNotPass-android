@@ -1,6 +1,5 @@
 package fr.jorisfavier.youshallnotpass.ui.search
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -27,9 +26,6 @@ class SearchFragment : Fragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-
-    @Inject
-    lateinit var sharedPreferences: SharedPreferences
 
     private lateinit var binding: FragmentSearchBinding
     private var searchAdapter: SearchResultAdapter =
@@ -67,13 +63,7 @@ class SearchFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        sharedPreferences.registerOnSharedPreferenceChangeListener(viewModel.onSharedPreferenceChangeListener)
         viewModel.refreshItems()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(viewModel.onSharedPreferenceChangeListener)
     }
 
     private fun initSettings() {

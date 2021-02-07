@@ -18,19 +18,15 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.BuildConfig
 import fr.jorisfavier.youshallnotpass.R
+import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.HIDE_ITEMS_PREFERENCE_KEY
+import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.THEME_PREFERENCE_KEY
 import fr.jorisfavier.youshallnotpass.ui.home.HomeViewModel
 import fr.jorisfavier.youshallnotpass.utils.getEntryforValue
 import fr.jorisfavier.youshallnotpass.utils.toast
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
-
 class SettingsFragment : PreferenceFragmentCompat() {
-
-    companion object {
-        const val THEME_PREFERENCE_KEY = "theme"
-        const val HIDE_ITEMS_PREFERENCE_KEY = "hideItems"
-    }
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -62,7 +58,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         allItemsVisibilityPreference = findPreference(HIDE_ITEMS_PREFERENCE_KEY)!!
         importPreference = findPreference("import")!!
         exportPreference = findPreference("export")!!
-        appThemePreference = findPreference("theme")!!
+        appThemePreference = findPreference(THEME_PREFERENCE_KEY)!!
         versionPreference = findPreference("appVersion")!!
         deleteAllPreference = findPreference("deleteAll")!!
         desktopPreference = findPreference("desktop")!!
@@ -78,11 +74,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun initAppThemePreference() {
         appThemePreference.entryValues = viewModel.themeValues
         appThemePreference.entries = viewModel.themeEntries.map { getString(it) }.toTypedArray()
-        viewModel.getDefaultThemeValue(
-            resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        )?.let {
-            appThemePreference.value = it
-        }
         appThemePreference.summary = appThemePreference.getEntryforValue(appThemePreference.value)
         appThemePreference.onPreferenceChangeListener =
             Preference.OnPreferenceChangeListener { _, newValue ->
@@ -94,6 +85,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 }
                 true
             }
+        lifecycleScope.launchWhenCreated {
+            viewModel.getDefaultThemeValue(resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK).collect {
+                appThemePreference.value = it
+            }
+        }
     }
 
     private fun initExportPreference() {

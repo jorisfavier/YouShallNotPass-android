@@ -3,6 +3,10 @@ package fr.jorisfavier.youshallnotpass.data.impl
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
+import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.DESKTOP_ADDRESS_PREFERENCE_KEY
+import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.DESKTOP_KEY_PREFERENCE_KEY
+import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.HIDE_ITEMS_PREFERENCE_KEY
+import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.THEME_PREFERENCE_KEY
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -59,10 +63,4 @@ class AppPreferenceDataSourceImpl(
         }
     }
 
-    companion object {
-        const val THEME_PREFERENCE_KEY = "theme"
-        const val HIDE_ITEMS_PREFERENCE_KEY = "hideItems"
-        const val DESKTOP_ADDRESS_PREFERENCE_KEY = "desktop_address_preference_key"
-        const val DESKTOP_KEY_PREFERENCE_KEY = "desktop_key_preference_key"
-    }
 }

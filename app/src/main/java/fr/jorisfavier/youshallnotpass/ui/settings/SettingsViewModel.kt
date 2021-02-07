@@ -1,12 +1,12 @@
 package fr.jorisfavier.youshallnotpass.ui.settings
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
 import fr.jorisfavier.youshallnotpass.R
+import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.model.ExternalItem
 import fr.jorisfavier.youshallnotpass.repository.IExternalItemRepository
@@ -18,7 +18,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class SettingsViewModel @Inject constructor(
-    private val sharedPreferences: SharedPreferences,
+    private val appPreferences: AppPreferenceDataSource,
     private val itemRepository: IItemRepository,
     private val externalItemRepository: IExternalItemRepository,
     private val cryptoManager: ICryptoManager,
@@ -49,8 +49,8 @@ class SettingsViewModel @Inject constructor(
         themeEntries = entries.toIntArray()
     }
 
-    fun getDefaultThemeValue(currentNightMode: Int): String? {
-        return if (!sharedPreferences.contains(SettingsFragment.THEME_PREFERENCE_KEY)) {
+    fun getDefaultThemeValue(currentNightMode: Int): Flow<String?> = flow {
+        val currentTheme = if (!appPreferences.getTheme().isNullOrEmpty()) {
             when (currentNightMode) {
                 Configuration.UI_MODE_NIGHT_NO -> AppCompatDelegate.MODE_NIGHT_NO.toString()
                 else -> AppCompatDelegate.MODE_NIGHT_YES.toString()
@@ -59,6 +59,7 @@ class SettingsViewModel @Inject constructor(
             Timber.d("No preference found for theme")
             null
         }
+        emit(currentTheme)
     }
 
     fun exportPasswords(password: String?): Flow<Result<Intent>> {

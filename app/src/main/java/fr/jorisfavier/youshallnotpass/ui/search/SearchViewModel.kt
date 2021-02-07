@@ -2,14 +2,14 @@ package fr.jorisfavier.youshallnotpass.ui.search
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.SharedPreferences
 import androidx.lifecycle.*
 import fr.jorisfavier.youshallnotpass.R
+import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
-import fr.jorisfavier.youshallnotpass.ui.settings.SettingsFragment
+import fr.jorisfavier.youshallnotpass.utils.default
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -20,28 +20,29 @@ class SearchViewModel @Inject constructor(
     private val itemRepository: IItemRepository,
     private val cryptoManager: ICryptoManager,
     private val clipboardManager: ClipboardManager,
-    private val sharedPreferences: SharedPreferences
+    private val appPreference: AppPreferenceDataSource
 ) : ViewModel() {
 
     val search = MutableLiveData("")
 
-    val results: LiveData<List<Item>> = search.switchMap { query ->
-        liveData {
+    val results = search.switchMap { query ->
+        liveData<List<Item>> {
             try {
+                val hideAll = appPreference.getShouldHideItems()
                 when {
                     query.isNotBlank() && query.isNotEmpty() -> {
                         emit(itemRepository.searchItem("%$query%"))
                     }
-                    !hideAllItems -> {
+                    !hideAll -> {
                         emit(itemRepository.getAllItems())
                     }
                     else -> {
-                        emit(listOf<Item>())
+                        emit(listOf())
                     }
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Error while searching for items")
-                emit(listOf<Item>())
+                emit(listOf())
             }
         }
     }
@@ -50,30 +51,19 @@ class SearchViewModel @Inject constructor(
         listItem.count() == 0
     }
 
-    val noResultTextIdRes = MediatorLiveData<Int>()
-
-    val onSharedPreferenceChangeListener =
-        SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key == SettingsFragment.HIDE_ITEMS_PREFERENCE_KEY) {
-                search.value = search.value
-            }
-        }
-
-    private val isSearchEmpty: Boolean
-        get() = search.value.orEmpty().isEmpty() || search.value.orEmpty().isBlank()
-    private val hideAllItems: Boolean
-        get() = sharedPreferences.getBoolean(SettingsFragment.HIDE_ITEMS_PREFERENCE_KEY, false)
-
-    init {
-        noResultTextIdRes.value = R.string.no_results_found
-        noResultTextIdRes.addSource(search) {
-            noResultTextIdRes.value = when {
-                isSearchEmpty && !hideAllItems -> R.string.no_item_yet
-                isSearchEmpty && hideAllItems -> R.string.use_the_search
+    val noResultTextIdRes = search.switchMap { search ->
+        liveData {
+            val isSearchEmpty = search.isEmpty() || search.isBlank()
+            val hideAll = appPreference.getShouldHideItems()
+            val res = when {
+                isSearchEmpty && !hideAll -> R.string.no_item_yet
+                isSearchEmpty && hideAll -> R.string.use_the_search
                 else -> R.string.no_results_found
             }
+            emit(res)
         }
-    }
+    }.default(R.string.no_results_found)
+
 
     fun deleteItem(item: Item): Flow<Result<Unit>> {
         return flow {
@@ -102,4 +92,5 @@ class SearchViewModel @Inject constructor(
     fun refreshItems() {
         search.value = search.value
     }
+
 }

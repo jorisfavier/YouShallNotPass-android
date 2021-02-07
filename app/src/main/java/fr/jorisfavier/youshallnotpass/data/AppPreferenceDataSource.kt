@@ -46,4 +46,11 @@ interface AppPreferenceDataSource {
      * @return null if unknown
      */
     suspend fun getDesktopPublicKey(): String?
+
+    companion object {
+        const val THEME_PREFERENCE_KEY = "theme"
+        const val HIDE_ITEMS_PREFERENCE_KEY = "hideItems"
+        const val DESKTOP_ADDRESS_PREFERENCE_KEY = "desktop_address_preference_key"
+        const val DESKTOP_KEY_PREFERENCE_KEY = "desktop_key_preference_key"
+    }
 }

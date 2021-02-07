@@ -2,14 +2,13 @@ package fr.jorisfavier.youshallnotpass
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.SharedPreferences
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.ui.search.SearchViewModel
-import fr.jorisfavier.youshallnotpass.ui.settings.SettingsFragment
 import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
 import io.mockk.*
 import junit.framework.TestCase.assertEquals
@@ -23,9 +22,9 @@ class SearchViewModelTest {
     private val itemRepository: IItemRepository = mockk()
     private val cryptoManager: ICryptoManager = mockk()
     private val clipboardManager: ClipboardManager = mockk()
-    private val sharedPreferences: SharedPreferences = mockk()
+    private val appPreferences: AppPreferenceDataSource = mockk()
 
-    private val viewModel by lazy { SearchViewModel(itemRepository, cryptoManager, clipboardManager, sharedPreferences) }
+    private val viewModel by lazy { SearchViewModel(itemRepository, cryptoManager, clipboardManager, appPreferences) }
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -45,7 +44,7 @@ class SearchViewModelTest {
     @Test
     fun `on first launch without item result should be empty with an explanation message`() {
         //given
-        every { sharedPreferences.getBoolean(SettingsFragment.HIDE_ITEMS_PREFERENCE_KEY, any()) } returns false
+        coEvery { appPreferences.getShouldHideItems() } returns false
         coEvery { itemRepository.getAllItems() } returns listOf()
 
         //when
@@ -62,7 +61,7 @@ class SearchViewModelTest {
     @Test
     fun `on first launch without item with hidden items, result should be empty with an explanation message`() {
         //given
-        every { sharedPreferences.getBoolean(SettingsFragment.HIDE_ITEMS_PREFERENCE_KEY, any()) } returns true
+        coEvery { appPreferences.getShouldHideItems() } returns true
         coEvery { itemRepository.getAllItems() } returns listOf()
 
         //when
@@ -79,7 +78,7 @@ class SearchViewModelTest {
     @Test
     fun `on first launch when repository throws an exception we should emit an empty list of items`() {
         //given
-        every { sharedPreferences.getBoolean(SettingsFragment.HIDE_ITEMS_PREFERENCE_KEY, any()) } returns false
+        coEvery { appPreferences.getShouldHideItems() } returns false
         coEvery { itemRepository.getAllItems() } throws Exception()
 
         //when
@@ -95,7 +94,7 @@ class SearchViewModelTest {
     @Test
     fun `on search when no item found we should have a no result message`() {
         //given
-        every { sharedPreferences.getBoolean(SettingsFragment.HIDE_ITEMS_PREFERENCE_KEY, any()) } returns true
+        coEvery { appPreferences.getShouldHideItems() } returns true
         coEvery { itemRepository.getAllItems() } returns listOf()
         coEvery { itemRepository.searchItem(any()) } returns listOf()
 
@@ -114,7 +113,7 @@ class SearchViewModelTest {
     @Test
     fun `on search when items are found we should emit items`() {
         //given
-        every { sharedPreferences.getBoolean(SettingsFragment.HIDE_ITEMS_PREFERENCE_KEY, any()) } returns true
+        coEvery { appPreferences.getShouldHideItems() } returns true
         coEvery { itemRepository.getAllItems() } returns listOf()
         coEvery { itemRepository.searchItem(any()) } returns listOf(fakeItem)
 
@@ -131,7 +130,7 @@ class SearchViewModelTest {
     @Test
     fun `on search when repository throws an exception we should emit an empty list of items`() {
         //given
-        every { sharedPreferences.getBoolean(SettingsFragment.HIDE_ITEMS_PREFERENCE_KEY, any()) } returns false
+        coEvery { appPreferences.getShouldHideItems() } returns false
         coEvery { itemRepository.getAllItems() } returns listOf(fakeItem)
         coEvery { itemRepository.searchItem(any()) } throws Exception()
 
@@ -148,12 +147,12 @@ class SearchViewModelTest {
     @Test
     fun `when changing HIDE_ITEMS_PREFERENCE_KEY shared preference we should emit items`() {
         //given
-        every { sharedPreferences.getBoolean(SettingsFragment.HIDE_ITEMS_PREFERENCE_KEY, any()) } returnsMany listOf(true, false)
+        coEvery { appPreferences.getShouldHideItems() } returnsMany listOf(true, false)
         coEvery { itemRepository.getAllItems() } returns listOf(fakeItem)
 
         //when
         viewModel.results.observeForever { }
-        viewModel.onSharedPreferenceChangeListener.onSharedPreferenceChanged(mockk(), SettingsFragment.HIDE_ITEMS_PREFERENCE_KEY)
+        viewModel.refreshItems()
 
         //then
         assertTrue(viewModel.results.value?.isNotEmpty() ?: false)
@@ -162,7 +161,7 @@ class SearchViewModelTest {
     @Test
     fun `when refreshItems called we should emit items`() {
         //given
-        every { sharedPreferences.getBoolean(SettingsFragment.HIDE_ITEMS_PREFERENCE_KEY, any()) } returns false
+        coEvery { appPreferences.getShouldHideItems() } returns false
         coEvery { itemRepository.getAllItems() } returnsMany listOf(listOf(), listOf(fakeItem))
 
         //when

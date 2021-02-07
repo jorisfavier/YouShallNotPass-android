@@ -1,7 +1,7 @@
 package fr.jorisfavier.youshallnotpass
 
-import android.content.SharedPreferences
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.model.ExternalItem
 import fr.jorisfavier.youshallnotpass.model.Item
@@ -25,9 +25,9 @@ class SettingsViewModelTest {
 
     private val itemRepository: IItemRepository = mockk()
     private val cryptoManager: ICryptoManager = mockk()
-    private val sharedPreferences: SharedPreferences = mockk()
+    private val appPreferences: AppPreferenceDataSource = mockk()
     private val externalItemRepository: IExternalItemRepository = mockk()
-    private val viewModel = SettingsViewModel(sharedPreferences, itemRepository, externalItemRepository, cryptoManager)
+    private val viewModel = SettingsViewModel(appPreferences, itemRepository, externalItemRepository, cryptoManager)
 
     private val fakeItem = Item(
         id = 1,
