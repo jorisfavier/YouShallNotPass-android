@@ -11,7 +11,8 @@ class SearchResultAdapter(
     private val onItemEditClicked: (Item) -> Unit,
     private val onDeleteItemClicked: (Item) -> Unit,
     private val decryptPassword: (Item) -> Result<String>,
-    private val copyPasswordToClipboard: (Item, ItemDataType) -> Unit
+    private val copyPasswordToClipboard: (Item, ItemDataType) -> Unit,
+    private val sendToDesktop: (Item, ItemDataType) -> Unit
 ) : RecyclerView.Adapter<SearchResultViewHolder>() {
 
     private var results: List<Item> = ArrayList()
@@ -32,7 +33,8 @@ class SearchResultAdapter(
             onItemEditClicked,
             onDeleteItemClicked,
             decryptPassword,
-            copyPasswordToClipboard
+            copyPasswordToClipboard,
+            sendToDesktop
         )
         holder.itemView.setOnClickListener {
             if (lastExpandedViewHolder != holder) {

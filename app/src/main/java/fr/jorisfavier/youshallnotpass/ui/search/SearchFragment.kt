@@ -28,15 +28,18 @@ class SearchFragment : Fragment() {
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private lateinit var binding: FragmentSearchBinding
-    private var searchAdapter: SearchResultAdapter =
+
+    private val viewModel: SearchViewModel by viewModels { viewModelFactory }
+
+    private val searchAdapter by lazy {
         SearchResultAdapter(
             this::navigateToEditItemFragment,
             this::deleteItem,
-            this::decryptPassword,
-            this::copyToClipboard
+            viewModel::decryptPassword,
+            this::copyToClipboard,
+            viewModel::sendToDesktop
         )
-
-    private val viewModel: SearchViewModel by viewModels { viewModelFactory }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,10 +117,14 @@ class SearchFragment : Fragment() {
             .show()
     }
 
-    private fun decryptPassword(item: Item) = viewModel.decryptPassword(item)
-
     private fun copyToClipboard(item: Item, type: ItemDataType) {
         viewModel.copyToClipboard(item, type)
+            .onSuccess { context?.toast(it) }
+            .onFailure { context?.toast(R.string.error_occurred) }
+    }
+
+    private fun copyToDesktop(item: Item, type: ItemDataType) {
+        viewModel.sendToDesktop(item, type)
             .onSuccess { context?.toast(it) }
             .onFailure { context?.toast(R.string.error_occurred) }
     }

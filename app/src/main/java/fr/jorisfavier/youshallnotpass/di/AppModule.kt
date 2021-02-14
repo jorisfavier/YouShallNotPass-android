@@ -11,7 +11,10 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import dagger.Module
 import dagger.Provides
+import fr.jorisfavier.youshallnotpass.BuildConfig
 import fr.jorisfavier.youshallnotpass.YouShallNotPassDatabase
+import fr.jorisfavier.youshallnotpass.api.DesktopApi
+import fr.jorisfavier.youshallnotpass.api.HostInterceptor
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
 import fr.jorisfavier.youshallnotpass.data.ExternalItemDataSource
 import fr.jorisfavier.youshallnotpass.data.ItemDataSource
@@ -23,10 +26,18 @@ import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.manager.impl.AuthManager
 import fr.jorisfavier.youshallnotpass.manager.impl.ContentResolverManager
 import fr.jorisfavier.youshallnotpass.manager.impl.CryptoManager
+import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
 import fr.jorisfavier.youshallnotpass.repository.IExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
+import fr.jorisfavier.youshallnotpass.repository.impl.DesktopRepositoryImpl
 import fr.jorisfavier.youshallnotpass.repository.impl.ExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.impl.ItemRepository
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -133,5 +144,54 @@ class AppModule {
     fun provideKeyguardManager(app: Application): KeyguardManager {
         return app.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
     }
+
+    @Singleton
+    @Provides
+    fun provideHostInterceptor() = HostInterceptor()
+
+    @Singleton
+    @Provides
+    fun provideHttpClient(hostInterceptor: HostInterceptor): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(hostInterceptor)
+            .addInterceptor(
+                HttpLoggingInterceptor().apply {
+                    level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+                    else HttpLoggingInterceptor.Level.NONE
+                }
+            )
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideRetrofit(httpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .client(httpClient)
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .baseUrl("http://0.0.0.0")
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideDesktopApi(retrofit: Retrofit): DesktopApi {
+        return retrofit.create(DesktopApi::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideDesktopRepository(
+        api: DesktopApi,
+        appPreferenceDataSource: AppPreferenceDataSource,
+        hostInterceptor: HostInterceptor,
+        cryptoManager: ICryptoManager
+    ): DesktopRepository {
+        GlobalScope.launch {
+            hostInterceptor.host = appPreferenceDataSource.getDesktopAddress()
+        }
+        return DesktopRepositoryImpl(api, appPreferenceDataSource, hostInterceptor, cryptoManager)
+    }
+
 
 }

@@ -2,27 +2,17 @@ package fr.jorisfavier.youshallnotpass.manager.impl
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import android.util.Base64
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.manager.model.EncryptedData
 import fr.jorisfavier.youshallnotpass.utils.md5
 import java.io.IOException
 import java.nio.charset.Charset
-import java.security.InvalidAlgorithmParameterException
-import java.security.InvalidKeyException
-import java.security.KeyStore
-import java.security.KeyStoreException
-import java.security.NoSuchAlgorithmException
-import java.security.NoSuchProviderException
-import java.security.UnrecoverableKeyException
+import java.security.*
 import java.security.cert.CertificateException
 import java.security.spec.InvalidKeySpecException
-import javax.crypto.BadPaddingException
-import javax.crypto.Cipher
-import javax.crypto.IllegalBlockSizeException
-import javax.crypto.KeyGenerator
-import javax.crypto.NoSuchPaddingException
-import javax.crypto.SecretKey
-import javax.crypto.SecretKeyFactory
+import java.security.spec.X509EncodedKeySpec
+import javax.crypto.*
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.PBEParameterSpec
@@ -99,6 +89,17 @@ class CryptoManager : ICryptoManager {
         val cipher = Cipher.getInstance(ENCRYPTION_WITH_PASSWORD_ALGORITHM)
         cipher.init(Cipher.DECRYPT_MODE, key, pbParamSpec)
         return cipher.doFinal(encryptedData)
+    }
+
+    override fun encryptDataWithPublicKey(key: String, data: String): ByteArray {
+        val decodedKey = Base64.decode(key, Base64.DEFAULT)
+        val keySpec = X509EncodedKeySpec(decodedKey)
+        val keyFactory: KeyFactory = KeyFactory.getInstance("RSA")
+        val pubKey: PublicKey = keyFactory.generatePublic(keySpec)
+        val cipher: Cipher =
+            Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding") //or try with "RSA"
+        cipher.init(Cipher.ENCRYPT_MODE, pubKey)
+        return cipher.doFinal(data.toByteArray())
     }
 
     /**

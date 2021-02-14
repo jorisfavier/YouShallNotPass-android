@@ -39,7 +39,8 @@ class SearchResultViewHolder(
         onEditItemClicked: (Item) -> Unit,
         onDeleteItemClicked: (Item) -> Unit,
         decryptPassword: (Item) -> Result<String>,
-        copyToClipboard: (Item, ItemDataType) -> Unit
+        copyToClipboard: (Item, ItemDataType) -> Unit,
+        sendToDesktop: (Item, ItemDataType) -> Unit
     ) {
         toggleViewState(false, animate = false)
         isExpanded = false
@@ -58,6 +59,8 @@ class SearchResultViewHolder(
         binding.searchResultItemCopyLoginButton.setOnClickListener { copyToClipboard(result, ItemDataType.LOGIN) }
         binding.searchResultItemEditButton.setOnClickListener { onEditItemClicked.invoke(result) }
         binding.searchResultItemDeleteButton.setOnClickListener { onDeleteItemClicked.invoke(result) }
+        binding.searchResultItemPasswordDesktopButton.setOnClickListener { sendToDesktop.invoke(result, ItemDataType.PASSWORD) }
+        binding.searchResultItemLoginDesktopButton.setOnClickListener { sendToDesktop.invoke(result, ItemDataType.LOGIN) }
         binding.executePendingBindings()
     }
 

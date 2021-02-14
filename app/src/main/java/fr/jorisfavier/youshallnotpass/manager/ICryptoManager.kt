@@ -34,4 +34,12 @@ interface ICryptoManager {
      */
     fun decryptDataWithPassword(password: String, encryptedData: ByteArray): ByteArray
 
+    /**
+     * Encrypt the given data using a given public rsa key
+     * @param key a public rsa key using the following transformation: RSA/ECB/OAEPWithSHA1AndMGF1Padding
+     * @param data the data to encrypt
+     * @return an encrypted byte array
+     */
+    fun encryptDataWithPublicKey(key: String, data: String): ByteArray
+
 }

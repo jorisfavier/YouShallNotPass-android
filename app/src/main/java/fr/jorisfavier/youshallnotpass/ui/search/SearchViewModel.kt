@@ -8,11 +8,13 @@ import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
+import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.utils.default
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -20,7 +22,8 @@ class SearchViewModel @Inject constructor(
     private val itemRepository: IItemRepository,
     private val cryptoManager: ICryptoManager,
     private val clipboardManager: ClipboardManager,
-    private val appPreference: AppPreferenceDataSource
+    private val appPreference: AppPreferenceDataSource,
+    private val desktopRepository: DesktopRepository
 ) : ViewModel() {
 
     val search = MutableLiveData("")
@@ -91,6 +94,18 @@ class SearchViewModel @Inject constructor(
 
     fun refreshItems() {
         search.value = search.value
+    }
+
+    fun sendToDesktop(item: Item, type: ItemDataType) {
+        viewModelScope.launch {
+            kotlin.runCatching {
+                val data = when (type) {
+                    ItemDataType.PASSWORD -> decryptPassword(item).getOrThrow()
+                    ItemDataType.LOGIN -> item.login.orEmpty()
+                }
+                desktopRepository.sendData(data)
+            }
+        }
     }
 
 }
