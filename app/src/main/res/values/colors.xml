@@ -8,7 +8,9 @@
     <color name="cerulean_frost">#6e95ca</color>
     <color name="midnight">#00203f</color>
     <color name="gray_nurse">#E1E2E1</color>
+    <color name="gray_nurse_light">#26E1E2E1</color>
     <color name="night_rider">#2C2C2C</color>
+    <color name="night_rider_light">#262C2C2C</color>
     <color name="black_800">#121212</color>
     <color name="black_50_opacity">#80000000</color>
 </resources>

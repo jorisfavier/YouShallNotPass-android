@@ -21,7 +21,7 @@ class DesktopConnectionViewModel @Inject constructor(private val desktopReposito
             val ipRegex = "(\\d+\\.){3}\\d+(:\\d{4})?".toRegex()
             if (elements.size == 2 && elements[0].matches(ipRegex) && elements[1].contains("KEY")) {
                 viewModelScope.launch {
-                    desktopRepository.updateDesktopInfo("http://" + elements[0], cleanUpKey(elements[1]))
+                    kotlin.runCatching { desktopRepository.updateDesktopInfo("http://" + elements[0], cleanUpKey(elements[1])) }
                         .onSuccess { _qrCodeAnalyseState.value = State.Success }
                         .onFailure { _qrCodeAnalyseState.value = State.Error }
                 }

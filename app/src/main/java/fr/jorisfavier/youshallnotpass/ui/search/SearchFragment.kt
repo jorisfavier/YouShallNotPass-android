@@ -17,6 +17,9 @@ import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentSearchBinding
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
+import fr.jorisfavier.youshallnotpass.ui.settings.SettingsFragment
+import fr.jorisfavier.youshallnotpass.utils.onUnknownFailure
+import fr.jorisfavier.youshallnotpass.utils.onYsnpFailure
 import fr.jorisfavier.youshallnotpass.utils.toast
 import jp.wasabeef.recyclerview.animators.FadeInRightAnimator
 import kotlinx.coroutines.flow.collect
@@ -37,7 +40,7 @@ class SearchFragment : Fragment() {
             this::deleteItem,
             viewModel::decryptPassword,
             this::copyToClipboard,
-            viewModel::sendToDesktop
+            this::copyToDesktop
         )
     }
 
@@ -124,8 +127,24 @@ class SearchFragment : Fragment() {
     }
 
     private fun copyToDesktop(item: Item, type: ItemDataType) {
-        viewModel.sendToDesktop(item, type)
-            .onSuccess { context?.toast(it) }
-            .onFailure { context?.toast(R.string.error_occurred) }
+        lifecycleScope.launchWhenCreated {
+            viewModel.sendToDesktop(item, type).collect { result ->
+                result
+                    .onSuccess { requireContext().toast(it) }
+                    .onYsnpFailure {
+                        MaterialAlertDialogBuilder(requireContext())
+                            .setTitle(R.string.error_occurred)
+                            .setMessage(it.messageResId)
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .setPositiveButton(R.string.sync_desktop_amd_mobile) { _, _ ->
+                                val direction =
+                                    SearchFragmentDirections.actionSearchFragmentToSettingsFragment(highlightItem = SettingsFragment.KEY_DESKTOP)
+                                findNavController().navigate(direction)
+                            }
+                            .show()
+                    }
+                    .onUnknownFailure { requireContext().toast(R.string.error_occurred) }
+            }
+        }
     }
 }

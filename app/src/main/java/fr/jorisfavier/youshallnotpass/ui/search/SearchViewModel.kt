@@ -8,13 +8,14 @@ import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
+import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.utils.default
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -96,16 +97,18 @@ class SearchViewModel @Inject constructor(
         search.value = search.value
     }
 
-    fun sendToDesktop(item: Item, type: ItemDataType) {
-        viewModelScope.launch {
-            kotlin.runCatching {
-                val data = when (type) {
-                    ItemDataType.PASSWORD -> decryptPassword(item).getOrThrow()
-                    ItemDataType.LOGIN -> item.login.orEmpty()
-                }
-                desktopRepository.sendData(data)
-            }
+    fun sendToDesktop(item: Item, type: ItemDataType) = flow {
+        val data = when (type) {
+            ItemDataType.PASSWORD -> decryptPassword(item).getOrThrow()
+            ItemDataType.LOGIN -> item.login.orEmpty()
+        }
+        desktopRepository.sendData(data)
+        emit(Result.success(R.string.ysnp_desktop_communication_success))
+    }.catch { error ->
+        if (error is HttpException) {
+            emit(Result.failure(YsnpException(R.string.ysnp_desktop_communication_fail)))
+        } else {
+            emit(Result.failure(error))
         }
     }
-
 }

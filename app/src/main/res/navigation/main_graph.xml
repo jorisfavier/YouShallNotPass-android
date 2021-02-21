@@ -27,19 +27,24 @@
         tools:layout="@layout/fragment_item">
         <argument
             android:name="itemId"
-            app:argType="integer"
-            android:defaultValue="0" />
+            android:defaultValue="0"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="fr.jorisfavier.youshallnotpass.ui.settings.SettingsFragment"
-        android:label="@string/settings" >
+        android:label="@string/settings">
         <action
             android:id="@+id/action_settingsFragment_to_importPasswordActivity"
             app:destination="@id/importPasswordActivity" />
         <action
             android:id="@+id/action_settingsFragment_to_desktopConnectionActivity"
             app:destination="@id/desktopConnectionActivity" />
+        <argument
+            android:name="highlightItem"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
     <activity
         android:id="@+id/importPasswordActivity"

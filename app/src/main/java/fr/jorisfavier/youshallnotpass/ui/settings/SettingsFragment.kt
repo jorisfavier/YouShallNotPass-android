@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -20,6 +21,7 @@ import fr.jorisfavier.youshallnotpass.BuildConfig
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.HIDE_ITEMS_PREFERENCE_KEY
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.THEME_PREFERENCE_KEY
+import fr.jorisfavier.youshallnotpass.ui.common.BlinkPreference
 import fr.jorisfavier.youshallnotpass.ui.home.HomeViewModel
 import fr.jorisfavier.youshallnotpass.utils.getEntryforValue
 import fr.jorisfavier.youshallnotpass.utils.toast
@@ -30,6 +32,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private val args: SettingsFragmentArgs by navArgs()
 
     val viewModel: SettingsViewModel by viewModels { viewModelFactory }
 
@@ -56,12 +60,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         super.onViewCreated(view, savedInstanceState)
         (activity as AppCompatActivity).supportActionBar?.show()
         allItemsVisibilityPreference = findPreference(HIDE_ITEMS_PREFERENCE_KEY)!!
-        importPreference = findPreference("import")!!
-        exportPreference = findPreference("export")!!
+        importPreference = findPreference(KEY_IMPORT)!!
+        exportPreference = findPreference(KEY_EXPORT)!!
         appThemePreference = findPreference(THEME_PREFERENCE_KEY)!!
-        versionPreference = findPreference("appVersion")!!
-        deleteAllPreference = findPreference("deleteAll")!!
-        desktopPreference = findPreference("desktop")!!
+        versionPreference = findPreference(KEY_APP_VERSION)!!
+        deleteAllPreference = findPreference(KEY_DELETE_ALL)!!
+        desktopPreference = findPreference(KEY_DESKTOP)!!
 
         initAppThemePreference()
         initExportPreference()
@@ -69,6 +73,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         initAboutPreference()
         initDeleteAllPreference()
         initDesktopPreference()
+        playFocusAnimationIfNeeded()
     }
 
     private fun initAppThemePreference() {
@@ -134,11 +139,18 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun initDesktopPreference() {
+        desktopPreference.setViewId(View.generateViewId())
         desktopPreference.setOnPreferenceClickListener {
             homeViewModel.ignoreNextPause()
             val direction = SettingsFragmentDirections.actionSettingsFragmentToDesktopConnectionActivity()
             findNavController().navigate(direction)
             true
+        }
+    }
+
+    private fun playFocusAnimationIfNeeded() {
+        args.highlightItem?.let {
+            findPreference<BlinkPreference>(it)?.blink()
         }
     }
 
@@ -153,5 +165,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 }
             }
         }
+    }
+
+    companion object {
+        const val KEY_IMPORT = "import"
+        const val KEY_EXPORT = "export"
+        const val KEY_APP_VERSION = "appVersion"
+        const val KEY_DELETE_ALL = "deleteAll"
+        const val KEY_DESKTOP = "desktop"
     }
 }

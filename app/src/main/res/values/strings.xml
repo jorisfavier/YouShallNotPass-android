@@ -78,4 +78,7 @@
     <string name="unable_to_read_qr_code">Unable to read the QR code, please make sure you are scanning the one from the YouShallNotPass desktop app</string>
     <string name="qr_code_success">You are now connected with the YouShallNotPass Desktop app!</string>
     <string name="ysnp_desktop_summary">You can directly send your items to your computer using the YouShallNotPass desktop app: https://urltodefine.com</string>
+    <string name="ysnp_desktop_communication_success">Data successfully sent to the desktop app!</string>
+    <string name="ysnp_desktop_communication_fail">We were unable to send your data to the desktop app. Try to sync your mobile and desktop app together and try again.</string>
+    <string name="sync_desktop_amd_mobile">Sync with desktop</string>
 </resources>
