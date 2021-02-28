@@ -23,8 +23,8 @@ import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.HID
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.THEME_PREFERENCE_KEY
 import fr.jorisfavier.youshallnotpass.ui.common.BlinkPreference
 import fr.jorisfavier.youshallnotpass.ui.home.HomeViewModel
-import fr.jorisfavier.youshallnotpass.utils.getEntryforValue
-import fr.jorisfavier.youshallnotpass.utils.toast
+import fr.jorisfavier.youshallnotpass.utils.extensions.getEntryforValue
+import fr.jorisfavier.youshallnotpass.utils.extensions.toast
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
@@ -91,16 +91,20 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 true
             }
         lifecycleScope.launchWhenCreated {
-            viewModel.getDefaultThemeValue(resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK).collect {
-                appThemePreference.value = it
-            }
+            viewModel.getDefaultThemeValue(resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK)
+                .collect {
+                    appThemePreference.value = it
+                }
         }
     }
 
     private fun initExportPreference() {
         exportPreference.setOnPreferenceClickListener {
             val dialog = ExportDialogFragment(::exportPasswords)
-            dialog.show(requireActivity().supportFragmentManager, ExportDialogFragment::class.java.simpleName)
+            dialog.show(
+                requireActivity().supportFragmentManager,
+                ExportDialogFragment::class.java.simpleName
+            )
             true
         }
     }
@@ -108,7 +112,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun initImportPreference() {
         importPreference.setOnPreferenceClickListener {
             homeViewModel.ignoreNextPause()
-            val direction = SettingsFragmentDirections.actionSettingsFragmentToImportPasswordActivity()
+            val direction =
+                SettingsFragmentDirections.actionSettingsFragmentToImportPasswordActivity()
             findNavController().navigate(direction)
             true
         }
@@ -126,7 +131,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     lifecycleScope.launchWhenCreated {
                         viewModel.deleteAllItems().collect {
-                            val messageResId = if (it.isSuccess) R.string.delete_all_successful else R.string.error_occurred
+                            val messageResId =
+                                if (it.isSuccess) R.string.delete_all_successful else R.string.error_occurred
                             requireContext().toast(messageResId)
                         }
                     }
@@ -142,7 +148,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
         desktopPreference.setViewId(View.generateViewId())
         desktopPreference.setOnPreferenceClickListener {
             homeViewModel.ignoreNextPause()
-            val direction = SettingsFragmentDirections.actionSettingsFragmentToDesktopConnectionActivity()
+            val direction =
+                SettingsFragmentDirections.actionSettingsFragmentToDesktopConnectionActivity()
             findNavController().navigate(direction)
             true
         }

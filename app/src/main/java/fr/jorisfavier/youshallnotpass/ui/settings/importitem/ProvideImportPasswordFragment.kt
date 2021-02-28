@@ -12,8 +12,8 @@ import com.github.appintro.SlidePolicy
 import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentImportPasswordNeededBinding
-import fr.jorisfavier.youshallnotpass.utils.hideKeyboard
-import fr.jorisfavier.youshallnotpass.utils.toast
+import fr.jorisfavier.youshallnotpass.utils.extensions.hideKeyboard
+import fr.jorisfavier.youshallnotpass.utils.extensions.toast
 import javax.inject.Inject
 
 class ProvideImportPasswordFragment : Fragment(R.layout.fragment_import_password_needed),

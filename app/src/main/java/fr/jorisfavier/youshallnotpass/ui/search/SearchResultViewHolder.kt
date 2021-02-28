@@ -11,10 +11,10 @@ import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.ViewholderSearchResultBinding
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
-import fr.jorisfavier.youshallnotpass.utils.fadeIn
-import fr.jorisfavier.youshallnotpass.utils.fadeOut
-import fr.jorisfavier.youshallnotpass.utils.px
-import fr.jorisfavier.youshallnotpass.utils.toast
+import fr.jorisfavier.youshallnotpass.utils.extensions.fadeIn
+import fr.jorisfavier.youshallnotpass.utils.extensions.fadeOut
+import fr.jorisfavier.youshallnotpass.utils.extensions.px
+import fr.jorisfavier.youshallnotpass.utils.extensions.toast
 import timber.log.Timber
 
 class SearchResultViewHolder(
@@ -55,12 +55,32 @@ class SearchResultViewHolder(
                 }
 
         }
-        binding.searchResultItemCopyPasswordButton.setOnClickListener { copyToClipboard(result, ItemDataType.PASSWORD) }
-        binding.searchResultItemCopyLoginButton.setOnClickListener { copyToClipboard(result, ItemDataType.LOGIN) }
+        binding.searchResultItemCopyPasswordButton.setOnClickListener {
+            copyToClipboard(
+                result,
+                ItemDataType.PASSWORD
+            )
+        }
+        binding.searchResultItemCopyLoginButton.setOnClickListener {
+            copyToClipboard(
+                result,
+                ItemDataType.LOGIN
+            )
+        }
         binding.searchResultItemEditButton.setOnClickListener { onEditItemClicked.invoke(result) }
         binding.searchResultItemDeleteButton.setOnClickListener { onDeleteItemClicked.invoke(result) }
-        binding.searchResultItemPasswordDesktopButton.setOnClickListener { sendToDesktop.invoke(result, ItemDataType.PASSWORD) }
-        binding.searchResultItemLoginDesktopButton.setOnClickListener { sendToDesktop.invoke(result, ItemDataType.LOGIN) }
+        binding.searchResultItemPasswordDesktopButton.setOnClickListener {
+            sendToDesktop.invoke(
+                result,
+                ItemDataType.PASSWORD
+            )
+        }
+        binding.searchResultItemLoginDesktopButton.setOnClickListener {
+            sendToDesktop.invoke(
+                result,
+                ItemDataType.LOGIN
+            )
+        }
         binding.executePendingBindings()
     }
 
@@ -78,7 +98,8 @@ class SearchResultViewHolder(
                     (it.animatedValue as Float).let { progress ->
                         binding.searchResultItemCard.layoutParams.height =
                             currentHeight + (detailHeight.toFloat() * progress * coeff).toInt()
-                        val padding = currentSidePadding + (DETAIL_PADDING * progress * coeff).toInt()
+                        val padding =
+                            currentSidePadding + (DETAIL_PADDING * progress * coeff).toInt()
                         binding.searchResultMainContainer.updatePadding(
                             left = padding,
                             right = padding
@@ -106,7 +127,8 @@ class SearchResultViewHolder(
             binding.searchResultItemPassword.inputType =
                 InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
         } else {
-            binding.searchResultItemPassword.inputType = InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_PASSWORD
+            binding.searchResultItemPassword.inputType =
+                InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_PASSWORD
         }
         binding.searchResultItemPassword.text = text
     }

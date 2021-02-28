@@ -21,8 +21,8 @@ import fr.jorisfavier.youshallnotpass.databinding.ActivityDesktopConnectionBindi
 import fr.jorisfavier.youshallnotpass.model.QRCodeAnalyzer
 import fr.jorisfavier.youshallnotpass.utils.CustomLifecycle
 import fr.jorisfavier.youshallnotpass.utils.State
-import fr.jorisfavier.youshallnotpass.utils.aspectRatio
-import fr.jorisfavier.youshallnotpass.utils.toast
+import fr.jorisfavier.youshallnotpass.utils.extensions.aspectRatio
+import fr.jorisfavier.youshallnotpass.utils.extensions.toast
 import timber.log.Timber
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -43,9 +43,10 @@ class DesktopConnectionActivity : AppCompatActivity() {
     private val cameraPermission: Int
         get() = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
 
-    private val onCameraPermissionGranted = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        requestPermissionIfNeeded()
-    }
+    private val onCameraPermissionGranted =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            requestPermissionIfNeeded()
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

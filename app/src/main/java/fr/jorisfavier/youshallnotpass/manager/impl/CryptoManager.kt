@@ -5,7 +5,7 @@ import android.security.keystore.KeyProperties
 import android.util.Base64
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.manager.model.EncryptedData
-import fr.jorisfavier.youshallnotpass.utils.md5
+import fr.jorisfavier.youshallnotpass.utils.extensions.md5
 import java.io.IOException
 import java.nio.charset.Charset
 import java.security.*

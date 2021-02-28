@@ -14,7 +14,7 @@ import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentImportSelectFileBinding
 import fr.jorisfavier.youshallnotpass.utils.autoCleared
-import fr.jorisfavier.youshallnotpass.utils.toast
+import fr.jorisfavier.youshallnotpass.utils.extensions.toast
 import javax.inject.Inject
 
 class ImportSelectFileFragment : Fragment(R.layout.fragment_import_select_file), SlidePolicy {

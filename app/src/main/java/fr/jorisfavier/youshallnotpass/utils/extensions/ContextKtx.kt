@@ -1,4 +1,4 @@
-package fr.jorisfavier.youshallnotpass.utils
+package fr.jorisfavier.youshallnotpass.utils.extensions
 
 import android.content.Context
 import android.util.TypedValue

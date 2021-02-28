@@ -1,4 +1,4 @@
-package fr.jorisfavier.youshallnotpass.utils
+package fr.jorisfavier.youshallnotpass.utils.extensions
 
 /**
  * Returns the first non null value of nullableElement's list.

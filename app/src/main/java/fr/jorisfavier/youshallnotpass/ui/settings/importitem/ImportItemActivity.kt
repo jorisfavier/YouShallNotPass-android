@@ -9,7 +9,7 @@ import com.github.appintro.AppIntroPageTransformerType
 import dagger.android.AndroidInjection
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.ui.settings.importitem.review.ReviewImportedItemsFragment
-import fr.jorisfavier.youshallnotpass.utils.getThemeColor
+import fr.jorisfavier.youshallnotpass.utils.extensions.getThemeColor
 import javax.inject.Inject
 
 class ImportItemActivity : AppIntro() {

@@ -1,6 +1,6 @@
 package fr.jorisfavier.youshallnotpass.api
 
-import fr.jorisfavier.youshallnotpass.utils.hostWithPort
+import fr.jorisfavier.youshallnotpass.utils.extensions.hostWithPort
 import okhttp3.Interceptor
 import okhttp3.Response
 

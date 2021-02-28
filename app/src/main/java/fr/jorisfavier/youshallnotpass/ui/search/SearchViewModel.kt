@@ -11,7 +11,7 @@ import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
-import fr.jorisfavier.youshallnotpass.utils.default
+import fr.jorisfavier.youshallnotpass.utils.extensions.default
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow

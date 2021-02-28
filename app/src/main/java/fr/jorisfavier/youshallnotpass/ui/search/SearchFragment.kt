@@ -19,9 +19,9 @@ import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.ui.settings.SettingsFragment
 import fr.jorisfavier.youshallnotpass.utils.autoCleared
-import fr.jorisfavier.youshallnotpass.utils.onUnknownFailure
-import fr.jorisfavier.youshallnotpass.utils.onYsnpFailure
-import fr.jorisfavier.youshallnotpass.utils.toast
+import fr.jorisfavier.youshallnotpass.utils.extensions.onUnknownFailure
+import fr.jorisfavier.youshallnotpass.utils.extensions.onYsnpFailure
+import fr.jorisfavier.youshallnotpass.utils.extensions.toast
 import jp.wasabeef.recyclerview.animators.FadeInRightAnimator
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject

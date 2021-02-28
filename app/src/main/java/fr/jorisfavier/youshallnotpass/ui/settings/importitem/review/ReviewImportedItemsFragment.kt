@@ -15,7 +15,7 @@ import fr.jorisfavier.youshallnotpass.databinding.FragmentImportReviewItemBindin
 import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemViewModel
 import fr.jorisfavier.youshallnotpass.utils.State
 import fr.jorisfavier.youshallnotpass.utils.autoCleared
-import fr.jorisfavier.youshallnotpass.utils.toast
+import fr.jorisfavier.youshallnotpass.utils.extensions.toast
 import javax.inject.Inject
 
 class ReviewImportedItemsFragment : Fragment(R.layout.fragment_import_review_item), SlidePolicy {

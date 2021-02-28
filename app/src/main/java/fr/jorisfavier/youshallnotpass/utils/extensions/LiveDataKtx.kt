@@ -1,4 +1,4 @@
-package fr.jorisfavier.youshallnotpass.utils
+package fr.jorisfavier.youshallnotpass.utils.extensions
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData

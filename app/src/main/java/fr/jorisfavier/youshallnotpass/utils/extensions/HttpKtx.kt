@@ -1,4 +1,4 @@
-package fr.jorisfavier.youshallnotpass.utils
+package fr.jorisfavier.youshallnotpass.utils.extensions
 
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull

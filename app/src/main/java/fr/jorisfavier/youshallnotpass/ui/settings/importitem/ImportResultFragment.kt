@@ -14,7 +14,7 @@ import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentImportResultBinding
 import fr.jorisfavier.youshallnotpass.utils.State
 import fr.jorisfavier.youshallnotpass.utils.autoCleared
-import fr.jorisfavier.youshallnotpass.utils.getThemeColor
+import fr.jorisfavier.youshallnotpass.utils.extensions.getThemeColor
 import javax.inject.Inject
 
 class ImportResultFragment : Fragment(R.layout.fragment_import_result) {

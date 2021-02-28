@@ -3,7 +3,7 @@ package fr.jorisfavier.youshallnotpass.ui.settings.importitem.review
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import fr.jorisfavier.youshallnotpass.R
-import fr.jorisfavier.youshallnotpass.utils.inflate
+import fr.jorisfavier.youshallnotpass.utils.extensions.inflate
 
 class ImportedItemAdapter(private var items: List<ExternalItemViewModel>) : RecyclerView.Adapter<ImportedItemViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImportedItemViewHolder {

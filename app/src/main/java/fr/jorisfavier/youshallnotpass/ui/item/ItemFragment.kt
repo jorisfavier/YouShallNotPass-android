@@ -16,7 +16,7 @@ import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentItemBinding
 import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.utils.autoCleared
-import fr.jorisfavier.youshallnotpass.utils.toast
+import fr.jorisfavier.youshallnotpass.utils.extensions.toast
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
@@ -35,7 +35,11 @@ class ItemFragment : Fragment(R.layout.fragment_item) {
         AndroidSupportInjection.inject(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         binding = FragmentItemBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
@@ -45,7 +49,8 @@ class ItemFragment : Fragment(R.layout.fragment_item) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (activity as AppCompatActivity).supportActionBar?.apply {
-            title = getString(if (args.itemId == 0) R.string.item_create_title else R.string.item_edit_title)
+            title =
+                getString(if (args.itemId == 0) R.string.item_create_title else R.string.item_edit_title)
             show()
         }
 
@@ -65,7 +70,8 @@ class ItemFragment : Fragment(R.layout.fragment_item) {
             viewModel.updateOrCreateItem().collect {
                 val messageResourceId = when {
                     it.isSuccess -> it.getOrDefault(R.string.item_creation_success)
-                    it.isFailure -> (it.exceptionOrNull() as? YsnpException)?.messageResId ?: R.string.error_occurred
+                    it.isFailure -> (it.exceptionOrNull() as? YsnpException)?.messageResId
+                        ?: R.string.error_occurred
                     else -> R.string.error_occurred
                 }
                 context?.toast(messageResourceId)

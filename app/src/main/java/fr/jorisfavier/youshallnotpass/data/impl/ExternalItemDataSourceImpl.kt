@@ -9,8 +9,8 @@ import fr.jorisfavier.youshallnotpass.data.model.ItemDto
 import fr.jorisfavier.youshallnotpass.manager.IContentResolverManager
 import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.utils.FileUtil
-import fr.jorisfavier.youshallnotpass.utils.firstNotNull
-import fr.jorisfavier.youshallnotpass.utils.getDomainIfUrl
+import fr.jorisfavier.youshallnotpass.utils.extensions.firstNotNull
+import fr.jorisfavier.youshallnotpass.utils.extensions.getDomainIfUrl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -92,11 +92,27 @@ class ExternalItemDataSourceImpl @Inject constructor(
                     items.add(
                         ItemDto(
                             title = lineContent
-                                .getOrNull(firstNotNull(defaultValue = DEFAULT_TITLE_INDEX, titleIndex, urlIndex))
+                                .getOrNull(
+                                    firstNotNull(
+                                        defaultValue = DEFAULT_TITLE_INDEX,
+                                        titleIndex,
+                                        urlIndex
+                                    )
+                                )
                                 ?.getDomainIfUrl()
                                 ?.capitalize(Locale.getDefault()),
-                            login = lineContent.getOrNull(firstNotNull(defaultValue = DEFAULT_LOGIN_INDEX, loginIndex)),
-                            password = lineContent.getOrNull(firstNotNull(defaultValue = DEFAULT_PASSWORD_INDEX, passwordIndex)),
+                            login = lineContent.getOrNull(
+                                firstNotNull(
+                                    defaultValue = DEFAULT_LOGIN_INDEX,
+                                    loginIndex
+                                )
+                            ),
+                            password = lineContent.getOrNull(
+                                firstNotNull(
+                                    defaultValue = DEFAULT_PASSWORD_INDEX,
+                                    passwordIndex
+                                )
+                            ),
                         )
                     )
                 }
