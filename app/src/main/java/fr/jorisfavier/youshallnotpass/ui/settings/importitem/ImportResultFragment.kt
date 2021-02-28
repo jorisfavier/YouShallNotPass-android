@@ -13,6 +13,7 @@ import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentImportResultBinding
 import fr.jorisfavier.youshallnotpass.utils.State
+import fr.jorisfavier.youshallnotpass.utils.autoCleared
 import fr.jorisfavier.youshallnotpass.utils.getThemeColor
 import javax.inject.Inject
 
@@ -22,14 +23,18 @@ class ImportResultFragment : Fragment(R.layout.fragment_import_result) {
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private val viewModel: ImportItemViewModel by activityViewModels { viewModelFactory }
-    private lateinit var binding: FragmentImportResultBinding
+    private var binding: FragmentImportResultBinding by autoCleared()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AndroidSupportInjection.inject(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = FragmentImportResultBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
@@ -53,9 +58,18 @@ class ImportResultFragment : Fragment(R.layout.fragment_import_result) {
                 binding.importResultImage.isVisible = state !is State.Loading
                 binding.importResultDescription.isVisible = state !is State.Loading
                 binding.importResultProgress.isVisible = state is State.Loading
-                binding.importResultImage.setImageDrawable(AppCompatResources.getDrawable(requireContext(), imageResId))
+                binding.importResultImage.setImageDrawable(
+                    AppCompatResources.getDrawable(
+                        requireContext(),
+                        imageResId
+                    )
+                )
                 binding.importResultDescription.text = getString(descriptionTextId)
-                binding.importResultDescription.setTextColor(requireContext().getThemeColor(colorResId))
+                binding.importResultDescription.setTextColor(
+                    requireContext().getThemeColor(
+                        colorResId
+                    )
+                )
             }
         }
     }

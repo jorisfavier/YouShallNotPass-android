@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
@@ -17,7 +16,8 @@ import fr.jorisfavier.youshallnotpass.utils.hideKeyboard
 import fr.jorisfavier.youshallnotpass.utils.toast
 import javax.inject.Inject
 
-class ProvideImportPasswordFragment : Fragment(R.layout.fragment_import_password_needed), SlidePolicy {
+class ProvideImportPasswordFragment : Fragment(R.layout.fragment_import_password_needed),
+    SlidePolicy {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -29,8 +29,12 @@ class ProvideImportPasswordFragment : Fragment(R.layout.fragment_import_password
         AndroidSupportInjection.inject(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = DataBindingUtil.inflate<FragmentImportPasswordNeededBinding>(inflater, R.layout.fragment_import_password_needed, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val binding = FragmentImportPasswordNeededBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = this
         binding.password = viewModel.password
         return binding.root

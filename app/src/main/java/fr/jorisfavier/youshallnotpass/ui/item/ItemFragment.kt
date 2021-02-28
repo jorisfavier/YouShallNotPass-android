@@ -15,6 +15,7 @@ import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentItemBinding
 import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
+import fr.jorisfavier.youshallnotpass.utils.autoCleared
 import fr.jorisfavier.youshallnotpass.utils.toast
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
@@ -27,7 +28,7 @@ class ItemFragment : Fragment(R.layout.fragment_item) {
     private val viewModel: ItemEditViewModel by viewModels { viewModelFactory }
     private val args: ItemFragmentArgs by navArgs()
 
-    private lateinit var binding: FragmentItemBinding
+    private var binding: FragmentItemBinding by autoCleared()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -14,6 +14,7 @@ import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentImportReviewItemBinding
 import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemViewModel
 import fr.jorisfavier.youshallnotpass.utils.State
+import fr.jorisfavier.youshallnotpass.utils.autoCleared
 import fr.jorisfavier.youshallnotpass.utils.toast
 import javax.inject.Inject
 
@@ -25,7 +26,7 @@ class ReviewImportedItemsFragment : Fragment(R.layout.fragment_import_review_ite
     private val viewModel: ImportItemViewModel by activityViewModels { viewModelFactory }
 
     private val adapter = ImportedItemAdapter(listOf())
-    private lateinit var binding: FragmentImportReviewItemBinding
+    private var binding: FragmentImportReviewItemBinding by autoCleared()
 
     override val isPolicyRespected: Boolean
         get() = viewModel.isAtLeastOneItemSelected
@@ -35,7 +36,11 @@ class ReviewImportedItemsFragment : Fragment(R.layout.fragment_import_review_ite
         AndroidSupportInjection.inject(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         binding = FragmentImportReviewItemBinding.inflate(layoutInflater, container, false)
         return binding.root
     }

@@ -13,6 +13,7 @@ import com.github.appintro.SlidePolicy
 import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentImportSelectFileBinding
+import fr.jorisfavier.youshallnotpass.utils.autoCleared
 import fr.jorisfavier.youshallnotpass.utils.toast
 import javax.inject.Inject
 
@@ -22,20 +23,25 @@ class ImportSelectFileFragment : Fragment(R.layout.fragment_import_select_file),
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private val viewModel: ImportItemViewModel by activityViewModels { viewModelFactory }
-    private lateinit var binding: FragmentImportSelectFileBinding
+    private var binding: FragmentImportSelectFileBinding by autoCleared()
 
-    private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let {
-            viewModel.setUri(uri)
+    private val getContent =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                viewModel.setUri(uri)
+            }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AndroidSupportInjection.inject(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         binding = FragmentImportSelectFileBinding.inflate(layoutInflater, container, false)
         return binding.root
     }

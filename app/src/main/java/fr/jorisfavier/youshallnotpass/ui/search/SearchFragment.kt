@@ -18,6 +18,7 @@ import fr.jorisfavier.youshallnotpass.databinding.FragmentSearchBinding
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.ui.settings.SettingsFragment
+import fr.jorisfavier.youshallnotpass.utils.autoCleared
 import fr.jorisfavier.youshallnotpass.utils.onUnknownFailure
 import fr.jorisfavier.youshallnotpass.utils.onYsnpFailure
 import fr.jorisfavier.youshallnotpass.utils.toast
@@ -30,7 +31,7 @@ class SearchFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    private lateinit var binding: FragmentSearchBinding
+    private var binding: FragmentSearchBinding by autoCleared()
 
     private val viewModel: SearchViewModel by viewModels { viewModelFactory }
 
@@ -49,7 +50,11 @@ class SearchFragment : Fragment() {
         AndroidSupportInjection.inject(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = FragmentSearchBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
@@ -138,7 +143,9 @@ class SearchFragment : Fragment() {
                             .setNegativeButton(android.R.string.cancel, null)
                             .setPositiveButton(R.string.sync_desktop_amd_mobile) { _, _ ->
                                 val direction =
-                                    SearchFragmentDirections.actionSearchFragmentToSettingsFragment(highlightItem = SettingsFragment.KEY_DESKTOP)
+                                    SearchFragmentDirections.actionSearchFragmentToSettingsFragment(
+                                        highlightItem = SettingsFragment.KEY_DESKTOP
+                                    )
                                 findNavController().navigate(direction)
                             }
                             .show()
