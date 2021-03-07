@@ -15,7 +15,7 @@
         app:title="@string/export_password" />
     <fr.jorisfavier.youshallnotpass.ui.common.BlinkPreference
         app:key="desktop"
-        app:summary="You can directly send you items to your computer using the YouShallNotPass desktop app: https://urltodefine.com"
+        app:summary="@string/ysnp_desktop_summary"
         app:title="@string/ysnp_desktop" />
     <ListPreference
         app:key="theme"
