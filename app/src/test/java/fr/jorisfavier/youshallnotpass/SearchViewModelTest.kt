@@ -7,6 +7,7 @@ import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
+import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.ui.search.SearchViewModel
 import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
@@ -23,8 +24,17 @@ class SearchViewModelTest {
     private val cryptoManager: ICryptoManager = mockk()
     private val clipboardManager: ClipboardManager = mockk()
     private val appPreferences: AppPreferenceDataSource = mockk()
+    private val desktopRepository: DesktopRepository = mockk()
 
-    private val viewModel by lazy { SearchViewModel(itemRepository, cryptoManager, clipboardManager, appPreferences) }
+    private val viewModel by lazy {
+        SearchViewModel(
+            itemRepository,
+            cryptoManager,
+            clipboardManager,
+            appPreferences,
+            desktopRepository
+        )
+    }
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -221,26 +231,84 @@ class SearchViewModelTest {
     }
 
     @Test
-    fun `when deleteItem called the item should be removed from the repository and the flow should emit a success`() = runBlocking {
-        //given
-        coEvery { itemRepository.deleteItem(any()) } just runs
-        //when
-        val result = viewModel.deleteItem(fakeItem).first()
+    fun `when deleteItem called the item should be removed from the repository and the flow should emit a success`() =
+        runBlocking {
+            //given
+            coEvery { itemRepository.deleteItem(any()) } just runs
+            //when
+            val result = viewModel.deleteItem(fakeItem).first()
 
-        //then
-        assertTrue(result.isSuccess)
-    }
+            //then
+            assertTrue(result.isSuccess)
+        }
 
     @Test
-    fun `when deleteItem called and the repository throws an exception the flow should emit a failure`() = runBlocking {
-        //given
-        coEvery { itemRepository.deleteItem(any()) } throws Exception()
-        //when
-        val result = viewModel.deleteItem(fakeItem).first()
+    fun `when deleteItem called and the repository throws an exception the flow should emit a failure`() =
+        runBlocking {
+            //given
+            coEvery { itemRepository.deleteItem(any()) } throws Exception()
+            //when
+            val result = viewModel.deleteItem(fakeItem).first()
 
-        //then
-        assertTrue(result.isFailure)
-    }
+            //then
+            assertTrue(result.isFailure)
+        }
+
+    @Test
+    fun `when sendToDesktop called with type LOGIN we send the login info to the desktop app`() =
+        runBlocking {
+            //given
+            val slot = slot<String>()
+            coEvery { desktopRepository.sendData(capture(slot)) } just runs
+            //when
+            val result = viewModel.sendToDesktop(fakeItem, ItemDataType.LOGIN).first()
+
+            //then
+            assertTrue(result.isSuccess)
+            assertEquals(fakeItem.login, slot.captured)
+        }
+
+    @Test
+    fun `when sendToDesktop called with type PASSWORD we send the password info to the desktop app`() =
+        runBlocking {
+            //given
+            val slot = slot<String>()
+            coEvery { desktopRepository.sendData(capture(slot)) } just runs
+            every { cryptoManager.decryptData(any(), any()) } returns fakePassword
+            //when
+            val result = viewModel.sendToDesktop(fakeItem, ItemDataType.PASSWORD).first()
+
+            //then
+            assertTrue(result.isSuccess)
+            assertEquals(fakePassword, slot.captured)
+        }
+
+    @Test
+    fun `when sendToDesktop called and cryptoManager throws an exception then nothing should be sent to the desktop app`() =
+        runBlocking {
+            //given
+            coEvery { desktopRepository.sendData(any()) } just runs
+            every { cryptoManager.decryptData(any(), any()) } throws Exception()
+            //when
+            val result = viewModel.sendToDesktop(fakeItem, ItemDataType.PASSWORD).first()
+
+            //then
+            assertTrue(result.isFailure)
+            coVerify(inverse = true) { desktopRepository.sendData(any()) }
+
+        }
+
+    @Test
+    fun `when sendToDesktop called and desktopRepository throws an exception then the flow should emit a failure`() =
+        runBlocking {
+            //given
+            coEvery { desktopRepository.sendData(any()) } throws Exception()
+            //when
+            val result = viewModel.sendToDesktop(fakeItem, ItemDataType.LOGIN).first()
+
+            //then
+            assertTrue(result.isFailure)
+        }
 
 
 }
