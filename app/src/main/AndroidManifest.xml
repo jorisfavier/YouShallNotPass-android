@@ -17,6 +17,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.YouShallNotPass">
 
+        <service
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_AUTOFILL_SERVICE"
+            android:name=".service.YsnpAutofillService">
+            <intent-filter>
+                <action android:name="android.service.autofill.AutofillService" />
+            </intent-filter>
+        </service>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="fr.jorisfavier.fileprovider"

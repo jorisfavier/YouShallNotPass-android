@@ -1,8 +1,13 @@
 package fr.jorisfavier.youshallnotpass.ui.settings
 
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.activityViewModels
@@ -46,6 +51,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var versionPreference: Preference
     private lateinit var deleteAllPreference: Preference
     private lateinit var desktopPreference: Preference
+    private lateinit var autofillPreference: SwitchPreferenceCompat
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -66,6 +72,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         versionPreference = findPreference(KEY_APP_VERSION)!!
         deleteAllPreference = findPreference(KEY_DELETE_ALL)!!
         desktopPreference = findPreference(KEY_DESKTOP)!!
+        autofillPreference = findPreference(KEY_AUTOFILL)!!
 
         initAppThemePreference()
         initExportPreference()
@@ -74,6 +81,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
         initDeleteAllPreference()
         initDesktopPreference()
         playFocusAnimationIfNeeded()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            initAutofillPreference()
+        }
     }
 
     private fun initAppThemePreference() {
@@ -155,6 +165,19 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun initAutofillPreference() {
+        autofillPreference.isVisible = true
+        autofillPreference.setOnPreferenceChangeListener { preference, newValue ->
+            homeViewModel.ignoreNextPause()
+            val intent = Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE).apply {
+                data = Uri.parse("package:${BuildConfig.APPLICATION_ID}")
+            }
+            startActivity(intent)
+            true
+        }
+    }
+
     private fun playFocusAnimationIfNeeded() {
         args.highlightItem?.let {
             findPreference<BlinkPreference>(it)?.blink()
@@ -180,5 +203,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         const val KEY_APP_VERSION = "appVersion"
         const val KEY_DELETE_ALL = "deleteAll"
         const val KEY_DESKTOP = "desktop"
+        const val KEY_AUTOFILL = "autofill"
     }
 }

@@ -81,5 +81,7 @@
     <string name="ysnp_desktop_communication_success">Données envoyées !</string>
     <string name="ysnp_desktop_communication_fail">Impossible d\'envoyer les données. Synchroniser vos applications mobile et PC et réessayez</string>
     <string name="sync_desktop_amd_mobile">Synchroniser</string>
+    <string name="autofill">Autofill</string>
+    <string name="autofill_explanation">Rempli automatiquement les formulaires d\'authentification en utilisant les données de YouShallNotPass</string>
 
 </resources>

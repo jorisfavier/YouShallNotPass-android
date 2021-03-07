@@ -1,4 +1,5 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <SwitchPreferenceCompat
         app:key="hideItems"
@@ -17,6 +18,12 @@
         app:key="desktop"
         app:summary="You can directly send you items to your computer using the YouShallNotPass desktop app: https://urltodefine.com"
         app:title="@string/ysnp_desktop" />
+    <SwitchPreferenceCompat
+        tools:isPreferenceVisible="true"
+        app:isPreferenceVisible="false"
+        app:key="autofill"
+        app:summary="@string/autofill_explanation"
+        app:title="@string/autofill" />
     <ListPreference
         app:key="theme"
         app:title="@string/app_theme" />
