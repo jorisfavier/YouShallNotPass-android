@@ -1,5 +1,6 @@
 package fr.jorisfavier.youshallnotpass.ui.settings
 
+import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
@@ -7,6 +8,8 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
+import android.view.autofill.AutofillManager
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -52,6 +55,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var deleteAllPreference: Preference
     private lateinit var desktopPreference: Preference
     private lateinit var autofillPreference: SwitchPreferenceCompat
+
+    private val requestAutofill =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                autofillPreference.isChecked = true
+            }
+        }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -167,14 +177,21 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initAutofillPreference() {
+        val autofillManager = requireContext().getSystemService(AutofillManager::class.java)
         autofillPreference.isVisible = true
-        autofillPreference.setOnPreferenceChangeListener { preference, newValue ->
-            homeViewModel.ignoreNextPause()
-            val intent = Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE).apply {
-                data = Uri.parse("package:${BuildConfig.APPLICATION_ID}")
+        autofillPreference.isChecked = autofillManager.hasEnabledAutofillServices()
+        autofillPreference.setOnPreferenceChangeListener { _, checked ->
+            if (checked == true) {
+                homeViewModel.ignoreNextPause()
+                val intent = Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE).apply {
+                    data = Uri.parse("package:${BuildConfig.APPLICATION_ID}")
+                }
+                requestAutofill.launch(intent)
+                false
+            } else {
+                autofillManager.disableAutofillServices()
+                true
             }
-            startActivity(intent)
-            true
         }
     }
 
