@@ -19,8 +19,12 @@ class SearchResultAdapter(
     private var lastExpandedViewHolder: SearchResultViewHolder? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchResultViewHolder {
-        val binding = ViewholderSearchResultBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return SearchResultViewHolder(binding.root, binding)
+        val binding = ViewholderSearchResultBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return SearchResultViewHolder(binding)
     }
 
     override fun getItemCount(): Int {

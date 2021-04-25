@@ -6,6 +6,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
 import fr.jorisfavier.youshallnotpass.ui.auth.AuthViewModel
+import fr.jorisfavier.youshallnotpass.ui.autofill.AutofillViewModel
 import fr.jorisfavier.youshallnotpass.ui.desktop.DesktopConnectionViewModel
 import fr.jorisfavier.youshallnotpass.ui.home.HomeViewModel
 import fr.jorisfavier.youshallnotpass.ui.item.ItemEditViewModel
@@ -49,6 +50,11 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(DesktopConnectionViewModel::class)
     abstract fun bindDesktopConnectionViewModel(desktopConnectionViewModel: DesktopConnectionViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(AutofillViewModel::class)
+    abstract fun bindAutofillViewModel(autofillViewModel: AutofillViewModel): ViewModel
 
     @Binds
     abstract fun bindViewModelFactory(factory: MainViewModelFactory): ViewModelProvider.Factory
