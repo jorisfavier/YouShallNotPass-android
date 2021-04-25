@@ -4,8 +4,8 @@ import android.app.assist.AssistStructure
 import android.os.Build
 import android.view.View
 import androidx.annotation.RequiresApi
-import fr.jorisfavier.youshallnotpass.model.AutofillItemType
 import fr.jorisfavier.youshallnotpass.model.AutofillParsedStructure
+import fr.jorisfavier.youshallnotpass.model.ItemDataType
 
 @RequiresApi(Build.VERSION_CODES.O)
 object AssistStructureUtil {
@@ -45,9 +45,9 @@ object AssistStructureUtil {
         return when {
             viewNode?.autofillHints?.any {
                 it == View.AUTOFILL_HINT_USERNAME || it == View.AUTOFILL_HINT_NAME || it == View.AUTOFILL_HINT_EMAIL_ADDRESS
-            } == true -> AutofillParsedStructure(viewNode.autofillId!!, AutofillItemType.LOGIN)
+            } == true -> AutofillParsedStructure(viewNode.autofillId!!, ItemDataType.LOGIN)
             viewNode?.autofillHints?.any { it == View.AUTOFILL_HINT_PASSWORD } == true ->
-                AutofillParsedStructure(viewNode.autofillId!!, AutofillItemType.PASSWORD)
+                AutofillParsedStructure(viewNode.autofillId!!, ItemDataType.PASSWORD)
             else -> null
         }
     }

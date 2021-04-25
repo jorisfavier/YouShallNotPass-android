@@ -3,21 +3,15 @@ package fr.jorisfavier.youshallnotpass.ui.autofill
 import android.app.assist.AssistStructure
 import android.content.Intent
 import android.os.Build
-import android.service.autofill.Dataset
-import android.service.autofill.FillResponse
 import android.view.autofill.AutofillManager
-import android.view.autofill.AutofillValue
-import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
-import fr.jorisfavier.youshallnotpass.BuildConfig
-import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
-import fr.jorisfavier.youshallnotpass.model.AutofillItemType
 import fr.jorisfavier.youshallnotpass.model.AutofillParsedStructure
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.utils.AssistStructureUtil
+import fr.jorisfavier.youshallnotpass.utils.AutofillHelper
 import fr.jorisfavier.youshallnotpass.utils.Event
 import timber.log.Timber
 import javax.inject.Inject
@@ -65,42 +59,12 @@ class AutofillViewModel @Inject constructor(
     }
 
     fun onItemClicked(item: Item) {
-        val dataSet = Dataset.Builder()
         val itemPassword = cryptoManager.decryptData(item.password, item.initializationVector)
-        autofillNodes.forEach {
-            when (it.type) {
-                AutofillItemType.LOGIN -> {
-                    dataSet.setValue(
-                        it.id,
-                        AutofillValue.forText(item.login),
-                        RemoteViews(
-                            BuildConfig.APPLICATION_ID,
-                            R.layout.autofill_response
-                        ).apply {
-                            setTextViewText(R.id.title, item.title)
-                            setTextViewText(R.id.subtitle, item.login)
-                        }
-                    )
-                }
-                AutofillItemType.PASSWORD -> {
-                    dataSet.setValue(
-                        it.id,
-                        AutofillValue.forText(itemPassword),
-                        RemoteViews(
-                            BuildConfig.APPLICATION_ID,
-                            R.layout.autofill_response
-                        ).apply {
-                            setTextViewText(R.id.title, item.title)
-                            setTextViewText(R.id.subtitle, item.login)
-                        }
-                    )
-                }
-            }
-        }
-        val data = dataSet.build()
-        val fillResponse = FillResponse.Builder()
-            .addDataset(data)
-            .build()
+        val data = AutofillHelper.buildDataSet(
+            parsedStructure = autofillNodes,
+            item = item,
+            password = itemPassword,
+        )
         _autofillResponse.value =
             Event(Intent().putExtra(AutofillManager.EXTRA_AUTHENTICATION_RESULT, data))
     }

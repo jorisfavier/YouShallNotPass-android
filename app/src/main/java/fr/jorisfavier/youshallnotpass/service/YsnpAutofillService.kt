@@ -7,14 +7,12 @@ import android.content.IntentSender
 import android.os.Build
 import android.os.CancellationSignal
 import android.service.autofill.*
-import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import dagger.android.AndroidInjection
-import fr.jorisfavier.youshallnotpass.BuildConfig
-import fr.jorisfavier.youshallnotpass.model.AutofillItemType
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.ui.autofill.AutofillActivity
 import fr.jorisfavier.youshallnotpass.utils.AssistStructureUtil
+import fr.jorisfavier.youshallnotpass.utils.AutofillHelper
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -38,14 +36,10 @@ class YsnpAutofillService : AutofillService() {
         val context: List<FillContext> = request.fillContexts
         val structure: AssistStructure = context[context.size - 1].structure
         // Traverse the structure looking for nodes to fill out.
-        val results = AssistStructureUtil.traverseStructure(structure)
-        Timber.d("zbri - $results")
+        val parsedStructure = AssistStructureUtil.traverseStructure(structure)
+        Timber.d("zbri - $parsedStructure")
 
-        if (results.isNotEmpty()) {
-            val authPresentation =
-                RemoteViews(BuildConfig.APPLICATION_ID, android.R.layout.simple_list_item_1).apply {
-                    setTextViewText(android.R.id.text1, "requires authentication")
-                }
+        if (parsedStructure.isNotEmpty()) {
             val authIntent = Intent(this, AutofillActivity::class.java)
 
             val intentSender: IntentSender = PendingIntent.getActivity(
@@ -55,30 +49,13 @@ class YsnpAutofillService : AutofillService() {
                 PendingIntent.FLAG_CANCEL_CURRENT
             ).intentSender
 
-            val dataSet = Dataset.Builder()
-            results.forEach {
-                when (it.type) {
-                    AutofillItemType.LOGIN -> {
-                        dataSet.setValue(
-                            it.id,
-                            null,
-                            authPresentation,
-                        )
-                    }
-                    AutofillItemType.PASSWORD -> {
-                        dataSet.setValue(
-                            it.id,
-                            null,
-                            authPresentation,
-                        )
-                    }
-                }
-            }
-            dataSet.setAuthentication(intentSender)
+            val dataSet = AutofillHelper.buildDataSet(
+                parsedStructure = parsedStructure,
+                intentSender = intentSender,
+            )
 
-            // Build a FillResponse object that requires authentication.
             val fillResponse: FillResponse = FillResponse.Builder()
-                .addDataset(dataSet.build())
+                .addDataset(dataSet)
                 .build()
             callback.onSuccess(fillResponse)
         } else {
