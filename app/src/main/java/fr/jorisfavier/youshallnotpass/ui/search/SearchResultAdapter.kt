@@ -2,6 +2,7 @@ package fr.jorisfavier.youshallnotpass.ui.search
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import fr.jorisfavier.youshallnotpass.databinding.ViewholderSearchResultBinding
 import fr.jorisfavier.youshallnotpass.model.Item
@@ -13,12 +14,11 @@ class SearchResultAdapter(
     private val decryptPassword: (Item) -> Result<String>,
     private val copyPasswordToClipboard: (Item, ItemDataType) -> Unit,
     private val sendToDesktop: (Item, ItemDataType) -> Unit
-) : RecyclerView.Adapter<SearchResultViewHolder>() {
+) : ListAdapter<Item, RecyclerView.ViewHolder>(Item.diffCallback) {
 
-    private var results: List<Item> = ArrayList()
     private var lastExpandedViewHolder: SearchResultViewHolder? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchResultViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val binding = ViewholderSearchResultBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
@@ -27,13 +27,10 @@ class SearchResultAdapter(
         return SearchResultViewHolder(binding)
     }
 
-    override fun getItemCount(): Int {
-        return results.size
-    }
-
-    override fun onBindViewHolder(holder: SearchResultViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val holder = holder as? SearchResultViewHolder ?: return
         holder.bind(
-            results[position],
+            getItem(position),
             onItemEditClicked,
             onDeleteItemClicked,
             decryptPassword,
@@ -49,18 +46,10 @@ class SearchResultAdapter(
         }
     }
 
-    fun updateResults(newList: List<Item>) {
-        results = newList
-        lastExpandedViewHolder?.toggleViewState(false)
-        notifyDataSetChanged()
-    }
-
     fun removeItem(item: Item) {
-        val position = results.indexOf(item)
-        val newList = results.toMutableList().apply {
+        val newList = currentList.toMutableList().apply {
             remove(item)
         }
-        results = newList
-        notifyItemRemoved(position)
+        submitList(newList)
     }
 }

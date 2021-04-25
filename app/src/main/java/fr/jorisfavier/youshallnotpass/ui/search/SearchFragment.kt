@@ -1,12 +1,8 @@
 package fr.jorisfavier.youshallnotpass.ui.search
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -14,28 +10,23 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.support.AndroidSupportInjection
 import fr.jorisfavier.youshallnotpass.R
-import fr.jorisfavier.youshallnotpass.databinding.FragmentSearchBinding
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.ui.settings.SettingsFragment
-import fr.jorisfavier.youshallnotpass.utils.autoCleared
 import fr.jorisfavier.youshallnotpass.utils.extensions.onUnknownFailure
 import fr.jorisfavier.youshallnotpass.utils.extensions.onYsnpFailure
 import fr.jorisfavier.youshallnotpass.utils.extensions.toast
-import jp.wasabeef.recyclerview.animators.FadeInRightAnimator
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
-class SearchFragment : Fragment() {
+class SearchFragment : SearchBaseFragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    private var binding: FragmentSearchBinding by autoCleared()
+    override val viewModel: SearchViewModel by viewModels { viewModelFactory }
 
-    private val viewModel: SearchViewModel by viewModels { viewModelFactory }
-
-    private val searchAdapter by lazy {
+    override val searchAdapter by lazy {
         SearchResultAdapter(
             this::navigateToEditItemFragment,
             this::deleteItem,
@@ -50,48 +41,10 @@ class SearchFragment : Fragment() {
         AndroidSupportInjection.inject(this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentSearchBinding.inflate(inflater, container, false)
-        binding.lifecycleOwner = this
-        binding.viewModel = viewModel
-        return binding.root
-
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initRecyclerView()
-        initSettings()
         binding.searchAddNewItemButton.setOnClickListener {
             navigateToCreateNewItem()
-        }
-        (activity as AppCompatActivity).supportActionBar?.hide()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.refreshItems()
-    }
-
-    private fun initSettings() {
-        binding.searchSettingsButton.setOnClickListener {
-            val action = SearchFragmentDirections.actionSearchFragmentToSettingsFragment()
-            findNavController().navigate(action)
-        }
-    }
-
-    private fun initRecyclerView() {
-        binding.searchRecyclerview.apply {
-            adapter = searchAdapter
-            setHasFixedSize(true)
-            itemAnimator = FadeInRightAnimator()
-        }
-        viewModel.results.observe(viewLifecycleOwner) { result ->
-            searchAdapter.updateResults(result)
         }
     }
 

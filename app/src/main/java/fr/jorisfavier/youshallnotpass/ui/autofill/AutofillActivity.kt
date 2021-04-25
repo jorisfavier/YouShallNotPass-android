@@ -24,7 +24,7 @@ class AutofillActivity : AppCompatActivity() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    private val viewModel: AutofillViewModel by viewModels { viewModelFactory }
+    private val viewModel: AutofillSearchViewModel by viewModels { viewModelFactory }
 
     private val navController by lazy {
         findNavControllerFromFragmentContainerView(R.id.nav_host_fragment)
@@ -44,6 +44,10 @@ class AutofillActivity : AppCompatActivity() {
             viewModel.setAssistStructure(assistStructure)
             requireAuthentication()
         }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp()
     }
 
     private fun requireAuthentication() {
