@@ -36,10 +36,9 @@ class YsnpAutofillService : AutofillService() {
         val context: List<FillContext> = request.fillContexts
         val structure: AssistStructure = context[context.size - 1].structure
         // Traverse the structure looking for nodes to fill out.
-        val parsedStructure = AssistStructureUtil.traverseStructure(structure)
-        Timber.d("zbri - $parsedStructure")
+        val parsedStructure = AssistStructureUtil.traverseStructure(structure, packageManager)
 
-        if (parsedStructure.isNotEmpty()) {
+        if (parsedStructure.items.isNotEmpty()) {
             val authIntent = Intent(this, AutofillActivity::class.java)
 
             val intentSender: IntentSender = PendingIntent.getActivity(
@@ -50,7 +49,7 @@ class YsnpAutofillService : AutofillService() {
             ).intentSender
 
             val dataSet = AutofillHelper.buildDataSet(
-                parsedStructure = parsedStructure,
+                autofillItems = parsedStructure.items,
                 intentSender = intentSender,
             )
 

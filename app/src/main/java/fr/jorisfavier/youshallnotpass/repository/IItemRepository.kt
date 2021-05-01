@@ -17,6 +17,13 @@ interface IItemRepository {
      */
     suspend fun searchItem(title: String): List<Item>
 
+    /***
+     *  Search for an item based on his certificates
+     *  @param certificates a list of certificate associated with an Item
+     *  @return a list of item
+     */
+    suspend fun searchItemByCertificates(certificates: List<String>): List<Item>
+
     /**
      * Retrieves an item base on the given id
      * @param id the item's identifier

@@ -99,7 +99,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun initAppThemePreference() {
         appThemePreference.entryValues = viewModel.themeValues
         appThemePreference.entries = viewModel.themeEntries.map { getString(it) }.toTypedArray()
-        appThemePreference.summary = appThemePreference.getEntryforValue(appThemePreference.value)
+        if (appThemePreference.value != null) {
+            appThemePreference.summary =
+                appThemePreference.getEntryforValue(appThemePreference.value)
+        }
         appThemePreference.onPreferenceChangeListener =
             Preference.OnPreferenceChangeListener { _, newValue ->
                 (newValue as? String)?.toIntOrNull()?.let {

@@ -7,7 +7,8 @@ data class Item(
     val title: String,
     val login: String? = null,
     val password: ByteArray,
-    val initializationVector: ByteArray
+    val initializationVector: ByteArray,
+    val packageCertificate: List<String> = listOf(),
 ) {
     val hasLogin: Boolean
         get() = !login.isNullOrEmpty()

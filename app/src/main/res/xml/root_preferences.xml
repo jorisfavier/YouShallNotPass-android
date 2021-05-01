@@ -26,6 +26,7 @@
         app:title="@string/autofill" />
     <ListPreference
         app:key="theme"
+        app:defaultValue=""
         app:title="@string/app_theme" />
     <PreferenceCategory app:title="@string/about" />
     <Preference

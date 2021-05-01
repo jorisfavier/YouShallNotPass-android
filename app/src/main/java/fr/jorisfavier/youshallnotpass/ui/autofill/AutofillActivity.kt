@@ -15,6 +15,8 @@ import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.ActivityAutofillBinding
 import fr.jorisfavier.youshallnotpass.ui.auth.AuthActivity
 import fr.jorisfavier.youshallnotpass.utils.extensions.findNavControllerFromFragmentContainerView
+import fr.jorisfavier.youshallnotpass.utils.extensions.getAppName
+import fr.jorisfavier.youshallnotpass.utils.extensions.getCertificateHashes
 import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -31,7 +33,7 @@ class AutofillActivity : AppCompatActivity() {
     }
 
     private val assistStructure by lazy {
-        intent.getParcelableExtra<AssistStructure>(AutofillManager.EXTRA_ASSIST_STRUCTURE)
+        intent.getParcelableExtra<AssistStructure>(AutofillManager.EXTRA_ASSIST_STRUCTURE)!!
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

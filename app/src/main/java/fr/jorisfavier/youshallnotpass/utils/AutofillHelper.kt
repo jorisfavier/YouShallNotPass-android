@@ -8,7 +8,7 @@ import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import fr.jorisfavier.youshallnotpass.BuildConfig
 import fr.jorisfavier.youshallnotpass.R
-import fr.jorisfavier.youshallnotpass.model.AutofillParsedStructure
+import fr.jorisfavier.youshallnotpass.model.AutofillItem
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
 
@@ -17,14 +17,14 @@ import fr.jorisfavier.youshallnotpass.model.ItemDataType
 object AutofillHelper {
 
     fun buildDataSet(
-        parsedStructure: List<AutofillParsedStructure>,
+        autofillItems: List<AutofillItem>,
         item: Item? = null,
         password: String? = null,
         intentSender: IntentSender? = null,
     ): Dataset {
         val dataSet = Dataset.Builder()
         val remoteViews = buildPresentation(item)
-        parsedStructure.forEach {
+        autofillItems.forEach {
             when (it.type) {
                 ItemDataType.LOGIN -> {
                     dataSet.setValue(
