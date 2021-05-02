@@ -28,9 +28,13 @@ class ItemRepository @Inject constructor(private var itemDataSource: ItemDataSou
 
     override suspend fun searchItemByCertificates(certificates: List<String>): List<Item> {
         return withContext(Dispatchers.IO) {
-            val certificatesString = Json.encodeToString(certificates)
-            itemDataSource.searchItemByCertificate(certificatesString)
-                .map { EntityToModel.itemEntityToItem(it) }
+            if (certificates.isEmpty()) {
+                listOf()
+            } else {
+                val certificatesString = Json.encodeToString(certificates)
+                itemDataSource.searchItemByCertificate(certificatesString)
+                    .map { EntityToModel.itemEntityToItem(it) }
+            }
         }
     }
 
