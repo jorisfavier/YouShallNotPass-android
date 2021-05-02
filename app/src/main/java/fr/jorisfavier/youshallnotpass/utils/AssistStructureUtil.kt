@@ -4,6 +4,7 @@ import android.app.assist.AssistStructure
 import android.content.pm.PackageManager
 import android.os.Build
 import android.view.View
+import android.view.autofill.AutofillId
 import androidx.annotation.RequiresApi
 import fr.jorisfavier.youshallnotpass.model.AutofillItem
 import fr.jorisfavier.youshallnotpass.model.AutofillParsedStructure
@@ -20,6 +21,7 @@ object AssistStructureUtil {
     ): AutofillParsedStructure {
         val viewNodes = mutableListOf<AssistStructure.ViewNode>()
         val autofillItems = mutableListOf<AutofillItem>()
+        val ignoreIds = mutableListOf<AutofillId>()
         val packageName = structure.activityComponent.packageName
         var webDomain: String? = null
         val windowNodes: List<AssistStructure.WindowNode> =
@@ -32,10 +34,15 @@ object AssistStructureUtil {
             viewNodes += traverseNode(viewNode)
         }
         for (viewNode in viewNodes) {
-            val autofillItem = createAutofillItem(viewNode) ?: continue
-            autofillItems.add(autofillItem)
-            if (viewNode.webDomain != null) {
-                webDomain = viewNode.webDomain
+            val autofillItem = createAutofillItem(viewNode)
+            val autofillId = viewNode.autofillId
+            if (autofillItem != null) {
+                autofillItems.add(autofillItem)
+                if (viewNode.webDomain != null) {
+                    webDomain = viewNode.webDomain
+                }
+            } else if (autofillId != null) {
+                ignoreIds.add(autofillId)
             }
         }
         return AutofillParsedStructure(
@@ -43,6 +50,7 @@ object AssistStructureUtil {
             appName = packageManager.getAppName(packageName),
             certificatesHashes = packageManager.getCertificateHashes(packageName),
             items = autofillItems,
+            ignoreIds = ignoreIds,
         )
     }
 

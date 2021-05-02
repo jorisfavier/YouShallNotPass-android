@@ -45,24 +45,27 @@ class YsnpAutofillService : AutofillService() {
         val context: List<FillContext> = request.fillContexts
         val structure: AssistStructure = context[context.size - 1].structure
         val parsedStructure = AssistStructureUtil.traverseStructure(structure, packageManager)
-        if (parsedStructure.items.isNotEmpty()) {
-            val fillResponse =
-                if (parsedStructure.webDomain != null || !authManager.isAutofillUnlocked) {
+        val fillResponse =
+            when {
+                parsedStructure.items.isEmpty() -> {
+                    null
+                }
+                parsedStructure.webDomain != null || !authManager.isAutofillUnlocked -> {
                     buildRequiresAuthResponse(parsedStructure)
-                } else {
+                }
+                else -> {
                     buildAutofillResponse(parsedStructure)
                 }
-            callback.onSuccess(fillResponse)
-        } else {
-            callback.onSuccess(null)
-        }
+            }
+        fillResponse?.setIgnoredIds(*parsedStructure.ignoreIds.toTypedArray())
+        callback.onSuccess(fillResponse?.build())
     }
 
     override fun onSaveRequest(p0: SaveRequest, p1: SaveCallback) {
         Timber.d("onSaveReq")
     }
 
-    private fun buildRequiresAuthResponse(parsedStructure: AutofillParsedStructure): FillResponse {
+    private fun buildRequiresAuthResponse(parsedStructure: AutofillParsedStructure): FillResponse.Builder {
 
         val intentSender = buildIntentSender()
         val dataSet = AutofillHelper.buildDataSet(
@@ -72,10 +75,9 @@ class YsnpAutofillService : AutofillService() {
 
         return FillResponse.Builder()
             .addDataset(dataSet)
-            .build()
     }
 
-    private fun buildAutofillResponse(parsedStructure: AutofillParsedStructure): FillResponse {
+    private fun buildAutofillResponse(parsedStructure: AutofillParsedStructure): FillResponse.Builder {
         val items = runBlocking {
             itemRepository.searchItemByCertificates(parsedStructure.certificatesHashes)
         }
@@ -100,7 +102,7 @@ class YsnpAutofillService : AutofillService() {
                 )
             )
         }
-        return responseBuilder.build()
+        return responseBuilder
     }
 
     private fun buildIntentSender(): IntentSender? {
