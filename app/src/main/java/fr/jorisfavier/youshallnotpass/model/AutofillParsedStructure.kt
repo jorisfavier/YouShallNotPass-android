@@ -8,4 +8,5 @@ data class AutofillParsedStructure(
     val certificatesHashes: List<String>,
     val items: List<AutofillItem>,
     val ignoreIds: List<AutofillId>,
+    val isNewCredentials: Boolean,
 )

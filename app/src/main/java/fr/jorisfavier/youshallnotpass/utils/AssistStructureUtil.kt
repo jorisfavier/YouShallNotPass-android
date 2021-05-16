@@ -6,6 +6,7 @@ import android.os.Build
 import android.view.View
 import android.view.autofill.AutofillId
 import androidx.annotation.RequiresApi
+import androidx.autofill.HintConstants
 import fr.jorisfavier.youshallnotpass.model.AutofillItem
 import fr.jorisfavier.youshallnotpass.model.AutofillParsedStructure
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
@@ -22,6 +23,7 @@ object AssistStructureUtil {
         val viewNodes = mutableListOf<AssistStructure.ViewNode>()
         val autofillItems = mutableListOf<AutofillItem>()
         val ignoreIds = mutableListOf<AutofillId>()
+        var newCredentials = false
         val packageName = structure.activityComponent.packageName
         var webDomain: String? = null
         val windowNodes: List<AssistStructure.WindowNode> =
@@ -44,6 +46,7 @@ object AssistStructureUtil {
             } else if (autofillId != null) {
                 ignoreIds.add(autofillId)
             }
+            newCredentials = newCredentials || isCredentialsCreationNode(viewNode)
         }
         return AutofillParsedStructure(
             webDomain = webDomain,
@@ -51,6 +54,7 @@ object AssistStructureUtil {
             certificatesHashes = packageManager.getCertificateHashes(packageName),
             items = autofillItems,
             ignoreIds = ignoreIds,
+            isNewCredentials = newCredentials,
         )
     }
 
@@ -73,17 +77,29 @@ object AssistStructureUtil {
     private fun createAutofillItem(viewNode: AssistStructure.ViewNode): AutofillItem? {
         return when {
             viewNode.autofillHints?.any {
-                it == View.AUTOFILL_HINT_USERNAME || it == View.AUTOFILL_HINT_NAME || it == View.AUTOFILL_HINT_EMAIL_ADDRESS
+                it == View.AUTOFILL_HINT_USERNAME
+                        || it == View.AUTOFILL_HINT_EMAIL_ADDRESS
+                        || it == HintConstants.AUTOFILL_HINT_NEW_USERNAME
             } == true -> AutofillItem(
                 viewNode.autofillId!!,
                 ItemDataType.LOGIN,
             )
-            viewNode.autofillHints?.any { it == View.AUTOFILL_HINT_PASSWORD } == true ->
+            viewNode.autofillHints?.any {
+                it == View.AUTOFILL_HINT_PASSWORD
+                        || it == HintConstants.AUTOFILL_HINT_NEW_PASSWORD
+            } == true ->
                 AutofillItem(
                     viewNode.autofillId!!,
                     ItemDataType.PASSWORD,
                 )
             else -> null
         }
+    }
+
+    private fun isCredentialsCreationNode(viewNode: AssistStructure.ViewNode): Boolean {
+        return viewNode.autofillHints?.any {
+            it == HintConstants.AUTOFILL_HINT_NEW_PASSWORD
+                    || it == HintConstants.AUTOFILL_HINT_NEW_USERNAME
+        } == true
     }
 }

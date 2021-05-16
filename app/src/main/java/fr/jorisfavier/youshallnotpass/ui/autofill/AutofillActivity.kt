@@ -14,9 +14,8 @@ import dagger.android.AndroidInjection
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.ActivityAutofillBinding
 import fr.jorisfavier.youshallnotpass.ui.auth.AuthActivity
+import fr.jorisfavier.youshallnotpass.ui.item.ItemFragmentArgs
 import fr.jorisfavier.youshallnotpass.utils.extensions.findNavControllerFromFragmentContainerView
-import fr.jorisfavier.youshallnotpass.utils.extensions.getAppName
-import fr.jorisfavier.youshallnotpass.utils.extensions.getCertificateHashes
 import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -36,6 +35,10 @@ class AutofillActivity : AppCompatActivity() {
         intent.getParcelableExtra<AssistStructure>(AutofillManager.EXTRA_ASSIST_STRUCTURE)!!
     }
 
+    private val redirectToItemCreation by lazy {
+        intent.getBooleanExtra(REDIRECT_TO_ITEM_KEY, false)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AndroidInjection.inject(this)
@@ -46,10 +49,29 @@ class AutofillActivity : AppCompatActivity() {
             viewModel.setAssistStructure(assistStructure)
             requireAuthentication()
         }
+        initObservers()
     }
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        navController.handleDeepLink(intent)
+    }
+
+    private fun initObservers() {
+        viewModel.appName.observe(this) { event ->
+            event.getContentIfNotHandled()?.let {
+                if (redirectToItemCreation) {
+                    navController.navigate(
+                        R.id.ItemFragment,
+                        ItemFragmentArgs(itemName = it).toBundle()
+                    )
+                }
+            }
+        }
     }
 
     private fun requireAuthentication() {
@@ -58,4 +80,9 @@ class AutofillActivity : AppCompatActivity() {
             startActivity(it)
         }
     }
+
+    companion object {
+        const val REDIRECT_TO_ITEM_KEY = "redirect_to_item_key"
+    }
+
 }

@@ -54,7 +54,7 @@ class ItemFragment : Fragment(R.layout.fragment_item) {
             show()
         }
 
-        viewModel.initData(args.itemId)
+        viewModel.initData(args.itemId, args.itemName)
 
         binding.itemviewCreateOrUpdateItemButton.setOnClickListener {
             createOrUpdateItem()

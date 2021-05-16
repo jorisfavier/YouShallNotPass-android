@@ -34,6 +34,7 @@ class AutofillSearchViewModel @Inject constructor(
     val autofillResponse: LiveData<Event<Intent>> = _autofillResponse
 
     private val autofillParsedStructure = MutableLiveData<AutofillParsedStructure>()
+    val appName = autofillParsedStructure.map { Event(it.appName) }
 
     override val results = search.combine(autofillParsedStructure)
         .switchMap { (query, parsedStructure) ->

@@ -47,6 +47,9 @@ class YsnpAutofillService : AutofillService() {
         val parsedStructure = AssistStructureUtil.traverseStructure(structure, packageManager)
         val fillResponse =
             when {
+                parsedStructure.isNewCredentials -> {
+                    buildSuggestCredentialsResponse(parsedStructure)
+                }
                 parsedStructure.items.isEmpty() -> {
                     null
                 }
@@ -61,8 +64,9 @@ class YsnpAutofillService : AutofillService() {
         callback.onSuccess(fillResponse?.build())
     }
 
-    override fun onSaveRequest(p0: SaveRequest, p1: SaveCallback) {
+    override fun onSaveRequest(saveRequest: SaveRequest, saveCallback: SaveCallback) {
         Timber.d("onSaveReq")
+        saveCallback.onFailure("Test")
     }
 
     private fun buildRequiresAuthResponse(parsedStructure: AutofillParsedStructure): FillResponse.Builder {
@@ -105,8 +109,21 @@ class YsnpAutofillService : AutofillService() {
         return responseBuilder
     }
 
-    private fun buildIntentSender(): IntentSender? {
+    private fun buildSuggestCredentialsResponse(parsedStructure: AutofillParsedStructure): FillResponse.Builder {
+        val responseBuilder = FillResponse.Builder()
+        val dataSets = AutofillHelper.buildSuggestedCredentialsDataSets(
+            context = this,
+            autofillItems = parsedStructure.items,
+            intentSender = buildIntentSender(redirectToItem = true),
+        )
+        dataSets.forEach(responseBuilder::addDataset)
+        responseBuilder.setSaveInfo(AutofillHelper.buildSaveInfo(parsedStructure.items))
+        return responseBuilder
+    }
+
+    private fun buildIntentSender(redirectToItem: Boolean = false): IntentSender {
         val authIntent = Intent(this, AutofillActivity::class.java)
+            .putExtra(AutofillActivity.REDIRECT_TO_ITEM_KEY, redirectToItem)
 
         return PendingIntent.getActivity(
             this,

@@ -36,8 +36,10 @@ class AutofillSearchFragment : SearchBaseFragment() {
 
     private fun initNewButton() {
         binding.searchAddNewItemButton.setOnClickListener {
-            val direction =
-                AutofillSearchFragmentDirections.actionAutofillSearchFragmentToItemFragment()
+            val direction = AutofillSearchFragmentDirections
+                .actionAutofillSearchFragmentToItemFragment(
+                    itemName = viewModel.appName.value?.peekContent(),
+                )
             findNavController().navigate(direction)
         }
     }

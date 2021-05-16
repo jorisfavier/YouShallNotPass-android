@@ -84,4 +84,6 @@
     <string name="autofill">Autofill</string>
     <string name="autofill_explanation">Fill forms using the YouShallNotPass data</string>
     <string name="search_for_item">Go to the search</string>
+    <string name="use_generated_password">Use generated Password</string>
+    <string name="create_new_item">Create new item</string>
 </resources>

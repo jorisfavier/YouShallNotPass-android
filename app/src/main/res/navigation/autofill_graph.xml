@@ -13,5 +13,15 @@
     </fragment>
     <fragment
         android:id="@+id/ItemFragment"
-        android:name="fr.jorisfavier.youshallnotpass.ui.item.ItemFragment" />
+        android:name="fr.jorisfavier.youshallnotpass.ui.item.ItemFragment">
+        <argument
+            android:name="itemId"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <argument
+            android:name="itemName"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
 </navigation>
