@@ -50,7 +50,7 @@ object AssistStructureUtil {
         }
         return AutofillParsedStructure(
             webDomain = webDomain,
-            appName = packageManager.getAppName(packageName),
+            appName = packageManager.getAppName(packageName) ?: packageName,
             certificatesHashes = packageManager.getCertificateHashes(packageName),
             items = autofillItems,
             ignoreIds = ignoreIds,
@@ -81,16 +81,18 @@ object AssistStructureUtil {
                         || it == View.AUTOFILL_HINT_EMAIL_ADDRESS
                         || it == HintConstants.AUTOFILL_HINT_NEW_USERNAME
             } == true -> AutofillItem(
-                viewNode.autofillId!!,
-                ItemDataType.LOGIN,
+                id = viewNode.autofillId!!,
+                value = viewNode.text?.toString().orEmpty(),
+                type = ItemDataType.LOGIN,
             )
             viewNode.autofillHints?.any {
                 it == View.AUTOFILL_HINT_PASSWORD
                         || it == HintConstants.AUTOFILL_HINT_NEW_PASSWORD
             } == true ->
                 AutofillItem(
-                    viewNode.autofillId!!,
-                    ItemDataType.PASSWORD,
+                    id = viewNode.autofillId!!,
+                    value = viewNode.text?.toString().orEmpty(),
+                    type = ItemDataType.PASSWORD,
                 )
             else -> null
         }

@@ -5,19 +5,22 @@ import android.app.assist.AssistStructure
 import android.content.Intent
 import android.content.IntentSender
 import android.os.Build
+import android.os.Bundle
 import android.os.CancellationSignal
 import android.service.autofill.*
 import androidx.annotation.RequiresApi
+import androidx.core.os.bundleOf
 import dagger.android.AndroidInjection
 import fr.jorisfavier.youshallnotpass.manager.IAuthManager
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.model.AutofillParsedStructure
+import fr.jorisfavier.youshallnotpass.model.Item
+import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.ui.autofill.AutofillActivity
 import fr.jorisfavier.youshallnotpass.utils.AssistStructureUtil
 import fr.jorisfavier.youshallnotpass.utils.AutofillHelper
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
 import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -48,7 +51,10 @@ class YsnpAutofillService : AutofillService() {
         val fillResponse =
             when {
                 parsedStructure.isNewCredentials -> {
-                    buildSuggestCredentialsResponse(parsedStructure)
+                    buildSuggestCredentialsResponse(
+                        parsedStructure = parsedStructure,
+                        clientState = request.clientState ?: bundleOf(),
+                    )
                 }
                 parsedStructure.items.isEmpty() -> {
                     null
@@ -65,8 +71,31 @@ class YsnpAutofillService : AutofillService() {
     }
 
     override fun onSaveRequest(saveRequest: SaveRequest, saveCallback: SaveCallback) {
-        Timber.d("onSaveReq")
-        saveCallback.onFailure("Test")
+        val context: List<FillContext> = saveRequest.fillContexts
+        val parsedStructure = context
+            .map { AssistStructureUtil.traverseStructure(it.structure, packageManager) }
+            .reduce { acc, structure -> acc.copy(items = acc.items + structure.items) }
+
+        var login: String? = null
+        var password: String? = null
+        parsedStructure.items.forEach {
+            if (it.type == ItemDataType.LOGIN) login = it.value else password = it.value
+        }
+        if (password != null && parsedStructure.appName != null) {
+            val encryptedPass = cryptoManager.encryptData(password!!)
+            val item = Item(
+                id = 0,
+                title = parsedStructure.appName,
+                login = login,
+                password = encryptedPass.ciphertext,
+                initializationVector = encryptedPass.initializationVector,
+                packageCertificate = parsedStructure.certificatesHashes,
+            )
+            runBlocking {
+                itemRepository.updateOrCreateItem(item)
+            }
+        }
+        saveCallback.onSuccess()
     }
 
     private fun buildRequiresAuthResponse(parsedStructure: AutofillParsedStructure): FillResponse.Builder {
@@ -109,7 +138,10 @@ class YsnpAutofillService : AutofillService() {
         return responseBuilder
     }
 
-    private fun buildSuggestCredentialsResponse(parsedStructure: AutofillParsedStructure): FillResponse.Builder {
+    private fun buildSuggestCredentialsResponse(
+        parsedStructure: AutofillParsedStructure,
+        clientState: Bundle,
+    ): FillResponse.Builder {
         val responseBuilder = FillResponse.Builder()
         val dataSets = AutofillHelper.buildSuggestedCredentialsDataSets(
             context = this,
@@ -117,7 +149,9 @@ class YsnpAutofillService : AutofillService() {
             intentSender = buildIntentSender(redirectToItem = true),
         )
         dataSets.forEach(responseBuilder::addDataset)
-        responseBuilder.setSaveInfo(AutofillHelper.buildSaveInfo(parsedStructure.items))
+        val newClientState = AutofillHelper.buildClientState(clientState, parsedStructure.items)
+        responseBuilder.setClientState(newClientState)
+        responseBuilder.setSaveInfo(AutofillHelper.buildSaveInfo(newClientState))
         return responseBuilder
     }
 

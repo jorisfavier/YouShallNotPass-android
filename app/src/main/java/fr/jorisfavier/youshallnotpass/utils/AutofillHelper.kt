@@ -3,9 +3,11 @@ package fr.jorisfavier.youshallnotpass.utils
 import android.content.Context
 import android.content.IntentSender
 import android.os.Build
+import android.os.Bundle
 import android.service.autofill.Dataset
 import android.service.autofill.SaveInfo
 import android.view.View
+import android.view.autofill.AutofillId
 import android.view.autofill.AutofillValue
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
@@ -18,6 +20,9 @@ import fr.jorisfavier.youshallnotpass.model.ItemDataType
 
 @RequiresApi(Build.VERSION_CODES.O)
 object AutofillHelper {
+
+    private const val PASSWORD_KEY = "password_key"
+    private const val LOGIN_KEY = "login_key"
 
     fun buildDataSet(
         autofillItems: List<AutofillItem>,
@@ -82,8 +87,12 @@ object AutofillHelper {
             }
         }
         dataSetCreateItem.setAuthentication(intentSender)
-        result.add(dataSetCreateItem.build())
-        result.add(dataSetUsePass.build())
+        if (autofillItems.any { it.type == ItemDataType.LOGIN }) {
+            result.add(dataSetCreateItem.build())
+        }
+        if (autofillItems.any { it.type == ItemDataType.PASSWORD }) {
+            result.add(dataSetUsePass.build())
+        }
         return result
     }
 
@@ -99,7 +108,7 @@ object AutofillHelper {
         }
     }
 
-    fun buildCreatePasswordPresentation(context: Context, password: String): RemoteViews {
+    private fun buildCreatePasswordPresentation(context: Context, password: String): RemoteViews {
         val generatedPassword = context.getString(R.string.use_generated_password)
         return RemoteViews(
             BuildConfig.APPLICATION_ID,
@@ -110,7 +119,7 @@ object AutofillHelper {
         }
     }
 
-    fun buildCreateItemPresentation(context: Context): RemoteViews {
+    private fun buildCreateItemPresentation(context: Context): RemoteViews {
         val createItem = context.getString(R.string.create_new_item)
         return RemoteViews(
             BuildConfig.APPLICATION_ID,
@@ -121,11 +130,27 @@ object AutofillHelper {
         }
     }
 
-    fun buildSaveInfo(autofillItems: List<AutofillItem>): SaveInfo {
-        return SaveInfo.Builder(
+    fun buildSaveInfo(clientState: Bundle): SaveInfo {
+        val loginId = clientState.getParcelable(LOGIN_KEY) as? AutofillId
+        val passwordId = clientState.getParcelable(PASSWORD_KEY) as? AutofillId
+        val saveInfo = SaveInfo.Builder(
             SaveInfo.SAVE_DATA_TYPE_USERNAME or SaveInfo.SAVE_DATA_TYPE_PASSWORD,
-            autofillItems.map { it.id }.toTypedArray(),
-        ).setFlags(SaveInfo.FLAG_SAVE_ON_ALL_VIEWS_INVISIBLE).build()
+            listOfNotNull(loginId, passwordId).toTypedArray(),
+        )
+        if (loginId != null && passwordId != null) {
+            saveInfo.setFlags(SaveInfo.FLAG_SAVE_ON_ALL_VIEWS_INVISIBLE)
+        }
+        return saveInfo.build()
+    }
+
+    fun buildClientState(currentClientState: Bundle, autofillItems: List<AutofillItem>): Bundle {
+        autofillItems.forEach {
+            if (it.type == ItemDataType.LOGIN)
+                currentClientState.putParcelable(LOGIN_KEY, it.id)
+            if (it.type == ItemDataType.PASSWORD)
+                currentClientState.putParcelable(PASSWORD_KEY, it.id)
+        }
+        return currentClientState
     }
 
     private fun buildPresentation(item: Item?): RemoteViews {
