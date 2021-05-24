@@ -83,7 +83,8 @@ class ItemEditViewModel @Inject constructor(
                             title = nameValue,
                             login = login.value,
                             password = encryptedData.ciphertext,
-                            initializationVector = encryptedData.initializationVector
+                            initializationVector = encryptedData.initializationVector,
+                            packageCertificate = currentItem?.packageCertificate.orEmpty()
                         )
                     )
                     val successResourceId =
