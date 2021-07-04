@@ -14,8 +14,8 @@ import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.ui.search.SearchBaseViewModel
 import fr.jorisfavier.youshallnotpass.utils.AssistStructureUtil
-import fr.jorisfavier.youshallnotpass.utils.AutofillHelper
 import fr.jorisfavier.youshallnotpass.utils.Event
+import fr.jorisfavier.youshallnotpass.utils.autofill.AutofillHelper26
 import fr.jorisfavier.youshallnotpass.utils.extensions.combine
 import fr.jorisfavier.youshallnotpass.utils.extensions.default
 import fr.jorisfavier.youshallnotpass.utils.extensions.getDomainIfUrl
@@ -89,7 +89,7 @@ class AutofillSearchViewModel @Inject constructor(
                 itemRepository.updateOrCreateItem(updatedItem)
             }
             val itemPassword = cryptoManager.decryptData(item.password, item.initializationVector)
-            val data = AutofillHelper.buildDataSet(
+            val data = AutofillHelper26.buildItemDataSet(
                 autofillItems = parsedStructure.items,
                 item = item,
                 password = itemPassword,

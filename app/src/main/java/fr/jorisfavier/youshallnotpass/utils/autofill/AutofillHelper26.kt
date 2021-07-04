@@ -1,4 +1,4 @@
-package fr.jorisfavier.youshallnotpass.utils
+package fr.jorisfavier.youshallnotpass.utils.autofill
 
 import android.content.Context
 import android.content.IntentSender
@@ -16,28 +16,29 @@ import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.model.AutofillItem
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
+import fr.jorisfavier.youshallnotpass.utils.PasswordOptions
+import fr.jorisfavier.youshallnotpass.utils.PasswordUtil
 
 
 @RequiresApi(Build.VERSION_CODES.O)
-object AutofillHelper {
+object AutofillHelper26 {
 
     private const val PASSWORD_KEY = "password_key"
     private const val LOGIN_KEY = "login_key"
 
-    fun buildDataSet(
+    fun buildItemDataSet(
         autofillItems: List<AutofillItem>,
-        item: Item? = null,
+        item: Item,
         password: String? = null,
-        intentSender: IntentSender? = null,
-        remoteViews: RemoteViews = buildPresentation(item),
     ): Dataset {
         val dataSet = Dataset.Builder()
+        val remoteViews = buildItemPresentation(item)
         autofillItems.forEach {
             when (it.type) {
                 ItemDataType.LOGIN -> {
                     dataSet.setValue(
                         it.id,
-                        AutofillValue.forText(item?.login),
+                        AutofillValue.forText(item.login),
                         remoteViews
                     )
                 }
@@ -50,9 +51,51 @@ object AutofillHelper {
                 }
             }
         }
-        if (intentSender != null) dataSet.setAuthentication(intentSender)
         return dataSet.build()
     }
+
+    fun buildRequireAuthDataSet(
+        autofillItems: List<AutofillItem>,
+        intentSender: IntentSender,
+    ): Dataset {
+        val dataSet = Dataset.Builder()
+        val remoteViews = buildRequireAuthPresentation()
+        autofillItems.forEach {
+            dataSet.setValue(it.id, null, remoteViews)
+        }
+        dataSet.setAuthentication(intentSender)
+        return dataSet.build()
+    }
+
+    fun buildNoItemFoundDataSet(
+        context: Context,
+        autofillItems: List<AutofillItem>,
+        intentSender: IntentSender,
+    ): Dataset {
+        val dataSet = Dataset.Builder()
+        val remoteViews = buildNoItemFoundPresentation(context)
+        autofillItems.forEach {
+            when (it.type) {
+                ItemDataType.LOGIN -> {
+                    dataSet.setValue(
+                        it.id,
+                        null,
+                        remoteViews
+                    )
+                }
+                ItemDataType.PASSWORD -> {
+                    dataSet.setValue(
+                        it.id,
+                        null,
+                        remoteViews
+                    )
+                }
+            }
+        }
+        dataSet.setAuthentication(intentSender)
+        return dataSet.build()
+    }
+
 
     fun buildSuggestedCredentialsDataSets(
         context: Context,
@@ -96,40 +139,6 @@ object AutofillHelper {
         return result
     }
 
-    fun buildNoItemFoundPresentation(context: Context): RemoteViews {
-        val noItemFound = context.getString(R.string.no_results_found)
-        val searchItems = context.getString(R.string.search_for_item)
-        return RemoteViews(
-            BuildConfig.APPLICATION_ID,
-            R.layout.autofill_response,
-        ).apply {
-            setTextViewText(R.id.title, noItemFound)
-            setTextViewText(R.id.subtitle, searchItems)
-        }
-    }
-
-    private fun buildCreatePasswordPresentation(context: Context, password: String): RemoteViews {
-        val generatedPassword = context.getString(R.string.use_generated_password)
-        return RemoteViews(
-            BuildConfig.APPLICATION_ID,
-            R.layout.autofill_response,
-        ).apply {
-            setTextViewText(R.id.title, generatedPassword)
-            setTextViewText(R.id.subtitle, password)
-        }
-    }
-
-    private fun buildCreateItemPresentation(context: Context): RemoteViews {
-        val createItem = context.getString(R.string.create_new_item)
-        return RemoteViews(
-            BuildConfig.APPLICATION_ID,
-            R.layout.autofill_response,
-        ).apply {
-            setTextViewText(R.id.title, createItem)
-            setViewVisibility(R.id.subtitle, View.GONE)
-        }
-    }
-
     fun buildSaveInfo(clientState: Bundle): SaveInfo {
         val loginId = clientState.getParcelable(LOGIN_KEY) as? AutofillId
         val passwordId = clientState.getParcelable(PASSWORD_KEY) as? AutofillId
@@ -153,20 +162,54 @@ object AutofillHelper {
         return currentClientState
     }
 
-    private fun buildPresentation(item: Item?): RemoteViews {
-        return if (item != null) {
-            RemoteViews(
-                BuildConfig.APPLICATION_ID,
-                R.layout.autofill_response
-            ).apply {
-                setTextViewText(R.id.title, item.title)
-                setTextViewText(R.id.subtitle, item.login)
-            }
-        } else {
-            RemoteViews(
-                BuildConfig.APPLICATION_ID,
-                R.layout.autofill_requires_authentication,
-            )
+    fun buildNoItemFoundPresentation(context: Context): RemoteViews {
+        val noItemFound = context.getString(R.string.no_results_found)
+        val searchItems = context.getString(R.string.search_for_item)
+        return RemoteViews(
+            BuildConfig.APPLICATION_ID,
+            R.layout.autofill_response,
+        ).apply {
+            setTextViewText(R.id.title, noItemFound)
+            setTextViewText(R.id.subtitle, searchItems)
+        }
+    }
+
+    fun buildCreatePasswordPresentation(context: Context, password: String): RemoteViews {
+        val generatedPassword = context.getString(R.string.use_generated_password)
+        return RemoteViews(
+            BuildConfig.APPLICATION_ID,
+            R.layout.autofill_response,
+        ).apply {
+            setTextViewText(R.id.title, generatedPassword)
+            setTextViewText(R.id.subtitle, password)
+        }
+    }
+
+    fun buildCreateItemPresentation(context: Context): RemoteViews {
+        val createItem = context.getString(R.string.create_new_item)
+        return RemoteViews(
+            BuildConfig.APPLICATION_ID,
+            R.layout.autofill_response,
+        ).apply {
+            setTextViewText(R.id.title, createItem)
+            setViewVisibility(R.id.subtitle, View.GONE)
+        }
+    }
+
+    fun buildRequireAuthPresentation(): RemoteViews {
+        return RemoteViews(
+            BuildConfig.APPLICATION_ID,
+            R.layout.autofill_requires_authentication,
+        )
+    }
+
+    fun buildItemPresentation(item: Item): RemoteViews {
+        return RemoteViews(
+            BuildConfig.APPLICATION_ID,
+            R.layout.autofill_response
+        ).apply {
+            setTextViewText(R.id.title, item.title)
+            setTextViewText(R.id.subtitle, item.login)
         }
     }
 }

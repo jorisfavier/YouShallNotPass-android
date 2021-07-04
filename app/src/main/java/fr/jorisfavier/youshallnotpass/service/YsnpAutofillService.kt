@@ -19,7 +19,7 @@ import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.ui.autofill.AutofillActivity
 import fr.jorisfavier.youshallnotpass.utils.AssistStructureUtil
-import fr.jorisfavier.youshallnotpass.utils.AutofillHelper
+import fr.jorisfavier.youshallnotpass.utils.autofill.AutofillHelperCompat
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
@@ -52,6 +52,7 @@ class YsnpAutofillService : AutofillService() {
             when {
                 parsedStructure.isNewCredentials -> {
                     buildSuggestCredentialsResponse(
+                        fillRequest = request,
                         parsedStructure = parsedStructure,
                         clientState = request.clientState ?: bundleOf(),
                     )
@@ -60,10 +61,16 @@ class YsnpAutofillService : AutofillService() {
                     null
                 }
                 parsedStructure.webDomain != null || !authManager.isAutofillUnlocked -> {
-                    buildRequiresAuthResponse(parsedStructure)
+                    buildRequiresAuthResponse(
+                        fillRequest = request,
+                        parsedStructure = parsedStructure,
+                    )
                 }
                 else -> {
-                    buildAutofillResponse(parsedStructure)
+                    buildAutofillResponse(
+                        fillRequest = request,
+                        parsedStructure = parsedStructure,
+                    )
                 }
             }
         fillResponse?.setIgnoredIds(*parsedStructure.ignoreIds.toTypedArray())
@@ -98,10 +105,15 @@ class YsnpAutofillService : AutofillService() {
         saveCallback.onSuccess()
     }
 
-    private fun buildRequiresAuthResponse(parsedStructure: AutofillParsedStructure): FillResponse.Builder {
+    private fun buildRequiresAuthResponse(
+        fillRequest: FillRequest,
+        parsedStructure: AutofillParsedStructure,
+    ): FillResponse.Builder {
 
         val intentSender = buildIntentSender()
-        val dataSet = AutofillHelper.buildDataSet(
+        val dataSet = AutofillHelperCompat.buildRequireAuthDataSet(
+            context = this,
+            fillRequest = fillRequest,
             autofillItems = parsedStructure.items,
             intentSender = intentSender,
         )
@@ -110,7 +122,10 @@ class YsnpAutofillService : AutofillService() {
             .addDataset(dataSet)
     }
 
-    private fun buildAutofillResponse(parsedStructure: AutofillParsedStructure): FillResponse.Builder {
+    private fun buildAutofillResponse(
+        fillRequest: FillRequest,
+        parsedStructure: AutofillParsedStructure,
+    ): FillResponse.Builder {
         val items = runBlocking {
             itemRepository.searchItemByCertificates(parsedStructure.certificatesHashes)
         }
@@ -119,7 +134,9 @@ class YsnpAutofillService : AutofillService() {
             items.forEach { item ->
                 val pass = cryptoManager.decryptData(item.password, item.initializationVector)
                 responseBuilder.addDataset(
-                    AutofillHelper.buildDataSet(
+                    AutofillHelperCompat.buildItemDataSet(
+                        context = this,
+                        fillRequest = fillRequest,
                         autofillItems = parsedStructure.items,
                         item = item,
                         password = pass,
@@ -128,9 +145,10 @@ class YsnpAutofillService : AutofillService() {
             }
         } else {
             responseBuilder.addDataset(
-                AutofillHelper.buildDataSet(
+                AutofillHelperCompat.buildNoItemFoundDataSet(
+                    fillRequest = fillRequest,
+                    context = this,
                     autofillItems = parsedStructure.items,
-                    remoteViews = AutofillHelper.buildNoItemFoundPresentation(this),
                     intentSender = buildIntentSender()
                 )
             )
@@ -139,19 +157,22 @@ class YsnpAutofillService : AutofillService() {
     }
 
     private fun buildSuggestCredentialsResponse(
+        fillRequest: FillRequest,
         parsedStructure: AutofillParsedStructure,
         clientState: Bundle,
     ): FillResponse.Builder {
         val responseBuilder = FillResponse.Builder()
-        val dataSets = AutofillHelper.buildSuggestedCredentialsDataSets(
+        val dataSets = AutofillHelperCompat.buildSuggestedCredentialsDataSets(
+            fillRequest = fillRequest,
             context = this,
             autofillItems = parsedStructure.items,
             intentSender = buildIntentSender(redirectToItem = true),
         )
         dataSets.forEach(responseBuilder::addDataset)
-        val newClientState = AutofillHelper.buildClientState(clientState, parsedStructure.items)
+        val newClientState =
+            AutofillHelperCompat.buildClientState(clientState, parsedStructure.items)
         responseBuilder.setClientState(newClientState)
-        responseBuilder.setSaveInfo(AutofillHelper.buildSaveInfo(newClientState))
+        responseBuilder.setSaveInfo(AutofillHelperCompat.buildSaveInfo(newClientState))
         return responseBuilder
     }
 
