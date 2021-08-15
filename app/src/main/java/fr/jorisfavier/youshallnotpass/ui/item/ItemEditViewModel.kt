@@ -1,9 +1,12 @@
 package fr.jorisfavier.youshallnotpass.ui.item
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import androidx.lifecycle.*
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
+import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.utils.PasswordOptions
@@ -18,7 +21,8 @@ import javax.inject.Inject
 
 class ItemEditViewModel @Inject constructor(
     private val cryptoManager: ICryptoManager,
-    private val itemRepository: IItemRepository
+    private val itemRepository: IItemRepository,
+    private val clipboardManager: ClipboardManager,
 ) : ViewModel() {
 
     val name = MutableLiveData<String>()
@@ -44,7 +48,7 @@ class ItemEditViewModel @Inject constructor(
             return result
         }
 
-    fun initData(itemId: Int, itemName: String?) {
+    fun initData(itemId: Int, itemName: String? = null) {
         if (itemId > 0) {
             viewModelScope.launch {
                 currentItem = runCatching { itemRepository.getItemById(itemId) }.getOrNull()
@@ -87,8 +91,14 @@ class ItemEditViewModel @Inject constructor(
                             packageCertificate = currentItem?.packageCertificate.orEmpty()
                         )
                     )
-                    val successResourceId =
-                        if (id == 0) R.string.item_creation_success else R.string.item_update_success
+                    val successResourceId: Int
+                    if (id == 0) {
+                        val clip = ClipData.newPlainText(ItemDataType.PASSWORD.name, passwordValue)
+                        clipboardManager.setPrimaryClip(clip)
+                        successResourceId = R.string.item_creation_success
+                    } else {
+                        successResourceId = R.string.item_update_success
+                    }
                     emit(Result.success(successResourceId))
                 }
             } else {

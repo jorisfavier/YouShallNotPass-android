@@ -1,5 +1,7 @@
 package fr.jorisfavier.youshallnotpass
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.manager.model.EncryptedData
@@ -9,12 +11,7 @@ import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import fr.jorisfavier.youshallnotpass.ui.item.ItemEditViewModel
 import fr.jorisfavier.youshallnotpass.utils.PasswordUtil
 import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.just
-import io.mockk.mockk
-import io.mockk.runs
-import io.mockk.slot
+import io.mockk.*
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.flow.first
@@ -45,7 +42,12 @@ class ItemEditViewModelTest {
     private val newFakeTitle = "new fake title"
     private val cryptoManager: ICryptoManager = mockk()
     private val itemRepo: IItemRepository = mockk()
-    private val viewModel = ItemEditViewModel(cryptoManager, itemRepo)
+    private val clipManager: ClipboardManager = mockk()
+    private val viewModel = ItemEditViewModel(
+        cryptoManager = cryptoManager,
+        itemRepository = itemRepo,
+        clipboardManager = clipManager
+    )
 
     @Test
     fun `on initData ItemEditViewModel should have numbers, symbol, uppercase, a password default size and 'create' button text`() {
@@ -58,16 +60,28 @@ class ItemEditViewModelTest {
         assertEquals(true, viewModel.hasSymbol.getOrAwaitValue())
         assertEquals(true, viewModel.hasUppercase.getOrAwaitValue())
         assertEquals(R.string.item_create, viewModel.createOrUpdateText.getOrAwaitValue())
-        assertEquals(PasswordUtil.MINIMUM_SECURE_SIZE, viewModel.passwordLengthValue.getOrAwaitValue())
+        assertEquals(
+            PasswordUtil.MINIMUM_SECURE_SIZE,
+            viewModel.passwordLengthValue.getOrAwaitValue()
+        )
     }
 
     @Test
     fun `on initData with a valid item id ItemEditViewModel should emit an 'update' button text, an item login and an item password`() {
         //given
         coEvery { itemRepo.getItemById(1) } returns fakeItem
-        every { cryptoManager.decryptData(fakeItem.password, fakeItem.initializationVector) } returns fakeDecryptedPassword
+        every {
+            cryptoManager.decryptData(
+                fakeItem.password,
+                fakeItem.initializationVector
+            )
+        } returns fakeDecryptedPassword
 
-        val viewModel = ItemEditViewModel(cryptoManager, itemRepo)
+        val viewModel = ItemEditViewModel(
+            cryptoManager = cryptoManager,
+            itemRepository = itemRepo,
+            clipboardManager = clipManager
+        )
 
         //when
         viewModel.initData(1)
@@ -79,19 +93,29 @@ class ItemEditViewModelTest {
     }
 
     @Test
-    fun `on initData should init as a normal item creation when an exception is raised by the itemRepository`() = runBlocking {
-        //given
-        coEvery { itemRepo.getItemById(1) } throws Exception()
-        every { cryptoManager.decryptData(fakeItem.password, fakeItem.initializationVector) } returns fakeDecryptedPassword
+    fun `on initData should init as a normal item creation when an exception is raised by the itemRepository`() =
+        runBlocking {
+            //given
+            coEvery { itemRepo.getItemById(1) } throws Exception()
+            every {
+                cryptoManager.decryptData(
+                    fakeItem.password,
+                    fakeItem.initializationVector
+                )
+            } returns fakeDecryptedPassword
 
-        val viewModel = ItemEditViewModel(cryptoManager, itemRepo)
+            val viewModel = ItemEditViewModel(
+                cryptoManager = cryptoManager,
+                itemRepository = itemRepo,
+                clipboardManager = clipManager
+            )
 
-        //when
-        viewModel.initData(1)
+            //when
+            viewModel.initData(1)
 
-        //then
-        assertEquals(R.string.item_create, viewModel.createOrUpdateText.getOrAwaitValue())
-    }
+            //then
+            assertEquals(R.string.item_create, viewModel.createOrUpdateText.getOrAwaitValue())
+        }
 
     @Test
     fun `generateSecurePassword with symbol disabled should emit a password without symbols`() {
@@ -171,56 +195,67 @@ class ItemEditViewModelTest {
     }
 
     @Test
-    fun `updateOrCreateItem should return a success when password and name are provided`() = runBlocking {
-        //given
-        every { cryptoManager.encryptData(fakeDecryptedPassword) } returns fakeEncryptedData
-        coEvery { itemRepo.searchItem(fakeItem.title) } returns listOf()
-        coEvery { itemRepo.updateOrCreateItem(any()) } just runs
+    fun `updateOrCreateItem should return a success when password and name are provided`() =
+        runBlocking {
+            //given
+            every { cryptoManager.encryptData(fakeDecryptedPassword) } returns fakeEncryptedData
+            coEvery { itemRepo.searchItem(fakeItem.title) } returns listOf()
+            coEvery { itemRepo.updateOrCreateItem(any()) } just runs
+            every { clipManager.setPrimaryClip(any()) } just runs
 
-        //when
-        viewModel.initData(0)
-        viewModel.password.value = fakeDecryptedPassword
-        viewModel.name.value = fakeItem.title
-        val result = viewModel.updateOrCreateItem().first()
+            //when
+            viewModel.initData(0)
+            viewModel.password.value = fakeDecryptedPassword
+            viewModel.name.value = fakeItem.title
+            val result = viewModel.updateOrCreateItem().first()
 
-        //then
-        assertTrue(result.isSuccess)
-        assertEquals(R.string.item_creation_success, result.getOrNull())
-    }
-
-    @Test
-    fun `updateOrCreateItem should return an error when password and name are not provided`() = runBlocking {
-        //given
-        every { cryptoManager.encryptData(fakeDecryptedPassword) } returns fakeEncryptedData
-        coEvery { itemRepo.searchItem(fakeItem.title) } returns listOf()
-        coEvery { itemRepo.updateOrCreateItem(any()) } just runs
-
-        //when
-        viewModel.initData(0)
-        val result = viewModel.updateOrCreateItem().first()
-
-        //then
-        assertTrue(result.isFailure)
-        assertEquals(R.string.item_name_or_password_missing, (result.exceptionOrNull() as? YsnpException)?.messageResId)
-    }
+            //then
+            assertTrue(result.isSuccess)
+            verify { clipManager.setPrimaryClip(any()) }
+            assertEquals(R.string.item_creation_success, result.getOrNull())
+        }
 
     @Test
-    fun `updateOrCreateItem should return an error when trying to add an item with a same name`() = runBlocking {
-        //given
-        every { cryptoManager.encryptData(fakeDecryptedPassword) } returns fakeEncryptedData
-        coEvery { itemRepo.searchItem(fakeItem.title) } returns listOf(fakeItem)
-        coEvery { itemRepo.updateOrCreateItem(any()) } just runs
+    fun `updateOrCreateItem should return an error when password and name are not provided`() =
+        runBlocking {
+            //given
+            every { cryptoManager.encryptData(fakeDecryptedPassword) } returns fakeEncryptedData
+            coEvery { itemRepo.searchItem(fakeItem.title) } returns listOf()
+            coEvery { itemRepo.updateOrCreateItem(any()) } just runs
 
-        //when
-        viewModel.initData(0)
-        viewModel.password.value = fakeDecryptedPassword
-        viewModel.name.value = fakeItem.title
-        val result = viewModel.updateOrCreateItem().first()
+            //when
+            viewModel.initData(0)
+            val result = viewModel.updateOrCreateItem().first()
 
-        //then
-        assertTrue(result.isFailure)
-        assertEquals(R.string.item_already_exist, (result.exceptionOrNull() as? YsnpException)?.messageResId)
-    }
+            //then
+            assertTrue(result.isFailure)
+            assertEquals(
+                R.string.item_name_or_password_missing,
+                (result.exceptionOrNull() as? YsnpException)?.messageResId
+            )
+        }
+
+    @Test
+    fun `updateOrCreateItem should return an error when trying to add an item with a same name`() =
+        runBlocking {
+            //given
+            every { cryptoManager.encryptData(fakeDecryptedPassword) } returns fakeEncryptedData
+            coEvery { itemRepo.searchItem(fakeItem.title) } returns listOf(fakeItem)
+            coEvery { itemRepo.updateOrCreateItem(any()) } just runs
+
+            //when
+            viewModel.initData(0)
+            viewModel.password.value = fakeDecryptedPassword
+            viewModel.name.value = fakeItem.title
+            val result = viewModel.updateOrCreateItem().first()
+
+            //then
+            assertTrue(result.isFailure)
+            assertEquals(
+                R.string.item_already_exist,
+                (result.exceptionOrNull() as? YsnpException)?.messageResId
+            )
+        }
 
     @Test
     fun `updateOrCreateItem should return an error when an exception is raised`() = runBlocking {
@@ -237,7 +272,10 @@ class ItemEditViewModelTest {
 
         //then
         assertTrue(result.isFailure)
-        assertEquals(R.string.error_occurred, (result.exceptionOrNull() as? YsnpException)?.messageResId)
+        assertEquals(
+            R.string.error_occurred,
+            (result.exceptionOrNull() as? YsnpException)?.messageResId
+        )
     }
 
     @Test
@@ -247,7 +285,12 @@ class ItemEditViewModelTest {
         coEvery { itemRepo.getItemById(1) } returns fakeItem
         every { cryptoManager.encryptData(fakeDecryptedPassword) } returns fakeEncryptedData
         coEvery { itemRepo.updateOrCreateItem(capture(slot)) } just runs
-        every { cryptoManager.decryptData(fakeItem.password, fakeItem.initializationVector) } returns fakeDecryptedPassword
+        every {
+            cryptoManager.decryptData(
+                fakeItem.password,
+                fakeItem.initializationVector
+            )
+        } returns fakeDecryptedPassword
 
         //when
         viewModel.initData(1)

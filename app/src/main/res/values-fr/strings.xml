@@ -11,7 +11,7 @@
     <string name="item_update">Mettre à jour</string>
     <string name="item_generate_password">Générer mot de passe</string>
     <string name="authentication_required">Authentification requise</string>
-    <string name="item_creation_success">Nouvel item ajouté</string>
+    <string name="item_creation_success">Nouvel item ajouté. Le mot de passe a été copié dans le presse-papier</string>
     <string name="item_update_success">Item mis à jour</string>
     <string name="item_already_exist">Cet item existe déjà, merci de choisir un nom différent</string>
     <string name="item_name_or_password_missing">Merci de renseigner un nom et un mot de passe</string>
