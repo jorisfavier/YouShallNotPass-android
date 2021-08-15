@@ -4,6 +4,7 @@ import android.app.assist.AssistStructure
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.service.autofill.FillRequest
 import android.view.autofill.AutofillManager
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -35,6 +36,10 @@ class AutofillActivity : AppCompatActivity() {
         intent.getParcelableExtra<AssistStructure>(AutofillManager.EXTRA_ASSIST_STRUCTURE)!!
     }
 
+    private val fillRequest by lazy {
+        intent.getParcelableExtra<FillRequest>(FILL_REQUEST_KEY)!!
+    }
+
     private val redirectToItemCreation by lazy {
         intent.getBooleanExtra(REDIRECT_TO_ITEM_KEY, false)
     }
@@ -46,7 +51,7 @@ class AutofillActivity : AppCompatActivity() {
         setContentView(binding.root)
         setupActionBarWithNavController(navController)
         if (savedInstanceState == null) {
-            viewModel.setAssistStructure(assistStructure)
+            viewModel.setAutofillInfos(assistStructure, fillRequest)
             requireAuthentication()
         }
         initObservers()
@@ -83,6 +88,7 @@ class AutofillActivity : AppCompatActivity() {
 
     companion object {
         const val REDIRECT_TO_ITEM_KEY = "redirect_to_item_key"
+        const val FILL_REQUEST_KEY = "fill_request_key"
     }
 
 }

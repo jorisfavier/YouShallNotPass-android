@@ -110,7 +110,7 @@ class YsnpAutofillService : AutofillService() {
         parsedStructure: AutofillParsedStructure,
     ): FillResponse.Builder {
 
-        val intentSender = buildIntentSender()
+        val intentSender = buildIntentSender(fillRequest)
         val dataSet = AutofillHelperCompat.buildRequireAuthDataSet(
             context = this,
             fillRequest = fillRequest,
@@ -149,7 +149,7 @@ class YsnpAutofillService : AutofillService() {
                     fillRequest = fillRequest,
                     context = this,
                     autofillItems = parsedStructure.items,
-                    intentSender = buildIntentSender()
+                    intentSender = buildIntentSender(fillRequest)
                 )
             )
         }
@@ -166,7 +166,7 @@ class YsnpAutofillService : AutofillService() {
             fillRequest = fillRequest,
             context = this,
             autofillItems = parsedStructure.items,
-            intentSender = buildIntentSender(redirectToItem = true),
+            intentSender = buildIntentSender(redirectToItem = true, fillRequest = fillRequest),
         )
         dataSets.forEach(responseBuilder::addDataset)
         val newClientState =
@@ -176,9 +176,13 @@ class YsnpAutofillService : AutofillService() {
         return responseBuilder
     }
 
-    private fun buildIntentSender(redirectToItem: Boolean = false): IntentSender {
+    private fun buildIntentSender(
+        fillRequest: FillRequest,
+        redirectToItem: Boolean = false,
+    ): IntentSender {
         val authIntent = Intent(this, AutofillActivity::class.java)
             .putExtra(AutofillActivity.REDIRECT_TO_ITEM_KEY, redirectToItem)
+            .putExtra(AutofillActivity.FILL_REQUEST_KEY, fillRequest)
 
         return PendingIntent.getActivity(
             this,

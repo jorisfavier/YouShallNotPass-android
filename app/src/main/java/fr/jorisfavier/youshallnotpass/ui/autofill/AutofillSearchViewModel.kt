@@ -4,6 +4,7 @@ import android.app.assist.AssistStructure
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.service.autofill.FillRequest
 import android.view.autofill.AutofillManager
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
@@ -16,6 +17,7 @@ import fr.jorisfavier.youshallnotpass.ui.search.SearchBaseViewModel
 import fr.jorisfavier.youshallnotpass.utils.AssistStructureUtil
 import fr.jorisfavier.youshallnotpass.utils.Event
 import fr.jorisfavier.youshallnotpass.utils.autofill.AutofillHelper26
+import fr.jorisfavier.youshallnotpass.utils.autofill.AutofillHelperCompat
 import fr.jorisfavier.youshallnotpass.utils.extensions.combine
 import fr.jorisfavier.youshallnotpass.utils.extensions.default
 import fr.jorisfavier.youshallnotpass.utils.extensions.getDomainIfUrl
@@ -31,9 +33,10 @@ class AutofillSearchViewModel @Inject constructor(
 ) : SearchBaseViewModel() {
 
     private var firstSearchProcessed = false
+    private lateinit var fillRequest: FillRequest
 
-    private val _autofillResponse = MutableLiveData<Event<Intent>>()
-    val autofillResponse: LiveData<Event<Intent>> = _autofillResponse
+    private val _autofillResponse = MutableLiveData<Event<AutofillDataSetInfo>>()
+    val autofillResponse: LiveData<Event<AutofillDataSetInfo>> = _autofillResponse
 
     private val autofillParsedStructure = MutableLiveData<AutofillParsedStructure>()
     val appName = autofillParsedStructure.map { Event(it.appName) }
@@ -82,9 +85,11 @@ class AutofillSearchViewModel @Inject constructor(
         }
     }.default(R.string.no_results_found)
 
-    fun setAssistStructure(assistStructure: AssistStructure) {
+    fun setAutofillInfos(assistStructure: AssistStructure, fillRequest: FillRequest) {
         autofillParsedStructure.value =
             AssistStructureUtil.traverseStructure(assistStructure, packageManager)
+        this.fillRequest = fillRequest
+
     }
 
     fun onItemClicked(item: Item) {
@@ -95,13 +100,13 @@ class AutofillSearchViewModel @Inject constructor(
                 itemRepository.updateOrCreateItem(updatedItem)
             }
             val itemPassword = cryptoManager.decryptData(item.password, item.initializationVector)
-            val data = AutofillHelper26.buildItemDataSet(
+            val data = AutofillDataSetInfo(
                 autofillItems = parsedStructure.items,
                 item = item,
-                password = itemPassword,
+                itemPassword = itemPassword,
+                fillRequest = fillRequest,
             )
-            _autofillResponse.value =
-                Event(Intent().putExtra(AutofillManager.EXTRA_AUTHENTICATION_RESULT, data))
+            _autofillResponse.value = Event(data)
         }
     }
 
