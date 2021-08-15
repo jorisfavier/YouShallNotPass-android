@@ -5,6 +5,7 @@ import android.app.KeyguardManager
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import androidx.preference.PreferenceManager
 import androidx.room.Room
 import androidx.security.crypto.EncryptedSharedPreferences
@@ -193,5 +194,9 @@ class AppModule {
         return DesktopRepositoryImpl(api, appPreferenceDataSource, hostInterceptor, cryptoManager)
     }
 
+    @Provides
+    fun providePackageManager(app: Application): PackageManager {
+        return app.packageManager
+    }
 
 }

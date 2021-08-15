@@ -3,7 +3,13 @@ package fr.jorisfavier.youshallnotpass.utils.extensions
 import android.app.Activity
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.IdRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
+import androidx.navigation.NavController
+import androidx.navigation.NavHost
+import androidx.navigation.fragment.NavHostFragment
+import fr.jorisfavier.youshallnotpass.R
 
 fun FragmentActivity?.hideKeyboard() {
     val imm =
@@ -15,4 +21,17 @@ fun FragmentActivity?.hideKeyboard() {
         view = View(this)
     }
     imm.hideSoftInputFromWindow(view.windowToken, 0)
+}
+
+/**
+ * Find a [NavController] given the id of a [FragmentContainerView] and its containing
+ * [Activity].
+ *
+ * Calling this on a View that is not a [NavHost] or within a [NavHost]
+ * will result in an [IllegalStateException]
+ */
+fun AppCompatActivity.findNavControllerFromFragmentContainerView(@IdRes viewId: Int): NavController {
+    val navHost =
+        supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+    return navHost.navController
 }

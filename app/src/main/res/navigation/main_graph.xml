@@ -29,6 +29,11 @@
             android:name="itemId"
             android:defaultValue="0"
             app:argType="integer" />
+        <argument
+            android:name="itemName"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"

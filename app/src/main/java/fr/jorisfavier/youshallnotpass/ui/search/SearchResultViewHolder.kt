@@ -2,7 +2,6 @@ package fr.jorisfavier.youshallnotpass.ui.search
 
 import android.animation.ValueAnimator
 import android.text.InputType
-import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.core.animation.doOnStart
 import androidx.core.view.updatePadding
@@ -18,9 +17,8 @@ import fr.jorisfavier.youshallnotpass.utils.extensions.toast
 import timber.log.Timber
 
 class SearchResultViewHolder(
-    itemView: View,
     private val binding: ViewholderSearchResultBinding
-) : RecyclerView.ViewHolder(itemView) {
+) : RecyclerView.ViewHolder(binding.root) {
 
     var view = itemView
         private set

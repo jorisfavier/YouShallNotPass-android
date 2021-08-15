@@ -2,7 +2,10 @@ package fr.jorisfavier.youshallnotpass.ui.search
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.liveData
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
@@ -25,11 +28,10 @@ class SearchViewModel @Inject constructor(
     private val clipboardManager: ClipboardManager,
     private val appPreference: AppPreferenceDataSource,
     private val desktopRepository: DesktopRepository
-) : ViewModel() {
+) : SearchBaseViewModel() {
 
-    val search = MutableLiveData("")
 
-    val results = search.switchMap { query ->
+    override val results = search.switchMap { query ->
         liveData<List<Item>> {
             try {
                 val hideAll = appPreference.getShouldHideItems()
@@ -51,11 +53,11 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    val hasNoResult: LiveData<Boolean> = results.map { listItem ->
+    override val hasNoResult: LiveData<Boolean> = results.map { listItem ->
         listItem.count() == 0
     }
 
-    val noResultTextIdRes = search.switchMap { search ->
+    override val noResultTextIdRes = search.switchMap { search ->
         liveData {
             val isSearchEmpty = search.isEmpty() || search.isBlank()
             val hideAll = appPreference.getShouldHideItems()
@@ -91,10 +93,6 @@ class SearchViewModel @Inject constructor(
         val clip = ClipData.newPlainText(type.name, data)
         clipboardManager.setPrimaryClip(clip)
         return Result.success(resId)
-    }
-
-    fun refreshItems() {
-        search.value = search.value
     }
 
     fun sendToDesktop(item: Item, type: ItemDataType) = flow {

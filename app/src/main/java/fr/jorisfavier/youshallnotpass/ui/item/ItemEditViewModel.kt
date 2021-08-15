@@ -1,10 +1,6 @@
 package fr.jorisfavier.youshallnotpass.ui.item
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
@@ -48,7 +44,7 @@ class ItemEditViewModel @Inject constructor(
             return result
         }
 
-    fun initData(itemId: Int) {
+    fun initData(itemId: Int, itemName: String?) {
         if (itemId > 0) {
             viewModelScope.launch {
                 currentItem = runCatching { itemRepository.getItemById(itemId) }.getOrNull()
@@ -59,6 +55,8 @@ class ItemEditViewModel @Inject constructor(
                     login.value = it.login.orEmpty()
                 }
             }
+        } else if (itemName != null) {
+            name.value = itemName.orEmpty()
         }
     }
 
@@ -85,7 +83,8 @@ class ItemEditViewModel @Inject constructor(
                             title = nameValue,
                             login = login.value,
                             password = encryptedData.ciphertext,
-                            initializationVector = encryptedData.initializationVector
+                            initializationVector = encryptedData.initializationVector,
+                            packageCertificate = currentItem?.packageCertificate.orEmpty()
                         )
                     )
                     val successResourceId =

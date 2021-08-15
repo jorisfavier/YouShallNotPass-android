@@ -2,6 +2,7 @@ package fr.jorisfavier.youshallnotpass.utils.extensions
 
 import java.security.MessageDigest
 
+
 fun String.md5(): ByteArray? {
     val md = MessageDigest.getInstance("MD5");
     return try {
@@ -17,15 +18,15 @@ fun String.md5(): ByteArray? {
  * @return the url domain or the string itself if it's not a url
  */
 fun String.getDomainIfUrl(): String {
-    if (startsWith("http") || startsWith("wwww")) {
+    if (startsWith("http") || startsWith("www")) {
         val segments = split(".")
-        return if (segments.size == 2) {
-            segments.first()
+        return when (segments.size) {
+            2 -> segments.first()
                 .removePrefix("http://")
-                .removePrefix("http://www")
                 .removePrefix("https://")
-                .removePrefix("https://wwww")
-        } else segments.getOrElse(1) { segments.first() }
+            3 -> segments[1]
+            else -> segments.first()
+        }
     }
     return this
 }

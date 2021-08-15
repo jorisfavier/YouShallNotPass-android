@@ -7,9 +7,12 @@ import fr.jorisfavier.youshallnotpass.repository.mapper.EntityToModel
 import fr.jorisfavier.youshallnotpass.repository.mapper.ModelToEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
-class ItemRepository @Inject constructor(private var itemDataSource: ItemDataSource) : IItemRepository {
+class ItemRepository @Inject constructor(private var itemDataSource: ItemDataSource) :
+    IItemRepository {
 
     override suspend fun getAllItems(): List<Item> {
         return withContext(Dispatchers.IO) {
@@ -20,6 +23,18 @@ class ItemRepository @Inject constructor(private var itemDataSource: ItemDataSou
     override suspend fun searchItem(title: String): List<Item> {
         return withContext(Dispatchers.IO) {
             itemDataSource.searchItem(title).map { EntityToModel.itemEntityToItem(it) }
+        }
+    }
+
+    override suspend fun searchItemByCertificates(certificates: List<String>): List<Item> {
+        return withContext(Dispatchers.IO) {
+            if (certificates.isEmpty()) {
+                listOf()
+            } else {
+                val certificatesString = Json.encodeToString(certificates)
+                itemDataSource.searchItemByCertificate(certificatesString)
+                    .map { EntityToModel.itemEntityToItem(it) }
+            }
         }
     }
 

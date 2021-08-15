@@ -22,6 +22,14 @@ interface ItemDataSource {
     @Query("SELECT * from ItemEntity where title like :title")
     fun searchItem(title: String): List<ItemEntity>
 
+    /***
+     *  Search for an item in the database based on his name
+     *  @param title the item's name to search for
+     *  @return a list of item
+     */
+    @Query("SELECT * from ItemEntity where packageCertificates = :certificates")
+    fun searchItemByCertificate(certificates: String): List<ItemEntity>
+
     /**
      * Insert an item into the database
      * If the item already exist it will be replaced

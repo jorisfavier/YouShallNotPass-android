@@ -5,7 +5,11 @@ import java.security.SecureRandom
 enum class PasswordOptions(val value: Int) {
     UPPERCASE(1),
     NUMBER(2),
-    SYMBOL(4)
+    SYMBOL(4);
+
+    companion object {
+        val DEFAULT_OPTIONS = UPPERCASE.value + NUMBER.value + SYMBOL.value
+    }
 }
 
 object PasswordUtil {

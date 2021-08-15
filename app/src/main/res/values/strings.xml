@@ -81,4 +81,9 @@
     <string name="ysnp_desktop_communication_success">Data successfully sent to the desktop app!</string>
     <string name="ysnp_desktop_communication_fail">We were unable to send your data to the desktop app. Try to sync your mobile and desktop app together and try again.</string>
     <string name="sync_desktop_amd_mobile">Sync with desktop</string>
+    <string name="autofill">Autofill</string>
+    <string name="autofill_explanation">Fill forms using the YouShallNotPass data</string>
+    <string name="search_for_item">Go to the search</string>
+    <string name="use_generated_password">Use generated Password</string>
+    <string name="create_new_item">Create new item</string>
 </resources>

@@ -9,7 +9,7 @@
 
         <variable
             name="viewModel"
-            type="fr.jorisfavier.youshallnotpass.ui.search.SearchViewModel" />
+            type="fr.jorisfavier.youshallnotpass.ui.search.SearchBaseViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
