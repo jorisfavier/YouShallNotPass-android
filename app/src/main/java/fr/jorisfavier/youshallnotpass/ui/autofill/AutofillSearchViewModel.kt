@@ -30,6 +30,8 @@ class AutofillSearchViewModel @Inject constructor(
     private val packageManager: PackageManager,
 ) : SearchBaseViewModel() {
 
+    private var firstSearchProcessed = false
+
     private val _autofillResponse = MutableLiveData<Event<Intent>>()
     val autofillResponse: LiveData<Event<Intent>> = _autofillResponse
 
@@ -49,9 +51,13 @@ class AutofillSearchViewModel @Inject constructor(
                                 itemRepository.searchItemByCertificates(parsedStructure.certificatesHashes)
                             if (byCertificatesResult.isNotEmpty()) {
                                 emit(byCertificatesResult)
-                            } else {
+                            } else if (!firstSearchProcessed) {
+                                //When landing to this fragment the first time
+                                //if we haven't found any result from the certificate
+                                //we try to find some items from the app name or web domain
                                 search.value = parsedStructure.webDomain?.getDomainIfUrl()
                                     ?: parsedStructure.appName
+                                firstSearchProcessed = true
                             }
                         }
                         else -> {
