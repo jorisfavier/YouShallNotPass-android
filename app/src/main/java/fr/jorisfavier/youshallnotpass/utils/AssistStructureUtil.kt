@@ -16,6 +16,7 @@ import fr.jorisfavier.youshallnotpass.utils.extensions.getCertificateHashes
 @RequiresApi(Build.VERSION_CODES.O)
 object AssistStructureUtil {
 
+    @JvmStatic
     fun traverseStructure(
         structure: AssistStructure,
         packageManager: PackageManager,

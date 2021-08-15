@@ -89,7 +89,6 @@ class AutofillSearchViewModel @Inject constructor(
         autofillParsedStructure.value =
             AssistStructureUtil.traverseStructure(assistStructure, packageManager)
         this.fillRequest = fillRequest
-
     }
 
     fun onItemClicked(item: Item) {
@@ -97,7 +96,7 @@ class AutofillSearchViewModel @Inject constructor(
             val parsedStructure = autofillParsedStructure.value ?: return@launch
             if (parsedStructure.certificatesHashes.isNotEmpty()) {
                 val updatedItem = item.copy(packageCertificate = parsedStructure.certificatesHashes)
-                itemRepository.updateOrCreateItem(updatedItem)
+                runCatching { itemRepository.updateOrCreateItem(updatedItem) }
             }
             val itemPassword = cryptoManager.decryptData(item.password, item.initializationVector)
             val data = AutofillDataSetInfo(
