@@ -6,7 +6,7 @@ import androidx.core.content.FileProvider
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.data.ExternalItemDataSource
 import fr.jorisfavier.youshallnotpass.data.model.ItemDto
-import fr.jorisfavier.youshallnotpass.manager.IContentResolverManager
+import fr.jorisfavier.youshallnotpass.manager.ContentResolverManager
 import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.utils.FileUtil
 import fr.jorisfavier.youshallnotpass.utils.extensions.firstNotNull
@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 class ExternalItemDataSourceImpl @Inject constructor(
     private val appContext: Context,
-    private val contentResolver: IContentResolverManager
+    private val contentResolver: ContentResolverManager
 ) : ExternalItemDataSource {
 
     override suspend fun saveToCsv(items: List<ItemDto>): Uri {

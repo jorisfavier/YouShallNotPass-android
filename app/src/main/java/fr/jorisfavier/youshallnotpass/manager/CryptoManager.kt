@@ -2,7 +2,7 @@ package fr.jorisfavier.youshallnotpass.manager
 
 import fr.jorisfavier.youshallnotpass.manager.model.EncryptedData
 
-interface ICryptoManager {
+interface CryptoManager {
     /**
      * Encrypt the given data using a private encryption key
      * @param plaintext the text to be encrypted

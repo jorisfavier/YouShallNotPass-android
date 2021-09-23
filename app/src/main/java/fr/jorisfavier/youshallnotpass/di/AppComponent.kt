@@ -4,11 +4,7 @@ import android.app.Application
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjectionModule
-import dagger.android.ContributesAndroidInjector
 import fr.jorisfavier.youshallnotpass.YSNPApplication
-import fr.jorisfavier.youshallnotpass.ui.auth.AuthActivity
-import fr.jorisfavier.youshallnotpass.ui.search.SearchFragment
-import fr.jorisfavier.youshallnotpass.repository.IItemRepository
 import javax.inject.Singleton
 
 @Singleton

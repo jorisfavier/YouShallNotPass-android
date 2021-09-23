@@ -3,7 +3,7 @@ package fr.jorisfavier.youshallnotpass.manager.impl
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
-import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
+import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.manager.model.EncryptedData
 import fr.jorisfavier.youshallnotpass.utils.extensions.md5
 import java.io.IOException
@@ -17,7 +17,7 @@ import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.PBEParameterSpec
 
-class CryptoManager : ICryptoManager {
+class CryptoManagerImpl : CryptoManager {
 
     @Throws(
         BadPaddingException::class,

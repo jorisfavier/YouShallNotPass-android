@@ -3,7 +3,7 @@ package fr.jorisfavier.youshallnotpass.repository
 import android.net.Uri
 import fr.jorisfavier.youshallnotpass.model.ExternalItem
 
-interface IExternalItemRepository {
+interface ExternalItemRepository {
 
     /**
      * Persist a given list of ExternalItem by encrypting it with the given password

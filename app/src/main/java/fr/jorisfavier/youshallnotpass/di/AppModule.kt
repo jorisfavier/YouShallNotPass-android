@@ -21,18 +21,18 @@ import fr.jorisfavier.youshallnotpass.data.ExternalItemDataSource
 import fr.jorisfavier.youshallnotpass.data.ItemDataSource
 import fr.jorisfavier.youshallnotpass.data.impl.AppPreferenceDataSourceImpl
 import fr.jorisfavier.youshallnotpass.data.impl.ExternalItemDataSourceImpl
-import fr.jorisfavier.youshallnotpass.manager.IAuthManager
-import fr.jorisfavier.youshallnotpass.manager.IContentResolverManager
-import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
-import fr.jorisfavier.youshallnotpass.manager.impl.AuthManager
-import fr.jorisfavier.youshallnotpass.manager.impl.ContentResolverManager
-import fr.jorisfavier.youshallnotpass.manager.impl.CryptoManager
+import fr.jorisfavier.youshallnotpass.manager.AuthManager
+import fr.jorisfavier.youshallnotpass.manager.ContentResolverManager
+import fr.jorisfavier.youshallnotpass.manager.CryptoManager
+import fr.jorisfavier.youshallnotpass.manager.impl.AuthManagerImpl
+import fr.jorisfavier.youshallnotpass.manager.impl.ContentResolverManagerImpl
+import fr.jorisfavier.youshallnotpass.manager.impl.CryptoManagerImpl
 import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
-import fr.jorisfavier.youshallnotpass.repository.IExternalItemRepository
-import fr.jorisfavier.youshallnotpass.repository.IItemRepository
+import fr.jorisfavier.youshallnotpass.repository.ExternalItemRepository
+import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.repository.impl.DesktopRepositoryImpl
-import fr.jorisfavier.youshallnotpass.repository.impl.ExternalItemRepository
-import fr.jorisfavier.youshallnotpass.repository.impl.ItemRepository
+import fr.jorisfavier.youshallnotpass.repository.impl.ExternalItemRepositoryImpl
+import fr.jorisfavier.youshallnotpass.repository.impl.ItemRepositoryImpl
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
@@ -48,8 +48,8 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun provideItemRepository(itemDataSource: ItemDataSource): IItemRepository {
-        return ItemRepository(itemDataSource)
+    fun provideItemRepository(itemDataSource: ItemDataSource): ItemRepository {
+        return ItemRepositoryImpl(itemDataSource)
     }
 
     @Singleton
@@ -68,8 +68,8 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun provideCryptoManager(): ICryptoManager {
-        return CryptoManager()
+    fun provideCryptoManager(): CryptoManager {
+        return CryptoManagerImpl()
     }
 
     @Provides
@@ -79,8 +79,8 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun provideAuthManager(): IAuthManager {
-        return AuthManager()
+    fun provideAuthManager(): AuthManager {
+        return AuthManagerImpl()
     }
 
     @Singleton
@@ -120,7 +120,7 @@ class AppModule {
     @Provides
     fun provideExternalItemDataSource(
         app: Application,
-        contentResolver: IContentResolverManager
+        contentResolver: ContentResolverManager
     ): ExternalItemDataSource {
         return ExternalItemDataSourceImpl(app.applicationContext, contentResolver)
     }
@@ -129,15 +129,15 @@ class AppModule {
     @Provides
     fun provideExternalItemRepository(
         externalItemDataSource: ExternalItemDataSource,
-        cryptoManager: ICryptoManager
-    ): IExternalItemRepository {
-        return ExternalItemRepository(externalItemDataSource, cryptoManager)
+        cryptoManager: CryptoManager
+    ): ExternalItemRepository {
+        return ExternalItemRepositoryImpl(externalItemDataSource, cryptoManager)
     }
 
     @Singleton
     @Provides
-    fun provideContentResolver(app: Application): IContentResolverManager {
-        return ContentResolverManager(app.contentResolver)
+    fun provideContentResolver(app: Application): ContentResolverManager {
+        return ContentResolverManagerImpl(app.contentResolver)
     }
 
     @Singleton
@@ -186,7 +186,7 @@ class AppModule {
         api: DesktopApi,
         appPreferenceDataSource: AppPreferenceDataSource,
         hostInterceptor: HostInterceptor,
-        cryptoManager: ICryptoManager
+        cryptoManager: CryptoManager
     ): DesktopRepository {
         GlobalScope.launch {
             hostInterceptor.host = appPreferenceDataSource.getDesktopAddress()

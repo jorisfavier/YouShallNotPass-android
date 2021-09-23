@@ -8,12 +8,12 @@ import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
-import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
+import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
-import fr.jorisfavier.youshallnotpass.repository.IItemRepository
+import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.utils.extensions.default
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -23,8 +23,8 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class SearchViewModel @Inject constructor(
-    private val itemRepository: IItemRepository,
-    private val cryptoManager: ICryptoManager,
+    private val itemRepository: ItemRepository,
+    private val cryptoManager: CryptoManager,
     private val clipboardManager: ClipboardManager,
     private val appPreference: AppPreferenceDataSource,
     private val desktopRepository: DesktopRepository

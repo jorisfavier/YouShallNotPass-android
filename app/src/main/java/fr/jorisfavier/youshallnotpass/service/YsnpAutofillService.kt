@@ -11,12 +11,12 @@ import android.service.autofill.*
 import androidx.annotation.RequiresApi
 import androidx.core.os.bundleOf
 import dagger.android.AndroidInjection
-import fr.jorisfavier.youshallnotpass.manager.IAuthManager
-import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
+import fr.jorisfavier.youshallnotpass.manager.AuthManager
+import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.model.AutofillParsedStructure
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
-import fr.jorisfavier.youshallnotpass.repository.IItemRepository
+import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.autofill.AutofillActivity
 import fr.jorisfavier.youshallnotpass.utils.AssistStructureUtil
 import fr.jorisfavier.youshallnotpass.utils.autofill.AutofillHelperCompat
@@ -27,13 +27,13 @@ import javax.inject.Inject
 class YsnpAutofillService : AutofillService() {
 
     @Inject
-    lateinit var itemRepository: IItemRepository
+    lateinit var itemRepository: ItemRepository
 
     @Inject
-    lateinit var authManager: IAuthManager
+    lateinit var authManager: AuthManager
 
     @Inject
-    lateinit var cryptoManager: ICryptoManager
+    lateinit var cryptoManager: CryptoManager
 
     override fun onCreate() {
         super.onCreate()

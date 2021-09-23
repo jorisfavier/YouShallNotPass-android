@@ -4,11 +4,11 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
-import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
+import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
-import fr.jorisfavier.youshallnotpass.repository.IItemRepository
+import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.search.SearchViewModel
 import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
 import io.mockk.*
@@ -20,8 +20,8 @@ import org.junit.Rule
 import org.junit.Test
 
 class SearchViewModelTest {
-    private val itemRepository: IItemRepository = mockk()
-    private val cryptoManager: ICryptoManager = mockk()
+    private val itemRepository: ItemRepository = mockk()
+    private val cryptoManager: CryptoManager = mockk()
     private val clipboardManager: ClipboardManager = mockk()
     private val appPreferences: AppPreferenceDataSource = mockk()
     private val desktopRepository: DesktopRepository = mockk()

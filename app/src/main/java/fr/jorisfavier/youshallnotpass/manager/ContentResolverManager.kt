@@ -2,7 +2,7 @@ package fr.jorisfavier.youshallnotpass.manager
 
 import android.net.Uri
 
-interface IContentResolverManager {
+interface ContentResolverManager {
     /**
      * Gets the mimeType of a file
      * @param uri the Uri to the file

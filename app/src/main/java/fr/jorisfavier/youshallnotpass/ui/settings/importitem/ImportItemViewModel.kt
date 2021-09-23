@@ -5,10 +5,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
+import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
-import fr.jorisfavier.youshallnotpass.repository.IExternalItemRepository
-import fr.jorisfavier.youshallnotpass.repository.IItemRepository
+import fr.jorisfavier.youshallnotpass.repository.ExternalItemRepository
+import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.settings.importitem.review.ExternalItemViewModel
 import fr.jorisfavier.youshallnotpass.utils.Event
 import fr.jorisfavier.youshallnotpass.utils.State
@@ -18,9 +18,9 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class ImportItemViewModel @Inject constructor(
-    private val externalItemRepository: IExternalItemRepository,
-    private val cryptoManager: ICryptoManager,
-    private val itemRepository: IItemRepository
+    private val externalItemRepository: ExternalItemRepository,
+    private val cryptoManager: CryptoManager,
+    private val itemRepository: ItemRepository
 ) : ViewModel() {
 
     private val _navigate = MutableLiveData<Event<Unit>>()

@@ -1,13 +1,12 @@
 package fr.jorisfavier.youshallnotpass
 
-import android.content.ClipData
 import android.content.ClipboardManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
+import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.manager.model.EncryptedData
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
-import fr.jorisfavier.youshallnotpass.repository.IItemRepository
+import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.item.ItemEditViewModel
 import fr.jorisfavier.youshallnotpass.utils.PasswordUtil
 import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
@@ -40,8 +39,8 @@ class ItemEditViewModelTest {
     private val fakeEncryptedData
         get() = EncryptedData(fakeItem.password, fakeItem.initializationVector)
     private val newFakeTitle = "new fake title"
-    private val cryptoManager: ICryptoManager = mockk()
-    private val itemRepo: IItemRepository = mockk()
+    private val cryptoManager: CryptoManager = mockk()
+    private val itemRepo: ItemRepository = mockk()
     private val clipManager: ClipboardManager = mockk()
     private val viewModel = ItemEditViewModel(
         cryptoManager = cryptoManager,

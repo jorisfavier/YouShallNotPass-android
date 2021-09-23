@@ -1,8 +1,8 @@
 package fr.jorisfavier.youshallnotpass
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import fr.jorisfavier.youshallnotpass.manager.IAuthManager
-import fr.jorisfavier.youshallnotpass.manager.impl.AuthManager
+import fr.jorisfavier.youshallnotpass.manager.AuthManager
+import fr.jorisfavier.youshallnotpass.manager.impl.AuthManagerImpl
 import fr.jorisfavier.youshallnotpass.ui.home.HomeViewModel
 import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
 import io.mockk.every
@@ -22,7 +22,7 @@ class HomeViewModelTest {
     @Test
     fun `user should not be authenticated when onAppPaused`() {
         //given
-        val authManager: IAuthManager = mockk()
+        val authManager: AuthManager = mockk()
         every { authManager setProperty "isUserAuthenticated" value false } just runs
         val viewModel = HomeViewModel(authManager)
 
@@ -36,7 +36,7 @@ class HomeViewModelTest {
     @Test
     fun `requireAuthentication should emit a value onAppResumed if the user is not authenticated`() {
         //given
-        val authManager: IAuthManager = mockk()
+        val authManager: AuthManager = mockk()
         every { authManager getProperty "isUserAuthenticated" } returns false
         val viewModel = HomeViewModel(authManager)
 
@@ -51,7 +51,7 @@ class HomeViewModelTest {
     @Test(expected = TimeoutException::class)
     fun `requireAuthentication should not emit a value on configuration change`() {
         //given
-        val authManager: IAuthManager = AuthManager().apply { isUserAuthenticated = true }
+        val authManager: AuthManager = AuthManagerImpl().apply { isUserAuthenticated = true }
         val viewModel = HomeViewModel(authManager)
 
         //when
@@ -67,7 +67,7 @@ class HomeViewModelTest {
     @Test(expected = TimeoutException::class)
     fun `requireAuthentication should not emit a value when ignoreNextPause`() {
         //given
-        val authManager: IAuthManager = AuthManager().apply { isUserAuthenticated = true }
+        val authManager: AuthManager = AuthManagerImpl().apply { isUserAuthenticated = true }
         val viewModel = HomeViewModel(authManager)
 
         //when

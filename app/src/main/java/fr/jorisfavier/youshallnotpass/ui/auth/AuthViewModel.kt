@@ -7,13 +7,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import fr.jorisfavier.youshallnotpass.R
-import fr.jorisfavier.youshallnotpass.manager.IAuthManager
+import fr.jorisfavier.youshallnotpass.manager.AuthManager
 import fr.jorisfavier.youshallnotpass.utils.Event
 import timber.log.Timber
 import javax.inject.Inject
 
 class AuthViewModel @Inject constructor(
-    private val authManager: IAuthManager,
+    private val authManager: AuthManager,
     private val keyguardManager: KeyguardManager
 ) : ViewModel() {
 

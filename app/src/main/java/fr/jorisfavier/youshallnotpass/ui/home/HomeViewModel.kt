@@ -3,11 +3,11 @@ package fr.jorisfavier.youshallnotpass.ui.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import fr.jorisfavier.youshallnotpass.manager.IAuthManager
+import fr.jorisfavier.youshallnotpass.manager.AuthManager
 import timber.log.Timber
 import javax.inject.Inject
 
-class HomeViewModel @Inject constructor(private val authManager: IAuthManager) : ViewModel() {
+class HomeViewModel @Inject constructor(private val authManager: AuthManager) : ViewModel() {
 
     //indicates that the user didn't put the app in background
     //but the app started an intent

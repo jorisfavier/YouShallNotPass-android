@@ -1,23 +1,19 @@
 package fr.jorisfavier.youshallnotpass.ui.autofill
 
 import android.app.assist.AssistStructure
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.service.autofill.FillRequest
-import android.view.autofill.AutofillManager
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
 import fr.jorisfavier.youshallnotpass.R
-import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
+import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.model.AutofillParsedStructure
 import fr.jorisfavier.youshallnotpass.model.Item
-import fr.jorisfavier.youshallnotpass.repository.IItemRepository
+import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.search.SearchBaseViewModel
 import fr.jorisfavier.youshallnotpass.utils.AssistStructureUtil
 import fr.jorisfavier.youshallnotpass.utils.Event
-import fr.jorisfavier.youshallnotpass.utils.autofill.AutofillHelper26
-import fr.jorisfavier.youshallnotpass.utils.autofill.AutofillHelperCompat
 import fr.jorisfavier.youshallnotpass.utils.extensions.combine
 import fr.jorisfavier.youshallnotpass.utils.extensions.default
 import fr.jorisfavier.youshallnotpass.utils.extensions.getDomainIfUrl
@@ -27,8 +23,8 @@ import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.O)
 class AutofillSearchViewModel @Inject constructor(
-    private val itemRepository: IItemRepository,
-    private val cryptoManager: ICryptoManager,
+    private val itemRepository: ItemRepository,
+    private val cryptoManager: CryptoManager,
     private val packageManager: PackageManager,
 ) : SearchBaseViewModel() {
 

@@ -4,11 +4,11 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import androidx.lifecycle.*
 import fr.jorisfavier.youshallnotpass.R
-import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
+import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
-import fr.jorisfavier.youshallnotpass.repository.IItemRepository
+import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.utils.PasswordOptions
 import fr.jorisfavier.youshallnotpass.utils.PasswordUtil
 import kotlinx.coroutines.flow.Flow
@@ -20,8 +20,8 @@ import java.util.*
 import javax.inject.Inject
 
 class ItemEditViewModel @Inject constructor(
-    private val cryptoManager: ICryptoManager,
-    private val itemRepository: IItemRepository,
+    private val cryptoManager: CryptoManager,
+    private val itemRepository: ItemRepository,
     private val clipboardManager: ClipboardManager,
 ) : ViewModel() {
 

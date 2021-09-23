@@ -2,7 +2,7 @@ package fr.jorisfavier.youshallnotpass.repository
 
 import fr.jorisfavier.youshallnotpass.model.Item
 
-interface IItemRepository {
+interface ItemRepository {
 
     /**
      * Return all items stored in the app

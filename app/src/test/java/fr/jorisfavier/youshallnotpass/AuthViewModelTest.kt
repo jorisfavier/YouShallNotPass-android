@@ -3,7 +3,7 @@ package fr.jorisfavier.youshallnotpass
 import android.app.KeyguardManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.biometric.BiometricPrompt
-import fr.jorisfavier.youshallnotpass.manager.IAuthManager
+import fr.jorisfavier.youshallnotpass.manager.AuthManager
 import fr.jorisfavier.youshallnotpass.ui.auth.AuthViewModel
 import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
 import io.mockk.every
@@ -24,7 +24,7 @@ class AuthViewModelTest {
     @Test
     fun `authCallback should emit Success onAuthenticationSucceeded`() {
         //given
-        val authManager: IAuthManager = mockk()
+        val authManager: AuthManager = mockk()
         val keyguardManager: KeyguardManager = mockk()
         every { authManager setProperty "isUserAuthenticated" value true } just runs
 
@@ -41,7 +41,7 @@ class AuthViewModelTest {
     @Test
     fun `authCallback should emit Failure onAuthenticationError`() {
         //given
-        val authManager: IAuthManager = mockk()
+        val authManager: AuthManager = mockk()
         val keyguardManager: KeyguardManager = mockk()
 
         val viewModel = AuthViewModel(authManager, keyguardManager)
@@ -58,7 +58,7 @@ class AuthViewModelTest {
     @Test
     fun `authCallback should emit Failure with no biometric message onAuthenticationError with ERROR_NO_BIOMETRICS code`() {
         //given
-        val authManager: IAuthManager = mockk()
+        val authManager: AuthManager = mockk()
         val keyguardManager: KeyguardManager = mockk()
 
         val viewModel = AuthViewModel(authManager, keyguardManager)
@@ -75,7 +75,7 @@ class AuthViewModelTest {
     @Test
     fun `authCallback should emit Failure onAuthenticationFailed`() {
         //given
-        val authManager: IAuthManager = mockk()
+        val authManager: AuthManager = mockk()
         val keyguardManager: KeyguardManager = mockk()
 
         val viewModel = AuthViewModel(authManager, keyguardManager)

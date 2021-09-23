@@ -5,7 +5,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.content.FileProvider
 import fr.jorisfavier.youshallnotpass.data.impl.ExternalItemDataSourceImpl
 import fr.jorisfavier.youshallnotpass.data.model.ItemDto
-import fr.jorisfavier.youshallnotpass.manager.IContentResolverManager
+import fr.jorisfavier.youshallnotpass.manager.ContentResolverManager
 import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import io.mockk.*
 import junit.framework.TestCase
@@ -23,7 +23,7 @@ class ExternalItemDataSourceImplTest {
     var mainCoroutineRule = MainCoroutineRule()
 
     private val appContext: Context = mockk()
-    private val contentResolver: IContentResolverManager = mockk()
+    private val contentResolver: ContentResolverManager = mockk()
     private val dataSource = ExternalItemDataSourceImpl(appContext, contentResolver)
     private val fakeItemDto = ItemDto(title = "FakeTitle", login = "fakeLogin", password = "fakePassword")
     private val fakeItemDtoWithUrl = ItemDto(title = "Test", login = "fakeLogin", password = "fakePassword")

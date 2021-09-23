@@ -3,9 +3,9 @@ package fr.jorisfavier.youshallnotpass.repository.impl
 import android.net.Uri
 import fr.jorisfavier.youshallnotpass.data.ExternalItemDataSource
 import fr.jorisfavier.youshallnotpass.data.model.ItemDto
-import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
+import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.model.ExternalItem
-import fr.jorisfavier.youshallnotpass.repository.IExternalItemRepository
+import fr.jorisfavier.youshallnotpass.repository.ExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.mapper.DtoToModel
 import fr.jorisfavier.youshallnotpass.repository.mapper.ModelToDto
 import kotlinx.coroutines.Dispatchers
@@ -14,10 +14,10 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class ExternalItemRepository(
+class ExternalItemRepositoryImpl(
     private val externalItemDataSource: ExternalItemDataSource,
-    private val cryptoManager: ICryptoManager
-) : IExternalItemRepository {
+    private val cryptoManager: CryptoManager
+) : ExternalItemRepository {
 
     override suspend fun saveExternalItems(items: List<ExternalItem>, password: String?): Uri {
         return withContext(Dispatchers.IO) {

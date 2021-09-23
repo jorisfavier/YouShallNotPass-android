@@ -1,6 +1,6 @@
 package fr.jorisfavier.youshallnotpass.manager
 
-interface IAuthManager {
+interface AuthManager {
     /**
      * Indicates if the user is authenticated in the app
      */

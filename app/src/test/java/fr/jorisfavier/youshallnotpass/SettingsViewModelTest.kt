@@ -2,11 +2,11 @@ package fr.jorisfavier.youshallnotpass
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
-import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
+import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.model.ExternalItem
 import fr.jorisfavier.youshallnotpass.model.Item
-import fr.jorisfavier.youshallnotpass.repository.IExternalItemRepository
-import fr.jorisfavier.youshallnotpass.repository.IItemRepository
+import fr.jorisfavier.youshallnotpass.repository.ExternalItemRepository
+import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.settings.SettingsViewModel
 import io.mockk.*
 import junit.framework.TestCase
@@ -23,10 +23,10 @@ class SettingsViewModelTest {
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()
 
-    private val itemRepository: IItemRepository = mockk()
-    private val cryptoManager: ICryptoManager = mockk()
+    private val itemRepository: ItemRepository = mockk()
+    private val cryptoManager: CryptoManager = mockk()
     private val appPreferences: AppPreferenceDataSource = mockk()
-    private val externalItemRepository: IExternalItemRepository = mockk()
+    private val externalItemRepository: ExternalItemRepository = mockk()
     private val viewModel = SettingsViewModel(appPreferences, itemRepository, externalItemRepository, cryptoManager)
 
     private val fakeItem = Item(

@@ -2,10 +2,10 @@ package fr.jorisfavier.youshallnotpass
 
 import android.content.pm.PackageManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
+import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.model.AutofillParsedStructure
 import fr.jorisfavier.youshallnotpass.model.Item
-import fr.jorisfavier.youshallnotpass.repository.IItemRepository
+import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.autofill.AutofillDataSetInfo
 import fr.jorisfavier.youshallnotpass.ui.autofill.AutofillSearchViewModel
 import fr.jorisfavier.youshallnotpass.utils.AssistStructureUtil
@@ -21,8 +21,8 @@ class AutofillSearchViewModelTest {
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()
 
-    private val itemRepository: IItemRepository = mockk()
-    private val cryptoManager: ICryptoManager = mockk()
+    private val itemRepository: ItemRepository = mockk()
+    private val cryptoManager: CryptoManager = mockk()
     private val packageManager: PackageManager = mockk()
 
     private val viewModel by lazy {

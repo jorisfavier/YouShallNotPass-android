@@ -2,14 +2,14 @@ package fr.jorisfavier.youshallnotpass.manager.impl
 
 import android.content.ContentResolver
 import android.net.Uri
-import fr.jorisfavier.youshallnotpass.manager.IContentResolverManager
+import fr.jorisfavier.youshallnotpass.manager.ContentResolverManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.*
 
-class ContentResolverManager(private val contentResolver: ContentResolver) : IContentResolverManager {
+class ContentResolverManagerImpl(private val contentResolver: ContentResolver) : ContentResolverManager {
     override suspend fun getMimeType(uri: Uri): String? {
         return withContext(Dispatchers.IO) {
             return@withContext contentResolver.getType(uri)

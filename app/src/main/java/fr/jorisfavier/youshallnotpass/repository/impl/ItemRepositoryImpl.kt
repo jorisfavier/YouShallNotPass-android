@@ -2,7 +2,7 @@ package fr.jorisfavier.youshallnotpass.repository.impl
 
 import fr.jorisfavier.youshallnotpass.data.ItemDataSource
 import fr.jorisfavier.youshallnotpass.model.Item
-import fr.jorisfavier.youshallnotpass.repository.IItemRepository
+import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.repository.mapper.EntityToModel
 import fr.jorisfavier.youshallnotpass.repository.mapper.ModelToEntity
 import kotlinx.coroutines.Dispatchers
@@ -11,8 +11,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
-class ItemRepository @Inject constructor(private var itemDataSource: ItemDataSource) :
-    IItemRepository {
+class ItemRepositoryImpl @Inject constructor(private var itemDataSource: ItemDataSource) :
+    ItemRepository {
 
     override suspend fun getAllItems(): List<Item> {
         return withContext(Dispatchers.IO) {

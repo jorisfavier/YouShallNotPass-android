@@ -2,12 +2,12 @@ package fr.jorisfavier.youshallnotpass
 
 import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import fr.jorisfavier.youshallnotpass.manager.ICryptoManager
+import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.manager.model.EncryptedData
 import fr.jorisfavier.youshallnotpass.model.ExternalItem
 import fr.jorisfavier.youshallnotpass.model.Item
-import fr.jorisfavier.youshallnotpass.repository.IExternalItemRepository
-import fr.jorisfavier.youshallnotpass.repository.IItemRepository
+import fr.jorisfavier.youshallnotpass.repository.ExternalItemRepository
+import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemViewModel
 import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemViewModel.Companion.PASSWORD_NEEDED_SLIDE
 import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemViewModel.Companion.REVIEW_ITEM_SLIDE
@@ -27,9 +27,9 @@ class ImportItemViewModelTest {
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()
 
-    private val itemRepository: IItemRepository = mockk()
-    private val cryptoManager: ICryptoManager = mockk()
-    private val externalItemRepository: IExternalItemRepository = mockk()
+    private val itemRepository: ItemRepository = mockk()
+    private val cryptoManager: CryptoManager = mockk()
+    private val externalItemRepository: ExternalItemRepository = mockk()
     private val viewModel = ImportItemViewModel(externalItemRepository, cryptoManager, itemRepository)
 
     private val fakeItem = ExternalItem(
