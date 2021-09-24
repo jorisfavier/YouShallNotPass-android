@@ -64,15 +64,13 @@ class ReviewImportedItemsFragment : Fragment(R.layout.fragment_import_review_ite
             binding.itemTotalCount = it.size
             adapter.updateData(it)
         }
-        viewModel.loadFromUriState.observe(viewLifecycleOwner) {
-            it.getContentIfNotHandled()?.let { state ->
-                binding.importReviewList.isVisible = state is State.Success
-                binding.importReviewDescription.isVisible = state is State.Success
-                binding.importReviewImage.isVisible = state is State.Success
-                binding.importReviewSelectAll.isVisible = state is State.Success
-                binding.importReviewItemCount.isVisible = state is State.Success
-                binding.importReviewLoading.isVisible = state is State.Loading
-            }
+        viewModel.loadFromUriState.observe(viewLifecycleOwner) { state ->
+            binding.importReviewList.isVisible = state is State.Success
+            binding.importReviewDescription.isVisible = state is State.Success
+            binding.importReviewImage.isVisible = state is State.Success
+            binding.importReviewSelectAll.isVisible = state is State.Success
+            binding.importReviewItemCount.isVisible = state is State.Success
+            binding.importReviewLoading.isVisible = state is State.Loading
         }
     }
 

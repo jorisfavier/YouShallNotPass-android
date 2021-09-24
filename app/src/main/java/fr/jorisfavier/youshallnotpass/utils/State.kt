@@ -1,7 +1,7 @@
 package fr.jorisfavier.youshallnotpass.utils
 
-sealed class State {
-    object Loading : State()
-    object Success : State()
-    object Error : State()
+sealed class State<out T : Any> {
+    object Loading : State<Nothing>()
+    class Success<out T : Any>(val value: T) : State<T>()
+    object Error : State<Nothing>()
 }

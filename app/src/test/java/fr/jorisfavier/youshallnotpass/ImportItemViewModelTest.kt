@@ -30,7 +30,8 @@ class ImportItemViewModelTest {
     private val itemRepository: ItemRepository = mockk()
     private val cryptoManager: CryptoManager = mockk()
     private val externalItemRepository: ExternalItemRepository = mockk()
-    private val viewModel = ImportItemViewModel(externalItemRepository, cryptoManager, itemRepository)
+    private val viewModel =
+        ImportItemViewModel(externalItemRepository, cryptoManager, itemRepository)
 
     private val fakeItem = ExternalItem(
         title = "Test title",
@@ -71,238 +72,281 @@ class ImportItemViewModelTest {
     }
 
     @Test
-    fun `onSlideChanged with PASSWORD_NEEDED_SLIDE position should emit a navigate event if isSecureFile is false`() = runBlocking {
-        //given
-        val uri: Uri = mockk()
-        coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns false
-        var count = 0
+    fun `onSlideChanged with PASSWORD_NEEDED_SLIDE position should emit a navigate event if isSecureFile is false`() =
+        runBlocking {
+            //given
+            val uri: Uri = mockk()
+            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns false
+            var count = 0
 
-        //when
-        viewModel.navigate.observeForever {
-            it.getContentIfNotHandled()?.let {
-                count++
+            //when
+            viewModel.navigate.observeForever {
+                it.getContentIfNotHandled()?.let {
+                    count++
+                }
             }
-        }
-        viewModel.setUri(uri)
-        viewModel.onSlideChanged(PASSWORD_NEEDED_SLIDE)
+            viewModel.setUri(uri)
+            viewModel.onSlideChanged(PASSWORD_NEEDED_SLIDE)
 
-        //then
-        TestCase.assertFalse(viewModel.isSecureFile.value ?: true)
-        TestCase.assertEquals(2, count)
-    }
+            //then
+            TestCase.assertFalse(viewModel.isSecureFile.value ?: true)
+            TestCase.assertEquals(2, count)
+        }
 
     @Test
-    fun `onSlideChanged with PASSWORD_NEEDED_SLIDE position should not emit a navigate event if isSecureFile is true`() = runBlocking {
-        //given
-        val uri: Uri = mockk()
-        coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns true
-        var count = 0
+    fun `onSlideChanged with PASSWORD_NEEDED_SLIDE position should not emit a navigate event if isSecureFile is true`() =
+        runBlocking {
+            //given
+            val uri: Uri = mockk()
+            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns true
+            var count = 0
 
-        //when
-        viewModel.navigate.observeForever {
-            it.getContentIfNotHandled()?.let {
-                count++
+            //when
+            viewModel.navigate.observeForever {
+                it.getContentIfNotHandled()?.let {
+                    count++
+                }
             }
-        }
-        viewModel.setUri(uri)
-        viewModel.onSlideChanged(PASSWORD_NEEDED_SLIDE)
+            viewModel.setUri(uri)
+            viewModel.onSlideChanged(PASSWORD_NEEDED_SLIDE)
 
-        //then
-        TestCase.assertTrue(viewModel.isSecureFile.value ?: false)
-        TestCase.assertEquals(1, count)
-    }
+            //then
+            TestCase.assertTrue(viewModel.isSecureFile.value ?: false)
+            TestCase.assertEquals(1, count)
+        }
 
     @Test
-    fun `onSlideChanged with REVIEW_ITEM_SLIDE position should load external items`() = runBlocking {
-        //given
-        val uri: Uri = mockk()
-        val filePassword = slot<String>()
-        coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns true
-        coEvery { externalItemRepository.getExternalItemsFromUri(any(), capture(filePassword)) } returns listOf(fakeItem)
-        viewModel.password.value = fakePassword
-        val states = mutableListOf<State>()
+    fun `onSlideChanged with REVIEW_ITEM_SLIDE position should load external items`() =
+        runBlocking {
+            //given
+            val uri: Uri = mockk()
+            val filePassword = slot<String>()
+            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns true
+            coEvery {
+                externalItemRepository.getExternalItemsFromUri(
+                    any(),
+                    capture(filePassword)
+                )
+            } returns listOf(fakeItem)
+            viewModel.password.value = fakePassword
+            val states = mutableListOf<State<Unit>>()
 
-        //when
-        viewModel.loadFromUriState.observeForever { event ->
-            event.getContentIfNotHandled()?.let { states.add(it) }
+            //when
+            viewModel.loadFromUriState.observeForever { state ->
+                states.add(state)
+            }
+            viewModel.setUri(uri)
+            viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
+
+            //then
+            TestCase.assertTrue(viewModel.isSecureFile.value ?: false)
+            TestCase.assertEquals(fakePassword, filePassword.captured)
+            TestCase.assertEquals(2, states.size)
+            TestCase.assertTrue(states[0] is State.Loading)
+            TestCase.assertTrue(states[1] is State.Success)
+            TestCase.assertEquals(
+                fakeItem,
+                viewModel.importedItems.value?.firstOrNull()?.externalItem
+            )
         }
-        viewModel.setUri(uri)
-        viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
-
-        //then
-        TestCase.assertTrue(viewModel.isSecureFile.value ?: false)
-        TestCase.assertEquals(fakePassword, filePassword.captured)
-        TestCase.assertEquals(2, states.size)
-        TestCase.assertTrue(states[0] is State.Loading)
-        TestCase.assertTrue(states[1] is State.Success)
-        TestCase.assertEquals(fakeItem, viewModel.importedItems.value?.firstOrNull()?.externalItem)
-    }
 
     @Test
-    fun `onSlideChanged with REVIEW_ITEM_SLIDE position and empty item list should emit error`() = runBlocking {
-        //given
-        val uri: Uri = mockk()
-        val filePassword = slot<String>()
-        coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns true
-        coEvery { externalItemRepository.getExternalItemsFromUri(any(), capture(filePassword)) } returns listOf()
-        viewModel.password.value = fakePassword
-        val states = mutableListOf<State>()
+    fun `onSlideChanged with REVIEW_ITEM_SLIDE position and empty item list should emit error`() =
+        runBlocking {
+            //given
+            val uri: Uri = mockk()
+            val filePassword = slot<String>()
+            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns true
+            coEvery {
+                externalItemRepository.getExternalItemsFromUri(
+                    any(),
+                    capture(filePassword)
+                )
+            } returns listOf()
+            viewModel.password.value = fakePassword
+            val states = mutableListOf<State<Unit>>()
 
-        //when
-        viewModel.loadFromUriState.observeForever { event ->
-            event.getContentIfNotHandled()?.let { states.add(it) }
+            //when
+            viewModel.loadFromUriState.observeForever {
+                states.add(it)
+            }
+            viewModel.setUri(uri)
+            viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
+
+            //then
+            TestCase.assertTrue(viewModel.isSecureFile.value ?: false)
+            TestCase.assertEquals(fakePassword, filePassword.captured)
+            TestCase.assertEquals(2, states.size)
+            TestCase.assertTrue(states[0] is State.Loading)
+            TestCase.assertTrue(states[1] is State.Error)
+            TestCase.assertEquals(0, viewModel.importedItems.value?.size)
         }
-        viewModel.setUri(uri)
-        viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
-
-        //then
-        TestCase.assertTrue(viewModel.isSecureFile.value ?: false)
-        TestCase.assertEquals(fakePassword, filePassword.captured)
-        TestCase.assertEquals(2, states.size)
-        TestCase.assertTrue(states[0] is State.Loading)
-        TestCase.assertTrue(states[1] is State.Error)
-        TestCase.assertEquals(0, viewModel.importedItems.value?.size)
-    }
 
     @Test
-    fun `onSlideChanged with REVIEW_ITEM_SLIDE position and exception from the repository should emit an error`() = runBlocking {
-        //given
-        val uri: Uri = mockk()
-        val filePassword = slot<String>()
-        coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns true
-        coEvery { externalItemRepository.getExternalItemsFromUri(any(), capture(filePassword)) } throws Exception()
-        viewModel.password.value = fakePassword
-        val states = mutableListOf<State>()
-        var count = 0
+    fun `onSlideChanged with REVIEW_ITEM_SLIDE position and exception from the repository should emit an error`() =
+        runBlocking {
+            //given
+            val uri: Uri = mockk()
+            val filePassword = slot<String>()
+            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns true
+            coEvery {
+                externalItemRepository.getExternalItemsFromUri(
+                    any(),
+                    capture(filePassword)
+                )
+            } throws Exception()
+            viewModel.password.value = fakePassword
+            val states = mutableListOf<State<Unit>>()
+            var count = 0
 
-        //when
-        viewModel.navigate.observeForever { event ->
-            event.getContentIfNotHandled()?.let { count++ }
-        }
-        viewModel.loadFromUriState.observeForever { event ->
-            event.getContentIfNotHandled()?.let { states.add(it) }
-        }
-        viewModel.setUri(uri)
-        viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
+            //when
+            viewModel.navigate.observeForever { event ->
+                event.getContentIfNotHandled()?.let { count++ }
+            }
+            viewModel.loadFromUriState.observeForever {
+                states.add(it)
+            }
+            viewModel.setUri(uri)
+            viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
 
-        //then
-        TestCase.assertTrue(viewModel.isSecureFile.value ?: false)
-        TestCase.assertEquals(fakePassword, filePassword.captured)
-        TestCase.assertEquals(2, states.size)
-        TestCase.assertTrue(states[0] is State.Loading)
-        TestCase.assertTrue(states[1] is State.Error)
-        TestCase.assertEquals(0, viewModel.importedItems.value?.size)
-        TestCase.assertEquals(2, count)
-    }
+            //then
+            TestCase.assertTrue(viewModel.isSecureFile.value ?: false)
+            TestCase.assertEquals(fakePassword, filePassword.captured)
+            TestCase.assertEquals(2, states.size)
+            TestCase.assertTrue(states[0] is State.Loading)
+            TestCase.assertTrue(states[1] is State.Error)
+            TestCase.assertEquals(0, viewModel.importedItems.value?.size)
+            TestCase.assertEquals(2, count)
+        }
 
     @Test
-    fun `onSlideChanged with SUCCESS_FAIL_SLIDE position and selected items should import items`() = runBlocking {
-        //given
-        val uri: Uri = mockk()
-        val items = slot<List<Item>>()
-        coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns false
-        coEvery { externalItemRepository.getExternalItemsFromUri(any(), any()) } returns listOf(fakeItem)
-        coEvery { cryptoManager.encryptData(any()) } returns fakeEncryptedData
-        coEvery { itemRepository.insertItems(capture(items)) } just runs
-        val states = mutableListOf<State>()
+    fun `onSlideChanged with SUCCESS_FAIL_SLIDE position and selected items should import items`() =
+        runBlocking {
+            //given
+            val uri: Uri = mockk()
+            val items = slot<List<Item>>()
+            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns false
+            coEvery { externalItemRepository.getExternalItemsFromUri(any(), any()) } returns listOf(
+                fakeItem
+            )
+            coEvery { cryptoManager.encryptData(any()) } returns fakeEncryptedData
+            coEvery { itemRepository.insertItems(capture(items)) } just runs
+            val states = mutableListOf<State<Unit>>()
 
-        //when
-        viewModel.importItemsState.observeForever { event ->
-            event.getContentIfNotHandled()?.let { states.add(it) }
+            //when
+            viewModel.importItemsState.observeForever {
+                states.add(it)
+            }
+            viewModel.setUri(uri)
+            viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
+            viewModel.importedItems.value?.forEach { it.selected = true }
+            viewModel.onSlideChanged(SUCCESS_FAIL_SLIDE)
+
+            //then
+            TestCase.assertEquals(2, states.size)
+            TestCase.assertTrue(states[0] is State.Loading)
+            TestCase.assertTrue(states[1] is State.Success)
+            TestCase.assertEquals(fakeItem.title, items.captured.first().title)
+            TestCase.assertEquals(fakeItem.login, items.captured.first().login)
+            TestCase.assertEquals(
+                fakeEncryptedData.initializationVector,
+                items.captured.first().initializationVector
+            )
+            TestCase.assertEquals(fakeEncryptedData.ciphertext, items.captured.first().password)
+            TestCase.assertEquals(0, items.captured.first().id)
         }
-        viewModel.setUri(uri)
-        viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
-        viewModel.importedItems.value?.forEach { it.selected = true }
-        viewModel.onSlideChanged(SUCCESS_FAIL_SLIDE)
-
-        //then
-        TestCase.assertEquals(2, states.size)
-        TestCase.assertTrue(states[0] is State.Loading)
-        TestCase.assertTrue(states[1] is State.Success)
-        TestCase.assertEquals(fakeItem.title, items.captured.first().title)
-        TestCase.assertEquals(fakeItem.login, items.captured.first().login)
-        TestCase.assertEquals(fakeEncryptedData.initializationVector, items.captured.first().initializationVector)
-        TestCase.assertEquals(fakeEncryptedData.ciphertext, items.captured.first().password)
-        TestCase.assertEquals(0, items.captured.first().id)
-    }
 
     @Test
-    fun `onSlideChanged with SUCCESS_FAIL_SLIDE position and no item selected should emit an error`() = runBlocking {
-        //given
-        val uri: Uri = mockk()
-        coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns false
-        coEvery { externalItemRepository.getExternalItemsFromUri(any(), any()) } returns listOf(fakeItem)
-        val states = mutableListOf<State>()
+    fun `onSlideChanged with SUCCESS_FAIL_SLIDE position and no item selected should emit an error`() =
+        runBlocking {
+            //given
+            val uri: Uri = mockk()
+            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns false
+            coEvery { externalItemRepository.getExternalItemsFromUri(any(), any()) } returns listOf(
+                fakeItem
+            )
+            val states = mutableListOf<State<Unit>>()
 
-        //when
-        viewModel.importItemsState.observeForever { event ->
-            event.getContentIfNotHandled()?.let { states.add(it) }
+            //when
+            viewModel.importItemsState.observeForever {
+                states.add(it)
+            }
+            viewModel.setUri(uri)
+            viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
+            viewModel.importedItems.value?.forEach { it.selected = false }
+            viewModel.onSlideChanged(SUCCESS_FAIL_SLIDE)
+
+            //then
+            TestCase.assertEquals(2, states.size)
+            TestCase.assertTrue(states[0] is State.Loading)
+            TestCase.assertTrue(states[1] is State.Error)
         }
-        viewModel.setUri(uri)
-        viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
-        viewModel.importedItems.value?.forEach { it.selected = false }
-        viewModel.onSlideChanged(SUCCESS_FAIL_SLIDE)
-
-        //then
-        TestCase.assertEquals(2, states.size)
-        TestCase.assertTrue(states[0] is State.Loading)
-        TestCase.assertTrue(states[1] is State.Error)
-    }
 
     @Test
-    fun `onSlideChanged with SUCCESS_FAIL_SLIDE position and an exception from the repository should emit an error`() = runBlocking {
-        //given
-        val uri: Uri = mockk()
-        coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns false
-        coEvery { externalItemRepository.getExternalItemsFromUri(any(), any()) } returns listOf(fakeItem)
-        coEvery { cryptoManager.encryptData(any()) } returns fakeEncryptedData
-        coEvery { itemRepository.insertItems(any()) } throws Exception()
-        val states = mutableListOf<State>()
+    fun `onSlideChanged with SUCCESS_FAIL_SLIDE position and an exception from the repository should emit an error`() =
+        runBlocking {
+            //given
+            val uri: Uri = mockk()
+            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns false
+            coEvery { externalItemRepository.getExternalItemsFromUri(any(), any()) } returns listOf(
+                fakeItem
+            )
+            coEvery { cryptoManager.encryptData(any()) } returns fakeEncryptedData
+            coEvery { itemRepository.insertItems(any()) } throws Exception()
+            val states = mutableListOf<State<Unit>>()
 
-        //when
-        viewModel.importItemsState.observeForever { event ->
-            event.getContentIfNotHandled()?.let { states.add(it) }
+            //when
+            viewModel.importItemsState.observeForever {
+                states.add(it)
+            }
+            viewModel.setUri(uri)
+            viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
+            viewModel.importedItems.value?.forEach { it.selected = true }
+            viewModel.onSlideChanged(SUCCESS_FAIL_SLIDE)
+
+            //then
+            TestCase.assertEquals(2, states.size)
+            TestCase.assertTrue(states[0] is State.Loading)
+            TestCase.assertTrue(states[1] is State.Error)
         }
-        viewModel.setUri(uri)
-        viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
-        viewModel.importedItems.value?.forEach { it.selected = true }
-        viewModel.onSlideChanged(SUCCESS_FAIL_SLIDE)
-
-        //then
-        TestCase.assertEquals(2, states.size)
-        TestCase.assertTrue(states[0] is State.Loading)
-        TestCase.assertTrue(states[1] is State.Error)
-    }
 
     @Test
-    fun `onSlideChanged with SUCCESS_FAIL_SLIDE position and no item found should emit an error`() = runBlocking {
-        //given
-        val uri: Uri = mockk()
-        coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns false
-        coEvery { externalItemRepository.getExternalItemsFromUri(any(), any()) } returns listOf()
-        val states = mutableListOf<State>()
+    fun `onSlideChanged with SUCCESS_FAIL_SLIDE position and no item found should emit an error`() =
+        runBlocking {
+            //given
+            val uri: Uri = mockk()
+            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns false
+            coEvery {
+                externalItemRepository.getExternalItemsFromUri(
+                    any(),
+                    any()
+                )
+            } returns listOf()
+            val states = mutableListOf<State<Unit>>()
 
-        //when
-        viewModel.importItemsState.observeForever { event ->
-            event.getContentIfNotHandled()?.let { states.add(it) }
+            //when
+            viewModel.importItemsState.observeForever {
+                states.add(it)
+            }
+            viewModel.setUri(uri)
+            viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
+            viewModel.importedItems.value?.forEach { it.selected = false }
+            viewModel.onSlideChanged(SUCCESS_FAIL_SLIDE)
+
+            //then
+            TestCase.assertEquals(2, states.size)
+            TestCase.assertTrue(states[0] is State.Loading)
+            TestCase.assertTrue(states[1] is State.Error)
         }
-        viewModel.setUri(uri)
-        viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
-        viewModel.importedItems.value?.forEach { it.selected = false }
-        viewModel.onSlideChanged(SUCCESS_FAIL_SLIDE)
-
-        //then
-        TestCase.assertEquals(2, states.size)
-        TestCase.assertTrue(states[0] is State.Loading)
-        TestCase.assertTrue(states[1] is State.Error)
-    }
 
     @Test
     fun `selectAllItems should select all importedItems`() = runBlocking {
         //given
         val uri: Uri = mockk()
         coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns false
-        coEvery { externalItemRepository.getExternalItemsFromUri(any(), any()) } returns listOf(fakeItem)
+        coEvery { externalItemRepository.getExternalItemsFromUri(any(), any()) } returns listOf(
+            fakeItem
+        )
 
         //when
         viewModel.setUri(uri)
@@ -311,6 +355,8 @@ class ImportItemViewModelTest {
         viewModel.selectAllItems()
 
         //then
-        TestCase.assertTrue(viewModel.importedItems.getOrAwaitValue().filter { it.selected }.size == 1)
+        TestCase.assertTrue(
+            viewModel.importedItems.getOrAwaitValue().filter { it.selected }.size == 1
+        )
     }
 }

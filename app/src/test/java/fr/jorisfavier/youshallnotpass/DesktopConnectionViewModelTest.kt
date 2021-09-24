@@ -25,7 +25,7 @@ class DesktopConnectionViewModelTest {
         //given
         val urlSlot = slot<String>()
         val publicKeySlot = slot<String>()
-        val stateList = mutableListOf<State>()
+        val stateList = mutableListOf<State<Unit>>()
         val fakeUrl = "192.168.0.1:8080"
         val cleanedKey = "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtFidODAnunzeGxbO8Kt5"
         val fakeKey = "-----BEGIN PUBLIC KEY-----\n" +
@@ -45,7 +45,7 @@ class DesktopConnectionViewModelTest {
         //then
         TestCase.assertEquals(2, stateList.size)
         TestCase.assertEquals(State.Loading, stateList.firstOrNull())
-        TestCase.assertEquals(State.Success, stateList[1])
+        TestCase.assertTrue(stateList[1] is State.Success)
         TestCase.assertEquals("http://$fakeUrl", urlSlot.captured)
         TestCase.assertEquals(cleanedKey, publicKeySlot.captured)
     }
@@ -53,7 +53,7 @@ class DesktopConnectionViewModelTest {
     @Test
     fun `onCodeFound with an incorrect formatted code should emit a failure state`() {
         //given
-        val stateList = mutableListOf<State>()
+        val stateList = mutableListOf<State<Unit>>()
         val fakeCode = "fakecode"
         coEvery {
             desktopRepository.updateDesktopInfo(any(), any())
@@ -75,7 +75,7 @@ class DesktopConnectionViewModelTest {
     @Test
     fun `onCodeFound with the repository throwing exception should emit a failure state`() {
         //given
-        val stateList = mutableListOf<State>()
+        val stateList = mutableListOf<State<Unit>>()
         val fakeUrl = "192.168.0.1:8080"
         val cleanedKey = "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtFidODAnunzeGxbO8Kt5"
         val fakeKey = "-----BEGIN PUBLIC KEY-----\n" +

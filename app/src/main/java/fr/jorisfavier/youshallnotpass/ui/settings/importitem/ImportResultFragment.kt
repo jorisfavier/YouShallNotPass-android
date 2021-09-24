@@ -45,32 +45,30 @@ class ImportResultFragment : Fragment(R.layout.fragment_import_result) {
     }
 
     private fun initObserver() {
-        viewModel.importItemsState.observe(viewLifecycleOwner) { event ->
-            event.getContentIfNotHandled()?.let { state ->
-                var descriptionTextId = R.string.import_failed
-                var imageResId = R.drawable.key_ysnp_broken
-                var colorResId = R.attr.colorError
-                if (state is State.Success) {
-                    descriptionTextId = R.string.import_completed
-                    imageResId = R.drawable.ysnp_small
-                    colorResId = R.attr.colorOnBackground
-                }
-                binding.importResultImage.isVisible = state !is State.Loading
-                binding.importResultDescription.isVisible = state !is State.Loading
-                binding.importResultProgress.isVisible = state is State.Loading
-                binding.importResultImage.setImageDrawable(
-                    AppCompatResources.getDrawable(
-                        requireContext(),
-                        imageResId
-                    )
-                )
-                binding.importResultDescription.text = getString(descriptionTextId)
-                binding.importResultDescription.setTextColor(
-                    requireContext().getThemeColor(
-                        colorResId
-                    )
-                )
+        viewModel.importItemsState.observe(viewLifecycleOwner) { state ->
+            var descriptionTextId = R.string.import_failed
+            var imageResId = R.drawable.key_ysnp_broken
+            var colorResId = R.attr.colorError
+            if (state is State.Success) {
+                descriptionTextId = R.string.import_completed
+                imageResId = R.drawable.ysnp_small
+                colorResId = R.attr.colorOnBackground
             }
+            binding.importResultImage.isVisible = state !is State.Loading
+            binding.importResultDescription.isVisible = state !is State.Loading
+            binding.importResultProgress.isVisible = state is State.Loading
+            binding.importResultImage.setImageDrawable(
+                AppCompatResources.getDrawable(
+                    requireContext(),
+                    imageResId
+                )
+            )
+            binding.importResultDescription.text = getString(descriptionTextId)
+            binding.importResultDescription.setTextColor(
+                requireContext().getThemeColor(
+                    colorResId
+                )
+            )
         }
     }
 

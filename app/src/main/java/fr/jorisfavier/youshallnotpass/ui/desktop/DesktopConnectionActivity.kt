@@ -73,7 +73,7 @@ class DesktopConnectionActivity : AppCompatActivity() {
                     cameraLifecycle.doOnResume()
                     toast(R.string.unable_to_read_qr_code)
                 }
-                is State.Success -> {
+                is State.Success<*> -> {
                     toast(R.string.qr_code_success)
                     finish()
                 }

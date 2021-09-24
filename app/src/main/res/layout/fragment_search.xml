@@ -63,19 +63,30 @@
             android:visibility="@{viewModel.hasNoResult ? View.GONE : View.VISIBLE}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@id/search_separator"
-            app:layout_constraintTop_toBottomOf="@id/search_edit_text_container">
+            app:layout_constraintTop_toBottomOf="@id/search_edit_text_container"
+            tools:listitem="@layout/viewholder_search_result">
 
         </androidx.recyclerview.widget.RecyclerView>
 
-        <TextView
+        <include
+            android:id="@+id/error_view"
+            layout="@layout/layout_error"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@{viewModel.noResultTextIdRes}"
-            android:textAlignment="center"
-            android:visibility="@{viewModel.hasNoResult ? View.VISIBLE : View.GONE}"
+            android:layout_marginHorizontal="20dp"
             app:layout_constraintBottom_toTopOf="@id/search_separator"
+            app:layout_constraintTop_toBottomOf="@id/search_edit_text_container" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/search_result_loader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            app:layout_constraintBottom_toTopOf="@id/search_separator"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/search_edit_text_container"
-            tools:text="@string/no_results_found" />
+            app:minHideDelay="500" />
 
         <View
             android:id="@+id/search_separator"

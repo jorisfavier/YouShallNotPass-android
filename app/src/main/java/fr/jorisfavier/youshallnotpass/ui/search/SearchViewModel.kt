@@ -14,6 +14,7 @@ import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
+import fr.jorisfavier.youshallnotpass.utils.State
 import fr.jorisfavier.youshallnotpass.utils.extensions.default
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -32,29 +33,30 @@ class SearchViewModel @Inject constructor(
 
 
     override val results = search.switchMap { query ->
-        liveData<List<Item>> {
+        liveData<State<List<Item>>> {
+            emit(State.Loading)
             try {
                 val hideAll = appPreference.getShouldHideItems()
                 when {
                     query.isNotBlank() && query.isNotEmpty() -> {
-                        emit(itemRepository.searchItem("%$query%"))
+                        emit(State.Success(itemRepository.searchItem("%$query%")))
                     }
                     !hideAll -> {
-                        emit(itemRepository.getAllItems())
+                        emit(State.Success(itemRepository.getAllItems()))
                     }
                     else -> {
-                        emit(listOf())
+                        emit(State.Success(listOf()))
                     }
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Error while searching for items")
-                emit(listOf())
+                emit(State.Success(listOf()))
             }
         }
     }
 
-    override val hasNoResult: LiveData<Boolean> = results.map { listItem ->
-        listItem.count() == 0
+    override val hasNoResult: LiveData<Boolean> = results.map { state ->
+        state is State.Success && state.value.count() == 0
     }
 
     override val noResultTextIdRes = search.switchMap { search ->

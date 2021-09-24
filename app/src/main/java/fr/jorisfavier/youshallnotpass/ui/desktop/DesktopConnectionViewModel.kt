@@ -4,15 +4,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import fr.jorisfavier.youshallnotpass.R
+import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
 import fr.jorisfavier.youshallnotpass.utils.State
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class DesktopConnectionViewModel @Inject constructor(private val desktopRepository: DesktopRepository) : ViewModel() {
+class DesktopConnectionViewModel @Inject constructor(private val desktopRepository: DesktopRepository) :
+    ViewModel() {
 
-    private val _qrCodeAnalyseState = MutableLiveData<State>()
-    val qrCodeAnalyseState: LiveData<State> = _qrCodeAnalyseState
+    private val _qrCodeAnalyseState = MutableLiveData<State<Unit>>()
+    val qrCodeAnalyseState: LiveData<State<Unit>> = _qrCodeAnalyseState
 
     fun onCodeFound(code: String?) {
         code?.let { qrCode ->
@@ -21,8 +24,13 @@ class DesktopConnectionViewModel @Inject constructor(private val desktopReposito
             val ipRegex = "(\\d+\\.){3}\\d+(:\\d{4})?".toRegex()
             if (elements.size == 2 && elements[0].matches(ipRegex) && elements[1].contains("KEY")) {
                 viewModelScope.launch {
-                    kotlin.runCatching { desktopRepository.updateDesktopInfo("http://" + elements[0], cleanUpKey(elements[1])) }
-                        .onSuccess { _qrCodeAnalyseState.value = State.Success }
+                    kotlin.runCatching {
+                        desktopRepository.updateDesktopInfo(
+                            "http://" + elements[0],
+                            cleanUpKey(elements[1])
+                        )
+                    }
+                        .onSuccess { _qrCodeAnalyseState.value = State.Success(Unit) }
                         .onFailure { _qrCodeAnalyseState.value = State.Error }
                 }
             } else {

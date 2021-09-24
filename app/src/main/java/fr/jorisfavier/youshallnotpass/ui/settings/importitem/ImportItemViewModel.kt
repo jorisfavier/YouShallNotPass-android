@@ -5,8 +5,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
+import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.repository.ExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.settings.importitem.review.ExternalItemViewModel
@@ -32,11 +34,11 @@ class ImportItemViewModel @Inject constructor(
     private val _importedItems = MutableLiveData<List<ExternalItemViewModel>>(listOf())
     val importedItems: LiveData<List<ExternalItemViewModel>> = _importedItems
 
-    private val _loadFromUriState = MutableLiveData<Event<State>>()
-    val loadFromUriState: LiveData<Event<State>> = _loadFromUriState
+    private val _loadFromUriState = MutableLiveData<State<Unit>>()
+    val loadFromUriState: LiveData<State<Unit>> = _loadFromUriState
 
-    private val _importItemsState = MutableLiveData<Event<State>>()
-    val importItemsState: LiveData<Event<State>> = _importItemsState
+    private val _importItemsState = MutableLiveData<State<Unit>>()
+    val importItemsState: LiveData<State<Unit>> = _importItemsState
 
 
     val isFileSelected: Boolean
@@ -91,19 +93,19 @@ class ImportItemViewModel @Inject constructor(
     private fun loadExternalItemsFromUri() {
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
             Timber.w(throwable, "An error occurred while loading items from uri")
-            _loadFromUriState.postValue(Event(State.Error))
+            _loadFromUriState.postValue(State.Error)
             _navigate.postValue(Event(Unit))
         }
 
         viewModelScope.launch(exceptionHandler) {
-            _loadFromUriState.postValue(Event(State.Loading))
+            _loadFromUriState.postValue(State.Loading)
             currentUri?.let { uri ->
                 val items = externalItemRepository.getExternalItemsFromUri(uri, password.value)
                 if (items.isNullOrEmpty()) {
-                    _loadFromUriState.postValue(Event(State.Error))
+                    _loadFromUriState.postValue(State.Error)
                 } else {
                     _importedItems.postValue(items.map { ExternalItemViewModel(it, false) })
-                    _loadFromUriState.postValue(Event(State.Success))
+                    _loadFromUriState.postValue(State.Success(Unit))
                 }
             }
         }
@@ -112,23 +114,30 @@ class ImportItemViewModel @Inject constructor(
     private fun importItems() {
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
             Timber.w(throwable, "An error occurred while importing items")
-            _importItemsState.postValue(Event(State.Error))
+            _importItemsState.postValue(State.Error)
         }
         viewModelScope.launch(exceptionHandler) {
-            _importItemsState.postValue(Event(State.Loading))
-            _importedItems.value?.asSequence()?.filter { it.selected }?.map { it.externalItem }?.toList()?.let { selectedItems ->
+            _importItemsState.postValue(State.Loading)
+            _importedItems.value?.asSequence()?.filter { it.selected }?.map { it.externalItem }
+                ?.toList()?.let { selectedItems ->
                 if (selectedItems.isEmpty()) {
-                    _importItemsState.postValue(Event(State.Error))
+                    _importItemsState.postValue(State.Error)
                 } else {
                     val itemsToImport = selectedItems.map { externalItem ->
                         val password = cryptoManager.encryptData(externalItem.password)
-                        Item(0, externalItem.title, externalItem.login, password.ciphertext, password.initializationVector)
+                        Item(
+                            0,
+                            externalItem.title,
+                            externalItem.login,
+                            password.ciphertext,
+                            password.initializationVector
+                        )
                     }
                     itemRepository.insertItems(itemsToImport)
-                    _importItemsState.postValue(Event(State.Success))
+                    _importItemsState.postValue(State.Success(Unit))
                 }
             } ?: run {
-                _importItemsState.postValue(Event(State.Error))
+                _importItemsState.postValue(State.Error)
             }
         }
     }

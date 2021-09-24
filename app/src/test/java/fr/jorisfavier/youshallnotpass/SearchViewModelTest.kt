@@ -10,6 +10,7 @@ import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.search.SearchViewModel
+import fr.jorisfavier.youshallnotpass.utils.State
 import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
 import io.mockk.*
 import junit.framework.TestCase.assertEquals
@@ -63,8 +64,9 @@ class SearchViewModelTest {
         viewModel.results.observeForever {}
 
         //then
+        val results = viewModel.results.value
         assertEquals(true, viewModel.hasNoResult.value)
-        assertTrue(viewModel.results.value?.isEmpty() ?: false)
+        assertTrue(results is State.Success && results.value.isEmpty())
         assertEquals(R.string.no_item_yet, viewModel.noResultTextIdRes.value)
     }
 
@@ -80,8 +82,9 @@ class SearchViewModelTest {
         viewModel.results.observeForever {}
 
         //then
+        val results = viewModel.results.value
         assertEquals(true, viewModel.hasNoResult.value)
-        assertTrue(viewModel.results.value?.isEmpty() ?: false)
+        assertTrue(results is State.Success && results.value.isEmpty())
         assertEquals(R.string.use_the_search, viewModel.noResultTextIdRes.value)
     }
 
@@ -97,8 +100,9 @@ class SearchViewModelTest {
         viewModel.results.observeForever {}
 
         //then
+        val results = viewModel.results.value
         assertEquals(true, viewModel.hasNoResult.value)
-        assertTrue(viewModel.results.value?.isEmpty() ?: false)
+        assertTrue(results is State.Success && results.value.isEmpty())
     }
 
     @Test
@@ -115,8 +119,9 @@ class SearchViewModelTest {
         viewModel.search.value = "test"
 
         //then
+        val results = viewModel.results.value
         assertEquals(true, viewModel.hasNoResult.value)
-        assertTrue(viewModel.results.value?.isEmpty() ?: false)
+        assertTrue(results is State.Success && results.value.isEmpty())
         assertEquals(R.string.no_results_found, viewModel.noResultTextIdRes.value)
     }
 
@@ -133,8 +138,9 @@ class SearchViewModelTest {
         viewModel.search.value = "test"
 
         //then
+        val results = viewModel.results.getOrAwaitValue()
         assertEquals(false, viewModel.hasNoResult.value)
-        assertTrue(viewModel.results.getOrAwaitValue().isNotEmpty())
+        assertTrue(results is State.Success && results.value.isNotEmpty())
     }
 
     @Test
@@ -150,8 +156,9 @@ class SearchViewModelTest {
         viewModel.search.value = "test"
 
         //then
+        val results = viewModel.results.getOrAwaitValue()
         assertEquals(true, viewModel.hasNoResult.value)
-        assertTrue(viewModel.results.getOrAwaitValue().isEmpty())
+        assertTrue(results is State.Success && results.value.isEmpty())
     }
 
     @Test
@@ -165,7 +172,8 @@ class SearchViewModelTest {
         viewModel.refreshItems()
 
         //then
-        assertTrue(viewModel.results.value?.isNotEmpty() ?: false)
+        val results = viewModel.results.value
+        assertTrue(results is State.Success && results.value.isNotEmpty())
     }
 
     @Test
@@ -179,7 +187,8 @@ class SearchViewModelTest {
         viewModel.refreshItems()
 
         //then
-        assertTrue(viewModel.results.value?.isNotEmpty() ?: false)
+        val results = viewModel.results.value
+        assertTrue(results is State.Success && results.value.isNotEmpty())
     }
 
     @Test
