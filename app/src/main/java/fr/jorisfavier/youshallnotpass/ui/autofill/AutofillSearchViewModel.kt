@@ -17,6 +17,7 @@ import fr.jorisfavier.youshallnotpass.utils.AssistStructureUtil
 import fr.jorisfavier.youshallnotpass.utils.Event
 import fr.jorisfavier.youshallnotpass.utils.State
 import fr.jorisfavier.youshallnotpass.utils.extensions.combine
+import fr.jorisfavier.youshallnotpass.utils.extensions.debounce
 import fr.jorisfavier.youshallnotpass.utils.extensions.default
 import fr.jorisfavier.youshallnotpass.utils.extensions.getDomainIfUrl
 import kotlinx.coroutines.launch
@@ -70,7 +71,7 @@ class AutofillSearchViewModel @Inject constructor(
                     emit(State.Success(listOf()))
                 }
             }
-        }
+        }.debounce(duration = 300, coroutineScope = viewModelScope)
 
     override val hasNoResult: LiveData<Boolean> = results.map { state ->
         state is State.Success && state.value.count() == 0

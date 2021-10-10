@@ -2,10 +2,7 @@ package fr.jorisfavier.youshallnotpass.ui.search
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
+import androidx.lifecycle.*
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
 import fr.jorisfavier.youshallnotpass.manager.CryptoManager
@@ -15,10 +12,14 @@ import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.utils.State
+import fr.jorisfavier.youshallnotpass.utils.extensions.combine
+import fr.jorisfavier.youshallnotpass.utils.extensions.debounce
 import fr.jorisfavier.youshallnotpass.utils.extensions.default
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
 import javax.inject.Inject
@@ -32,28 +33,29 @@ class SearchViewModel @Inject constructor(
 ) : SearchBaseViewModel() {
 
 
-    override val results = search.switchMap { query ->
-        liveData<State<List<Item>>> {
-            emit(State.Loading)
-            try {
-                val hideAll = appPreference.getShouldHideItems()
-                when {
-                    query.isNotBlank() && query.isNotEmpty() -> {
-                        emit(State.Success(itemRepository.searchItem("%$query%")))
+    override val results = search
+        .combine(appPreference.observeShouldHideItems().asLiveData())
+        .switchMap { (query, hideAll) ->
+            liveData<State<List<Item>>> {
+                emit(State.Loading)
+                try {
+                    when {
+                        query.isNotBlank() && query.isNotEmpty() -> {
+                            emit(State.Success(itemRepository.searchItem("%$query%")))
+                        }
+                        !hideAll -> {
+                            emit(State.Success(itemRepository.getAllItems()))
+                        }
+                        else -> {
+                            emit(State.Success(listOf()))
+                        }
                     }
-                    !hideAll -> {
-                        emit(State.Success(itemRepository.getAllItems()))
-                    }
-                    else -> {
-                        emit(State.Success(listOf()))
-                    }
+                } catch (e: Exception) {
+                    Timber.e(e, "Error while searching for items")
+                    emit(State.Success(listOf()))
                 }
-            } catch (e: Exception) {
-                Timber.e(e, "Error while searching for items")
-                emit(State.Success(listOf()))
             }
-        }
-    }
+        }.debounce(duration = 300, coroutineScope = viewModelScope)
 
     override val hasNoResult: LiveData<Boolean> = results.map { state ->
         state is State.Success && state.value.count() == 0
@@ -71,7 +73,6 @@ class SearchViewModel @Inject constructor(
             emit(res)
         }
     }.default(R.string.no_results_found)
-
 
     fun deleteItem(item: Item): Flow<Result<Unit>> {
         return flow {

@@ -17,7 +17,10 @@ import fr.jorisfavier.youshallnotpass.databinding.FragmentSearchBinding
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.utils.State
 import fr.jorisfavier.youshallnotpass.utils.autoCleared
+import fr.jorisfavier.youshallnotpass.utils.extensions.debounce
 import jp.wasabeef.recyclerview.animators.FadeInRightAnimator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 
 abstract class SearchBaseFragment : Fragment() {
@@ -56,11 +59,6 @@ abstract class SearchBaseFragment : Fragment() {
         (activity as AppCompatActivity).supportActionBar?.hide()
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.refreshItems()
-    }
-
     private fun initSettings() {
         binding.searchSettingsButton.setOnClickListener {
             val action = SearchFragmentDirections.actionSearchFragmentToSettingsFragment()
@@ -74,12 +72,7 @@ abstract class SearchBaseFragment : Fragment() {
             setHasFixedSize(true)
         }
         viewModel.results.observe(viewLifecycleOwner) { resultState ->
-            if (resultState is State.Loading) {
-                binding.searchResultLoader.show()
-            } else {
-                binding.searchResultLoader.hide()
-            }
-            binding.searchRecyclerview.isVisible = resultState is State.Success
+            binding.searchResultLoader.isVisible = resultState is State.Loading
             if (resultState is State.Success) {
                 searchAdapter.submitList(resultState.value)
             }

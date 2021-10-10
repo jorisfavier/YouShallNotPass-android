@@ -2,6 +2,10 @@ package fr.jorisfavier.youshallnotpass.utils.extensions
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 fun <T> LiveData<T>.default(
     defaultValue: T
@@ -38,3 +42,21 @@ fun <A, B> LiveData<A>.combine(other: LiveData<B>): LiveData<Pair<A, B>> {
         update()
     }
 }
+
+/**
+ * Debounce a LiveData emission from a given [duration] using the specified [coroutineScope]
+ * @param duration time in ms to debounce the liveData from
+ * @param coroutineScope
+ */
+fun <T> LiveData<T>.debounce(duration: Long = 1000L, coroutineScope: CoroutineScope) =
+    MediatorLiveData<T>().also { mld ->
+        val source = this
+        var job: Job? = null
+        mld.addSource(source) {
+            job?.cancel()
+            job = coroutineScope.launch {
+                delay(duration)
+                mld.value = source.value
+            }
+        }
+    }

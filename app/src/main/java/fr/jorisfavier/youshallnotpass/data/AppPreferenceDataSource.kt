@@ -1,5 +1,7 @@
 package fr.jorisfavier.youshallnotpass.data
 
+import kotlinx.coroutines.flow.Flow
+
 interface AppPreferenceDataSource {
     /**
      * Retrieves the theme chosen by the user
@@ -17,6 +19,11 @@ interface AppPreferenceDataSource {
      * Indicates if the we should hide all items on the home screen
      */
     suspend fun getShouldHideItems(): Boolean
+
+    /**
+     * Indicates if the we should hide all items on the home screen
+     */
+    fun observeShouldHideItems(): Flow<Boolean>
 
     /**
      * Set the user's choice regarding hiding the items on the home screen

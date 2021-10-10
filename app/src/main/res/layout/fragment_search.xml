@@ -74,6 +74,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@id/search_separator"
             app:layout_constraintTop_toBottomOf="@id/search_edit_text_container" />
 
@@ -85,8 +86,7 @@
             app:layout_constraintBottom_toTopOf="@id/search_separator"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/search_edit_text_container"
-            app:minHideDelay="500" />
+            app:layout_constraintTop_toBottomOf="@id/search_edit_text_container" />
 
         <View
             android:id="@+id/search_separator"
