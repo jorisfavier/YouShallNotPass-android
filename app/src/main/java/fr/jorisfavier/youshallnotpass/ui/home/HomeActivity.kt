@@ -6,27 +6,23 @@ import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.ui.setupActionBarWithNavController
-import dagger.android.AndroidInjection
+import dagger.hilt.android.AndroidEntryPoint
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.ui.auth.AuthActivity
 import fr.jorisfavier.youshallnotpass.utils.extensions.findNavControllerFromFragmentContainerView
-import javax.inject.Inject
 
+@AndroidEntryPoint
 class HomeActivity : AppCompatActivity(R.layout.activity_home) {
 
     private val navController by lazy {
         findNavControllerFromFragmentContainerView(R.id.nav_host_fragment)
     }
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-    private val viewModel: HomeViewModel by viewModels { viewModelFactory }
+    private val viewModel: HomeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AndroidInjection.inject(this)
         setupActionBarWithNavController(navController)
         window.setFlags(
             WindowManager.LayoutParams.FLAG_SECURE,

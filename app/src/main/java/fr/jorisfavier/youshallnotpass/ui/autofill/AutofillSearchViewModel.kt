@@ -6,11 +6,11 @@ import android.os.Build
 import android.service.autofill.FillRequest
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.model.AutofillParsedStructure
 import fr.jorisfavier.youshallnotpass.model.Item
-import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.search.SearchBaseViewModel
 import fr.jorisfavier.youshallnotpass.utils.AssistStructureUtil
@@ -25,6 +25,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.O)
+@HiltViewModel
 class AutofillSearchViewModel @Inject constructor(
     private val itemRepository: ItemRepository,
     private val cryptoManager: CryptoManager,

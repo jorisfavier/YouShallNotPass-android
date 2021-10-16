@@ -16,8 +16,9 @@ import javax.crypto.*
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.PBEParameterSpec
+import javax.inject.Inject
 
-class CryptoManagerImpl : CryptoManager {
+class CryptoManagerImpl @Inject constructor() : CryptoManager {
 
     @Throws(
         BadPaddingException::class,

@@ -8,27 +8,23 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dagger.android.AndroidInjection
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.ui.home.HomeActivity
-import javax.inject.Inject
 
+@AndroidEntryPoint
 class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
 
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var biometricPromptInfo: BiometricPrompt.PromptInfo
     private var redirectToHome = true
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-
-    private val viewModel: AuthViewModel by viewModels { viewModelFactory }
+    private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AndroidInjection.inject(this)
         initObserver()
         initAuthentication()
         displayAuthPrompt()
@@ -59,7 +55,10 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
         if (viewModel.isDeviceSecure()) {
             biometricPrompt.authenticate(biometricPromptInfo)
         } else {
-            displayErrorModal(titleResId = R.string.device_not_secure, messageResId = R.string.device_not_secure_message)
+            displayErrorModal(
+                titleResId = R.string.device_not_secure,
+                messageResId = R.string.device_not_secure_message
+            )
         }
     }
 

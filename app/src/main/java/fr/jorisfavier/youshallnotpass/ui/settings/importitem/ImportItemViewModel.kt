@@ -5,10 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import fr.jorisfavier.youshallnotpass.R
+import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
-import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.repository.ExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.settings.importitem.review.ExternalItemViewModel
@@ -19,6 +18,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
+@HiltViewModel
 class ImportItemViewModel @Inject constructor(
     private val externalItemRepository: ExternalItemRepository,
     private val cryptoManager: CryptoManager,
@@ -120,23 +120,23 @@ class ImportItemViewModel @Inject constructor(
             _importItemsState.postValue(State.Loading)
             _importedItems.value?.asSequence()?.filter { it.selected }?.map { it.externalItem }
                 ?.toList()?.let { selectedItems ->
-                if (selectedItems.isEmpty()) {
-                    _importItemsState.postValue(State.Error)
-                } else {
-                    val itemsToImport = selectedItems.map { externalItem ->
-                        val password = cryptoManager.encryptData(externalItem.password)
-                        Item(
-                            0,
-                            externalItem.title,
-                            externalItem.login,
-                            password.ciphertext,
-                            password.initializationVector
-                        )
+                    if (selectedItems.isEmpty()) {
+                        _importItemsState.postValue(State.Error)
+                    } else {
+                        val itemsToImport = selectedItems.map { externalItem ->
+                            val password = cryptoManager.encryptData(externalItem.password)
+                            Item(
+                                0,
+                                externalItem.title,
+                                externalItem.login,
+                                password.ciphertext,
+                                password.initializationVector
+                            )
+                        }
+                        itemRepository.insertItems(itemsToImport)
+                        _importItemsState.postValue(State.Success(Unit))
                     }
-                    itemRepository.insertItems(itemsToImport)
-                    _importItemsState.postValue(State.Success(Unit))
-                }
-            } ?: run {
+                } ?: run {
                 _importItemsState.postValue(State.Error)
             }
         }

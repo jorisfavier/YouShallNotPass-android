@@ -3,6 +3,7 @@ package fr.jorisfavier.youshallnotpass.ui.search
 import android.content.ClipData
 import android.content.ClipboardManager
 import androidx.lifecycle.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
 import fr.jorisfavier.youshallnotpass.manager.CryptoManager
@@ -17,13 +18,12 @@ import fr.jorisfavier.youshallnotpass.utils.extensions.debounce
 import fr.jorisfavier.youshallnotpass.utils.extensions.default
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
 import javax.inject.Inject
 
+@HiltViewModel
 class SearchViewModel @Inject constructor(
     private val itemRepository: ItemRepository,
     private val cryptoManager: CryptoManager,

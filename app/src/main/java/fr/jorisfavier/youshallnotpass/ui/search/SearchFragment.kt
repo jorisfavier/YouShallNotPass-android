@@ -4,11 +4,10 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dagger.android.support.AndroidSupportInjection
+import dagger.hilt.android.AndroidEntryPoint
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
@@ -17,14 +16,11 @@ import fr.jorisfavier.youshallnotpass.utils.extensions.onUnknownFailure
 import fr.jorisfavier.youshallnotpass.utils.extensions.onYsnpFailure
 import fr.jorisfavier.youshallnotpass.utils.extensions.toast
 import kotlinx.coroutines.flow.collect
-import javax.inject.Inject
 
+@AndroidEntryPoint
 class SearchFragment : SearchBaseFragment() {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-
-    override val viewModel: SearchViewModel by viewModels { viewModelFactory }
+    override val viewModel: SearchViewModel by viewModels()
 
     override val searchAdapter by lazy {
         SearchResultAdapter(
@@ -34,11 +30,6 @@ class SearchFragment : SearchBaseFragment() {
             this::copyToClipboard,
             this::copyToDesktop
         )
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        AndroidSupportInjection.inject(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

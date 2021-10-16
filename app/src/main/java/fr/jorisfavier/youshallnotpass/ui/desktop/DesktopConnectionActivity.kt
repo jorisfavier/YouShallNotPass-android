@@ -13,9 +13,8 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.core.view.doOnLayout
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dagger.android.AndroidInjection
+import dagger.hilt.android.AndroidEntryPoint
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.ActivityDesktopConnectionBinding
 import fr.jorisfavier.youshallnotpass.model.QRCodeAnalyzer
@@ -26,16 +25,13 @@ import fr.jorisfavier.youshallnotpass.utils.extensions.toast
 import timber.log.Timber
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import javax.inject.Inject
 
+@AndroidEntryPoint
 class DesktopConnectionActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDesktopConnectionBinding
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-
-    private val viewModel: DesktopConnectionViewModel by viewModels { viewModelFactory }
+    private val viewModel: DesktopConnectionViewModel by viewModels()
 
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var cameraLifecycle: CustomLifecycle
@@ -50,7 +46,6 @@ class DesktopConnectionActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AndroidInjection.inject(this)
         cameraLifecycle = CustomLifecycle(this)
         supportActionBar?.hide()
         binding = ActivityDesktopConnectionBinding.inflate(layoutInflater)

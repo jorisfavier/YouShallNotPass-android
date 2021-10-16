@@ -10,7 +10,7 @@ import android.os.CancellationSignal
 import android.service.autofill.*
 import androidx.annotation.RequiresApi
 import androidx.core.os.bundleOf
-import dagger.android.AndroidInjection
+import dagger.hilt.android.AndroidEntryPoint
 import fr.jorisfavier.youshallnotpass.manager.AuthManager
 import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.model.AutofillParsedStructure
@@ -24,6 +24,7 @@ import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.O)
+@AndroidEntryPoint
 class YsnpAutofillService : AutofillService() {
 
     @Inject
@@ -34,11 +35,6 @@ class YsnpAutofillService : AutofillService() {
 
     @Inject
     lateinit var cryptoManager: CryptoManager
-
-    override fun onCreate() {
-        super.onCreate()
-        AndroidInjection.inject(this)
-    }
 
     override fun onFillRequest(
         request: FillRequest,

@@ -12,6 +12,8 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import fr.jorisfavier.youshallnotpass.BuildConfig
 import fr.jorisfavier.youshallnotpass.YouShallNotPassDatabase
 import fr.jorisfavier.youshallnotpass.api.DesktopApi
@@ -21,12 +23,9 @@ import fr.jorisfavier.youshallnotpass.data.ExternalItemDataSource
 import fr.jorisfavier.youshallnotpass.data.ItemDataSource
 import fr.jorisfavier.youshallnotpass.data.impl.AppPreferenceDataSourceImpl
 import fr.jorisfavier.youshallnotpass.data.impl.ExternalItemDataSourceImpl
-import fr.jorisfavier.youshallnotpass.manager.AuthManager
 import fr.jorisfavier.youshallnotpass.manager.ContentResolverManager
 import fr.jorisfavier.youshallnotpass.manager.CryptoManager
-import fr.jorisfavier.youshallnotpass.manager.impl.AuthManagerImpl
 import fr.jorisfavier.youshallnotpass.manager.impl.ContentResolverManagerImpl
-import fr.jorisfavier.youshallnotpass.manager.impl.CryptoManagerImpl
 import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
 import fr.jorisfavier.youshallnotpass.repository.ExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
@@ -43,8 +42,9 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 
-@Module(includes = [ViewModelModule::class])
-class AppModule {
+@Module
+@InstallIn(SingletonComponent::class)
+object AppModule {
 
     @Singleton
     @Provides
@@ -66,21 +66,9 @@ class AppModule {
         return db.itemDao()
     }
 
-    @Singleton
-    @Provides
-    fun provideCryptoManager(): CryptoManager {
-        return CryptoManagerImpl()
-    }
-
     @Provides
     fun provideClipboardManager(app: Application): ClipboardManager {
         return app.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    }
-
-    @Singleton
-    @Provides
-    fun provideAuthManager(): AuthManager {
-        return AuthManagerImpl()
     }
 
     @Singleton
@@ -145,10 +133,6 @@ class AppModule {
     fun provideKeyguardManager(app: Application): KeyguardManager {
         return app.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
     }
-
-    @Singleton
-    @Provides
-    fun provideHostInterceptor() = HostInterceptor()
 
     @Singleton
     @Provides

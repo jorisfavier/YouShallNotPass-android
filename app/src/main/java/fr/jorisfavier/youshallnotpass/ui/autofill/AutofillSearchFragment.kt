@@ -9,28 +9,19 @@ import android.view.autofill.AutofillManager
 import androidx.annotation.RequiresApi
 import androidx.core.view.isInvisible
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import dagger.android.support.AndroidSupportInjection
+import dagger.hilt.android.AndroidEntryPoint
 import fr.jorisfavier.youshallnotpass.ui.search.SearchBaseFragment
 import fr.jorisfavier.youshallnotpass.utils.autofill.AutofillHelperCompat
-import javax.inject.Inject
 
+@AndroidEntryPoint
 @RequiresApi(Build.VERSION_CODES.O)
 class AutofillSearchFragment : SearchBaseFragment() {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-
-    override val viewModel: AutofillSearchViewModel by activityViewModels { viewModelFactory }
+    override val viewModel: AutofillSearchViewModel by activityViewModels()
 
     override val searchAdapter by lazy {
         AutofillAdapter(viewModel::onItemClicked)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        AndroidSupportInjection.inject(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

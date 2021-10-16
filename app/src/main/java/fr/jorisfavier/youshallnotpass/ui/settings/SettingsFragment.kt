@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -24,7 +23,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dagger.android.support.AndroidSupportInjection
+import dagger.hilt.android.AndroidEntryPoint
 import fr.jorisfavier.youshallnotpass.BuildConfig
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.HIDE_ITEMS_PREFERENCE_KEY
@@ -34,18 +33,15 @@ import fr.jorisfavier.youshallnotpass.ui.home.HomeViewModel
 import fr.jorisfavier.youshallnotpass.utils.extensions.getEntryforValue
 import fr.jorisfavier.youshallnotpass.utils.extensions.toast
 import kotlinx.coroutines.flow.collect
-import javax.inject.Inject
 
+@AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat() {
-
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private val args: SettingsFragmentArgs by navArgs()
 
-    val viewModel: SettingsViewModel by viewModels { viewModelFactory }
+    val viewModel: SettingsViewModel by viewModels()
 
-    private val homeViewModel: HomeViewModel by activityViewModels { viewModelFactory }
+    private val homeViewModel: HomeViewModel by activityViewModels()
 
     private lateinit var allItemsVisibilityPreference: SwitchPreferenceCompat
     private lateinit var importPreference: Preference
@@ -65,11 +61,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        AndroidSupportInjection.inject(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

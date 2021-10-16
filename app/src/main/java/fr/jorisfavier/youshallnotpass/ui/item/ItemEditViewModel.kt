@@ -3,6 +3,7 @@ package fr.jorisfavier.youshallnotpass.ui.item
 import android.content.ClipData
 import android.content.ClipboardManager
 import androidx.lifecycle.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
@@ -19,6 +20,7 @@ import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
+@HiltViewModel
 class ItemEditViewModel @Inject constructor(
     private val cryptoManager: CryptoManager,
     private val itemRepository: ItemRepository,

@@ -4,13 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import fr.jorisfavier.youshallnotpass.R
-import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
+import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
 import fr.jorisfavier.youshallnotpass.utils.State
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class DesktopConnectionViewModel @Inject constructor(private val desktopRepository: DesktopRepository) :
     ViewModel() {
 

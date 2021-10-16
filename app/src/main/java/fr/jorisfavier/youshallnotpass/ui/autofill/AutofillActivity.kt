@@ -9,24 +9,21 @@ import android.view.autofill.AutofillManager
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.ui.setupActionBarWithNavController
-import dagger.android.AndroidInjection
+import dagger.hilt.android.AndroidEntryPoint
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.ActivityAutofillBinding
 import fr.jorisfavier.youshallnotpass.ui.auth.AuthActivity
 import fr.jorisfavier.youshallnotpass.ui.item.ItemFragmentArgs
 import fr.jorisfavier.youshallnotpass.utils.extensions.findNavControllerFromFragmentContainerView
-import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.O)
+@AndroidEntryPoint
 class AutofillActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAutofillBinding
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-    private val viewModel: AutofillSearchViewModel by viewModels { viewModelFactory }
+    private val viewModel: AutofillSearchViewModel by viewModels()
 
     private val navController by lazy {
         findNavControllerFromFragmentContainerView(R.id.nav_host_fragment)
@@ -46,7 +43,6 @@ class AutofillActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AndroidInjection.inject(this)
         binding = ActivityAutofillBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupActionBarWithNavController(navController)

@@ -2,10 +2,11 @@ package fr.jorisfavier.youshallnotpass.manager.impl
 
 import fr.jorisfavier.youshallnotpass.manager.AuthManager
 import java.util.*
+import javax.inject.Inject
 
 private const val TEN_MINUTES_MILLI_SEC = 10 * 60 * 1000
 
-class AuthManagerImpl : AuthManager {
+class AuthManagerImpl @Inject constructor() : AuthManager {
     override var isUserAuthenticated: Boolean = false
         set(value) {
             lastAuthentication = Calendar.getInstance().timeInMillis
