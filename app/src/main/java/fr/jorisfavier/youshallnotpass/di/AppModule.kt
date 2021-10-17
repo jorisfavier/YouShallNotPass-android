@@ -66,6 +66,7 @@ object AppModule {
         return db.itemDao()
     }
 
+    @Singleton
     @Provides
     fun provideClipboardManager(app: Application): ClipboardManager {
         return app.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -178,6 +179,7 @@ object AppModule {
         return DesktopRepositoryImpl(api, appPreferenceDataSource, hostInterceptor, cryptoManager)
     }
 
+    @Singleton
     @Provides
     fun providePackageManager(app: Application): PackageManager {
         return app.packageManager

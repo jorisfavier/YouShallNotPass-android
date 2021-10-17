@@ -21,16 +21,34 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import timber.log.Timber
+import java.lang.reflect.Constructor
 import javax.inject.Inject
 
 @HiltViewModel
-class SearchViewModel @Inject constructor(
+class SearchViewModel(
     private val itemRepository: ItemRepository,
     private val cryptoManager: CryptoManager,
     private val clipboardManager: ClipboardManager,
     private val appPreference: AppPreferenceDataSource,
-    private val desktopRepository: DesktopRepository
+    private val desktopRepository: DesktopRepository,
+    debounceDurationMs: Long,
 ) : SearchBaseViewModel() {
+
+    @Inject
+    constructor(
+        itemRepository: ItemRepository,
+        cryptoManager: CryptoManager,
+        clipboardManager: ClipboardManager,
+        appPreference: AppPreferenceDataSource,
+        desktopRepository: DesktopRepository,
+    ) : this(
+        itemRepository,
+        cryptoManager,
+        clipboardManager,
+        appPreference,
+        desktopRepository,
+        debounceDurationMs = 300,
+    )
 
 
     override val results = search
@@ -55,24 +73,22 @@ class SearchViewModel @Inject constructor(
                     emit(State.Success(listOf()))
                 }
             }
-        }.debounce(duration = 300, coroutineScope = viewModelScope)
+        }.debounce(duration = debounceDurationMs, coroutineScope = viewModelScope)
 
     override val hasNoResult: LiveData<Boolean> = results.map { state ->
         state is State.Success && state.value.count() == 0
     }
 
-    override val noResultTextIdRes = search.switchMap { search ->
-        liveData {
-            val isSearchEmpty = search.isEmpty() || search.isBlank()
-            val hideAll = appPreference.getShouldHideItems()
-            val res = when {
-                isSearchEmpty && !hideAll -> R.string.no_item_yet
-                isSearchEmpty && hideAll -> R.string.use_the_search
-                else -> R.string.no_results_found
-            }
-            emit(res)
-        }
-    }.default(R.string.no_results_found)
+    override val noResultTextIdRes =
+        search.combine(appPreference.observeShouldHideItems().asLiveData())
+            .map { (search, hideAll) ->
+                val isSearchEmpty = search.isEmpty() || search.isBlank()
+                when {
+                    isSearchEmpty && !hideAll -> R.string.no_item_yet
+                    isSearchEmpty && hideAll -> R.string.use_the_search
+                    else -> R.string.no_results_found
+                }
+            }.default(R.string.no_results_found)
 
     fun deleteItem(item: Item): Flow<Result<Unit>> {
         return flow {

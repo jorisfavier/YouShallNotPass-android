@@ -43,12 +43,6 @@ class AppPreferenceDataSourceImpl(
         }
     }
 
-    override suspend fun getShouldHideItems(): Boolean {
-        return withContext(Dispatchers.IO) {
-            sharedPreferences.getBoolean(HIDE_ITEMS_PREFERENCE_KEY, false)
-        }
-    }
-
     override fun observeShouldHideItems(): Flow<Boolean> {
         return _shouldHideItems.onSubscription {
             withContext(Dispatchers.IO) {

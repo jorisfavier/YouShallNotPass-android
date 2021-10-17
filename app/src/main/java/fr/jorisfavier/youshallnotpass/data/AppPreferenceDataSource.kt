@@ -18,11 +18,6 @@ interface AppPreferenceDataSource {
     /**
      * Indicates if the we should hide all items on the home screen
      */
-    suspend fun getShouldHideItems(): Boolean
-
-    /**
-     * Indicates if the we should hide all items on the home screen
-     */
     fun observeShouldHideItems(): Flow<Boolean>
 
     /**

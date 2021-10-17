@@ -15,7 +15,9 @@ import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
 import io.mockk.*
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
@@ -33,7 +35,8 @@ class SearchViewModelTest {
             cryptoManager,
             clipboardManager,
             appPreferences,
-            desktopRepository
+            desktopRepository,
+            debounceDurationMs = 0,
         )
     }
 
@@ -53,27 +56,33 @@ class SearchViewModelTest {
     private val fakePassword = "fake password"
 
     @Test
-    fun `on first launch without item result should be empty with an explanation message`() {
-        //given
-        coEvery { appPreferences.getShouldHideItems() } returns false
-        coEvery { itemRepository.getAllItems() } returns listOf()
+    fun `on first launch without item result should be empty with an explanation message`() =
+        runBlocking {
+            //given
+            every { appPreferences.observeShouldHideItems() } returns flow {
+                emit(false)
+            }
+            coEvery { itemRepository.getAllItems() } returns listOf()
 
-        //when
-        viewModel.hasNoResult.observeForever {}
-        viewModel.noResultTextIdRes.observeForever {}
-        viewModel.results.observeForever {}
+            //when
+            viewModel.search.value = ""
+            viewModel.results.observeForever {}
+            viewModel.hasNoResult.observeForever {}
+            viewModel.noResultTextIdRes.observeForever {}
 
-        //then
-        val results = viewModel.results.value
-        assertEquals(true, viewModel.hasNoResult.value)
-        assertTrue(results is State.Success && results.value.isEmpty())
-        assertEquals(R.string.no_item_yet, viewModel.noResultTextIdRes.value)
-    }
+            //then
+            val results = viewModel.results.value
+            assertEquals(true, viewModel.hasNoResult.value)
+            assertTrue(results is State.Success && results.value.isEmpty())
+            assertEquals(R.string.no_item_yet, viewModel.noResultTextIdRes.value)
+        }
 
     @Test
     fun `on first launch without item with hidden items, result should be empty with an explanation message`() {
         //given
-        coEvery { appPreferences.getShouldHideItems() } returns true
+        every { appPreferences.observeShouldHideItems() } returns flow {
+            emit(true)
+        }
         coEvery { itemRepository.getAllItems() } returns listOf()
 
         //when
@@ -91,7 +100,9 @@ class SearchViewModelTest {
     @Test
     fun `on first launch when repository throws an exception we should emit an empty list of items`() {
         //given
-        coEvery { appPreferences.getShouldHideItems() } returns false
+        every { appPreferences.observeShouldHideItems() } returns flow {
+            emit(false)
+        }
         coEvery { itemRepository.getAllItems() } throws Exception()
 
         //when
@@ -108,7 +119,9 @@ class SearchViewModelTest {
     @Test
     fun `on search when no item found we should have a no result message`() {
         //given
-        coEvery { appPreferences.getShouldHideItems() } returns true
+        every { appPreferences.observeShouldHideItems() } returns flow {
+            emit(true)
+        }
         coEvery { itemRepository.getAllItems() } returns listOf()
         coEvery { itemRepository.searchItem(any()) } returns listOf()
 
@@ -128,7 +141,9 @@ class SearchViewModelTest {
     @Test
     fun `on search when items are found we should emit items`() {
         //given
-        coEvery { appPreferences.getShouldHideItems() } returns true
+        every { appPreferences.observeShouldHideItems() } returns flow {
+            emit(true)
+        }
         coEvery { itemRepository.getAllItems() } returns listOf()
         coEvery { itemRepository.searchItem(any()) } returns listOf(fakeItem)
 
@@ -146,7 +161,9 @@ class SearchViewModelTest {
     @Test
     fun `on search when repository throws an exception we should emit an empty list of items`() {
         //given
-        coEvery { appPreferences.getShouldHideItems() } returns false
+        every { appPreferences.observeShouldHideItems() } returns flow {
+            emit(false)
+        }
         coEvery { itemRepository.getAllItems() } returns listOf(fakeItem)
         coEvery { itemRepository.searchItem(any()) } throws Exception()
 
@@ -164,7 +181,10 @@ class SearchViewModelTest {
     @Test
     fun `when changing HIDE_ITEMS_PREFERENCE_KEY shared preference we should emit items`() {
         //given
-        coEvery { appPreferences.getShouldHideItems() } returnsMany listOf(true, false)
+        every { appPreferences.observeShouldHideItems() } returns flow {
+            emit(true)
+            emit(false)
+        }
         coEvery { itemRepository.getAllItems() } returns listOf(fakeItem)
 
         //when
@@ -179,7 +199,9 @@ class SearchViewModelTest {
     @Test
     fun `when refreshItems called we should emit items`() {
         //given
-        coEvery { appPreferences.getShouldHideItems() } returns false
+        every { appPreferences.observeShouldHideItems() } returns flow {
+            emit(false)
+        }
         coEvery { itemRepository.getAllItems() } returnsMany listOf(listOf(), listOf(fakeItem))
 
         //when
@@ -196,6 +218,9 @@ class SearchViewModelTest {
         //given
         val slot = slot<String>()
         mockkStatic(ClipData::class)
+        every { appPreferences.observeShouldHideItems() } returns flow {
+            emit(false)
+        }
         every { cryptoManager.decryptData(any(), any()) } returns fakePassword
         every { clipboardManager.setPrimaryClip(any()) } just runs
         every { ClipData.newPlainText(any(), capture(slot)) } returns mockk()
@@ -213,6 +238,9 @@ class SearchViewModelTest {
         //given
         val slot = slot<String>()
         mockkStatic(ClipData::class)
+        every { appPreferences.observeShouldHideItems() } returns flow {
+            emit(false)
+        }
         every { cryptoManager.decryptData(any(), any()) } returns fakePassword
         every { clipboardManager.setPrimaryClip(any()) } just runs
         every { ClipData.newPlainText(any(), capture(slot)) } returns mockk()
@@ -228,6 +256,9 @@ class SearchViewModelTest {
     @Test
     fun `when copyToClipboard called and cryptoManager throws an exception then nothing should be copied to the clipboard`() {
         //given
+        every { appPreferences.observeShouldHideItems() } returns flow {
+            emit(false)
+        }
         every { cryptoManager.decryptData(any(), any()) } throws Exception()
         every { clipboardManager.setPrimaryClip(any()) } just runs
         //when
@@ -243,6 +274,9 @@ class SearchViewModelTest {
     fun `when deleteItem called the item should be removed from the repository and the flow should emit a success`() =
         runBlocking {
             //given
+            every { appPreferences.observeShouldHideItems() } returns flow {
+                emit(false)
+            }
             coEvery { itemRepository.deleteItem(any()) } just runs
             //when
             val result = viewModel.deleteItem(fakeItem).first()
@@ -255,6 +289,9 @@ class SearchViewModelTest {
     fun `when deleteItem called and the repository throws an exception the flow should emit a failure`() =
         runBlocking {
             //given
+            every { appPreferences.observeShouldHideItems() } returns flow {
+                emit(false)
+            }
             coEvery { itemRepository.deleteItem(any()) } throws Exception()
             //when
             val result = viewModel.deleteItem(fakeItem).first()
@@ -267,6 +304,9 @@ class SearchViewModelTest {
     fun `when sendToDesktop called with type LOGIN we send the login info to the desktop app`() =
         runBlocking {
             //given
+            every { appPreferences.observeShouldHideItems() } returns flow {
+                emit(false)
+            }
             val slot = slot<String>()
             coEvery { desktopRepository.sendData(capture(slot)) } just runs
             //when
@@ -281,6 +321,9 @@ class SearchViewModelTest {
     fun `when sendToDesktop called with type PASSWORD we send the password info to the desktop app`() =
         runBlocking {
             //given
+            every { appPreferences.observeShouldHideItems() } returns flow {
+                emit(false)
+            }
             val slot = slot<String>()
             coEvery { desktopRepository.sendData(capture(slot)) } just runs
             every { cryptoManager.decryptData(any(), any()) } returns fakePassword
@@ -296,6 +339,9 @@ class SearchViewModelTest {
     fun `when sendToDesktop called and cryptoManager throws an exception then nothing should be sent to the desktop app`() =
         runBlocking {
             //given
+            every { appPreferences.observeShouldHideItems() } returns flow {
+                emit(false)
+            }
             coEvery { desktopRepository.sendData(any()) } just runs
             every { cryptoManager.decryptData(any(), any()) } throws Exception()
             //when
@@ -311,6 +357,9 @@ class SearchViewModelTest {
     fun `when sendToDesktop called and desktopRepository throws an exception then the flow should emit a failure`() =
         runBlocking {
             //given
+            every { appPreferences.observeShouldHideItems() } returns flow {
+                emit(false)
+            }
             coEvery { desktopRepository.sendData(any()) } throws Exception()
             //when
             val result = viewModel.sendToDesktop(fakeItem, ItemDataType.LOGIN).first()
