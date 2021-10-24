@@ -4,7 +4,9 @@ import fr.jorisfavier.youshallnotpass.utils.extensions.hostWithPort
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class HostInterceptor @Inject constructor() : Interceptor {
 
     @Volatile
