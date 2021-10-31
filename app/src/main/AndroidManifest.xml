@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-feature android:name="android.hardware.camera.any" />
+
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -16,6 +17,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.YouShallNotPass">
+
+        <meta-data
+            android:name="io.sentry.dsn"
+            android:value="@string/SENTRY_CDN" />
 
         <service
             android:name=".service.YsnpAutofillService"
