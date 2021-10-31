@@ -29,6 +29,7 @@ class HomeActivity : AppCompatActivity(R.layout.activity_home) {
             WindowManager.LayoutParams.FLAG_SECURE
         )
         initObserver()
+        viewModel.trackScreenView()
     }
 
     override fun onSupportNavigateUp(): Boolean {

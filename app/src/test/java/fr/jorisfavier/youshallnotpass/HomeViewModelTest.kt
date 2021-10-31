@@ -1,6 +1,7 @@
 package fr.jorisfavier.youshallnotpass
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import fr.jorisfavier.youshallnotpass.analytics.YSNPAnalytics
 import fr.jorisfavier.youshallnotpass.manager.AuthManager
 import fr.jorisfavier.youshallnotpass.manager.impl.AuthManagerImpl
 import fr.jorisfavier.youshallnotpass.ui.home.HomeViewModel
@@ -24,7 +25,7 @@ class HomeViewModelTest {
         //given
         val authManager: AuthManager = mockk()
         every { authManager setProperty "isUserAuthenticated" value false } just runs
-        val viewModel = HomeViewModel(authManager)
+        val viewModel = HomeViewModel(authManager, analytics = mockk())
 
         //when
         viewModel.onAppPaused()
@@ -38,7 +39,7 @@ class HomeViewModelTest {
         //given
         val authManager: AuthManager = mockk()
         every { authManager getProperty "isUserAuthenticated" } returns false
-        val viewModel = HomeViewModel(authManager)
+        val viewModel = HomeViewModel(authManager, analytics = mockk())
 
         //when
         viewModel.onAppResumed()
@@ -52,7 +53,7 @@ class HomeViewModelTest {
     fun `requireAuthentication should not emit a value on configuration change`() {
         //given
         val authManager: AuthManager = AuthManagerImpl().apply { isUserAuthenticated = true }
-        val viewModel = HomeViewModel(authManager)
+        val viewModel = HomeViewModel(authManager, analytics = mockk())
 
         //when
         viewModel.onAppPaused()
@@ -68,7 +69,7 @@ class HomeViewModelTest {
     fun `requireAuthentication should not emit a value when ignoreNextPause`() {
         //given
         val authManager: AuthManager = AuthManagerImpl().apply { isUserAuthenticated = true }
-        val viewModel = HomeViewModel(authManager)
+        val viewModel = HomeViewModel(authManager, analytics = mockk())
 
         //when
         viewModel.ignoreNextPause()

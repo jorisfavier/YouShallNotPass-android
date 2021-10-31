@@ -16,6 +16,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import fr.jorisfavier.youshallnotpass.BuildConfig
 import fr.jorisfavier.youshallnotpass.YouShallNotPassDatabase
+import fr.jorisfavier.youshallnotpass.analytics.YSNPAnalytics
+import fr.jorisfavier.youshallnotpass.analytics.impl.YSNPAnalyticsImpl
+import fr.jorisfavier.youshallnotpass.api.AnalyticsApi
+import fr.jorisfavier.youshallnotpass.api.AuthInterceptor
 import fr.jorisfavier.youshallnotpass.api.DesktopApi
 import fr.jorisfavier.youshallnotpass.api.HostInterceptor
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
@@ -41,6 +45,8 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 import javax.inject.Named
 import javax.inject.Singleton
 
+private const val ANALYTICS_HTTP_CLIENT = "analytics_http_client"
+private const val ANALYTICS_RETROFIT = "analytics_retrofit"
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -100,7 +106,7 @@ object AppModule {
     fun provideAppDataSource(
         sharedPreferences: SharedPreferences,
         @Named("SecuredSharedPreferences")
-        securedSharedPreferences: SharedPreferences
+        securedSharedPreferences: SharedPreferences,
     ): AppPreferenceDataSource {
         return AppPreferenceDataSourceImpl(sharedPreferences, securedSharedPreferences)
     }
@@ -109,7 +115,7 @@ object AppModule {
     @Provides
     fun provideExternalItemDataSource(
         app: Application,
-        contentResolver: ContentResolverManager
+        contentResolver: ContentResolverManager,
     ): ExternalItemDataSource {
         return ExternalItemDataSourceImpl(app.applicationContext, contentResolver)
     }
@@ -118,7 +124,7 @@ object AppModule {
     @Provides
     fun provideExternalItemRepository(
         externalItemDataSource: ExternalItemDataSource,
-        cryptoManager: CryptoManager
+        cryptoManager: CryptoManager,
     ): ExternalItemRepository {
         return ExternalItemRepositoryImpl(externalItemDataSource, cryptoManager)
     }
@@ -150,12 +156,42 @@ object AppModule {
     }
 
     @Singleton
+    @Named(ANALYTICS_HTTP_CLIENT)
+    @Provides
+    fun provideAnalyticsHttpClient(
+        httpClient: OkHttpClient,
+        authInterceptor: AuthInterceptor,
+    ): OkHttpClient {
+        return httpClient
+            .newBuilder()
+            .addInterceptor(authInterceptor)
+            .addInterceptor(
+                HttpLoggingInterceptor().apply {
+                    level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+                    else HttpLoggingInterceptor.Level.NONE
+                }
+            )
+            .build()
+    }
+
+    @Singleton
     @Provides
     fun provideRetrofit(httpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .client(httpClient)
             .addConverterFactory(ScalarsConverterFactory.create())
             .baseUrl("http://0.0.0.0")
+            .build()
+    }
+
+    @Singleton
+    @Named(ANALYTICS_RETROFIT)
+    @Provides
+    fun provideAnalyticsRetrofit(@Named(ANALYTICS_HTTP_CLIENT) httpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .client(httpClient)
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .baseUrl(BuildConfig.ANALYTIC_URL)
             .build()
     }
 
@@ -167,11 +203,17 @@ object AppModule {
 
     @Singleton
     @Provides
+    fun provideAnalyticsApi(@Named(ANALYTICS_RETROFIT) retrofit: Retrofit): AnalyticsApi {
+        return retrofit.create(AnalyticsApi::class.java)
+    }
+
+    @Singleton
+    @Provides
     fun provideDesktopRepository(
         api: DesktopApi,
         appPreferenceDataSource: AppPreferenceDataSource,
         hostInterceptor: HostInterceptor,
-        cryptoManager: CryptoManager
+        cryptoManager: CryptoManager,
     ): DesktopRepository {
         GlobalScope.launch {
             hostInterceptor.host = appPreferenceDataSource.getDesktopAddress()
@@ -183,6 +225,12 @@ object AppModule {
     @Provides
     fun providePackageManager(app: Application): PackageManager {
         return app.packageManager
+    }
+
+    @Singleton
+    @Provides
+    fun provideAnalytics(analyticsApi: AnalyticsApi): YSNPAnalytics {
+        return YSNPAnalyticsImpl(api = analyticsApi)
     }
 
 }
