@@ -51,16 +51,16 @@ android {
 dependencies {
     def lifecycle_version = "2.2.0"
     def gradle_version = "3.2.1"
-    def room_version = "2.2.5"
-    def biometric_version = '1.0.1'
-    def camerax_version = "1.1.0-alpha01"
+    def room_version = "2.3.0"
+    def biometric_version = '1.1.0'
+    def camerax_version = "1.1.0-alpha08"
     def retrofit_version = "2.9.0"
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:30.0.0'
     implementation 'com.android.support:design:30.0.0'
     implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
     implementation 'androidx.webkit:webkit:1.4.0'
@@ -97,8 +97,8 @@ dependencies {
     // CameraX Lifecycle Library
     implementation "androidx.camera:camera-lifecycle:$camerax_version"
     // CameraX View class
-    implementation "androidx.camera:camera-view:1.0.0-alpha21"
-
+    implementation "androidx.camera:camera-view:1.0.0-alpha28"
+    //Do not upgrade before this https://issuetracker.google.com/issues/164901843 got resolved
     implementation "androidx.security:security-crypto:1.1.0-alpha01"
 
     implementation 'androidx.autofill:autofill:1.1.0'
