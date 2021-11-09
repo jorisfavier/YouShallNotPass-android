@@ -51,6 +51,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var deleteAllPreference: Preference
     private lateinit var desktopPreference: Preference
     private lateinit var autofillPreference: SwitchPreferenceCompat
+    private lateinit var privacyPolicyPreference: Preference
 
     private val requestAutofill =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -74,6 +75,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         deleteAllPreference = findPreference(KEY_DELETE_ALL)!!
         desktopPreference = findPreference(KEY_DESKTOP)!!
         autofillPreference = findPreference(KEY_AUTOFILL)!!
+        privacyPolicyPreference = findPreference(KEY_PP)!!
 
         initAppThemePreference()
         initExportPreference()
@@ -82,6 +84,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         initDeleteAllPreference()
         initDesktopPreference()
         playFocusAnimationIfNeeded()
+        initPrivacyPolicyPreference()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             initAutofillPreference()
         }
@@ -189,6 +192,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
+    private fun initPrivacyPolicyPreference() {
+        privacyPolicyPreference.setViewId(View.generateViewId())
+        privacyPolicyPreference.setOnPreferenceClickListener {
+            val direction =
+                SettingsFragmentDirections.actionSettingsFragmentToPrivacyPolicyFragment()
+            findNavController().navigate(direction)
+            true
+        }
+    }
+
     private fun playFocusAnimationIfNeeded() {
         args.highlightItem?.let {
             findPreference<BlinkPreference>(it)?.blink()
@@ -215,5 +228,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         const val KEY_DELETE_ALL = "deleteAll"
         const val KEY_DESKTOP = "desktop"
         const val KEY_AUTOFILL = "autofill"
+        const val KEY_PP = "privacyPolicy"
     }
 }

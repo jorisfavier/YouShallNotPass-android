@@ -86,5 +86,6 @@
     <string name="search_for_item">Aller à la recherche</string>
     <string name="use_generated_password">Utiliser le mot de passe généré</string>
     <string name="create_new_item">Créer un item</string>
+    <string name="privacy_policy">Politique de confidentialité</string>
 
 </resources>

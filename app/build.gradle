@@ -18,6 +18,8 @@ android {
         versionName "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         buildConfigField "String", "ANALYTIC_URL", "\"https://app.piratepx.com\""
+        buildConfigField "String", "PRIVACY_POLICY_URL", "\"https://jorisfavier.fr/youshallnotpass/privacy-policy\""
+
     }
     compileOptions {
         sourceCompatibility = 1.8
@@ -61,6 +63,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+    implementation 'androidx.webkit:webkit:1.4.0'
 
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
