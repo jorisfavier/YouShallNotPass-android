@@ -39,7 +39,7 @@ class YsnpAutofillService : AutofillService() {
     override fun onFillRequest(
         request: FillRequest,
         cancellationSignal: CancellationSignal,
-        callback: FillCallback
+        callback: FillCallback,
     ) {
         val context: List<FillContext> = request.fillContexts
         val structure: AssistStructure = context[context.size - 1].structure
@@ -184,7 +184,7 @@ class YsnpAutofillService : AutofillService() {
             this,
             0,
             authIntent,
-            PendingIntent.FLAG_CANCEL_CURRENT
+            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_MUTABLE
         ).intentSender
     }
 }

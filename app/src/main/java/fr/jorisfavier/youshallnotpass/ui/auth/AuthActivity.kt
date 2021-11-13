@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +16,7 @@ import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.ui.home.HomeActivity
 
 @AndroidEntryPoint
-class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
+class AuthActivity : AppCompatActivity() {
 
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var biometricPromptInfo: BiometricPrompt.PromptInfo
@@ -25,6 +26,8 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen()
+        setContentView(R.layout.activity_auth)
         initObserver()
         initAuthentication()
         displayAuthPrompt()
@@ -72,7 +75,7 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
 
     private fun displayErrorModal(
         @StringRes titleResId: Int = R.string.auth_fail,
-        @StringRes messageResId: Int = R.string.auth_fail_try_again
+        @StringRes messageResId: Int = R.string.auth_fail_try_again,
     ) {
         val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle(getString(titleResId))
