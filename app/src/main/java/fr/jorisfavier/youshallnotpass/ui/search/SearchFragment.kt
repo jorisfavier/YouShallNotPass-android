@@ -94,7 +94,7 @@ class SearchFragment : SearchBaseFragment() {
                             }
                             .show()
                     }
-                    .onUnknownFailure { requireContext().toast(R.string.error_occurred) }
+                    .onUnknownFailure { requireContext().toast(R.string.error_desktop_transmission) }
             }
         }
     }

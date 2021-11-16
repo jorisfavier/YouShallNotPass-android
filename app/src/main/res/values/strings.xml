@@ -87,4 +87,5 @@
     <string name="use_generated_password">Use generated Password</string>
     <string name="create_new_item">Create new item</string>
     <string name="privacy_policy">Privacy policy</string>
+    <string name="error_desktop_transmission">An error occurred. Are your phone and computer connected to the same wifi?</string>
 </resources>
