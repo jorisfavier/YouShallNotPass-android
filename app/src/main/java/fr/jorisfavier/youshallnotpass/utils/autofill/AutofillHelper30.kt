@@ -164,7 +164,12 @@ object AutofillHelper30 {
         inlineSpec: InlinePresentationSpec,
     ): InlinePresentation {
         val slice = InlineSuggestionUi
-            .newContentBuilder(PendingIntent.getActivity(context, 0, Intent(), 0))
+            .newContentBuilder(PendingIntent.getActivity(
+                context,
+                0,
+                Intent(),
+                PendingIntent.FLAG_IMMUTABLE,
+            ))
             .setTitle(context.getString(R.string.authentication_required))
             .setStartIcon(Icon.createWithResource(context, R.drawable.ysnp_inline).apply {
                 this.setTintBlendMode(BlendMode.DST)
@@ -180,7 +185,12 @@ object AutofillHelper30 {
     ): InlinePresentation {
         val createItem = context.getString(R.string.create_new_item)
         val slice = InlineSuggestionUi
-            .newContentBuilder(PendingIntent.getActivity(context, 0, Intent(), 0))
+            .newContentBuilder(PendingIntent.getActivity(
+                context,
+                0,
+                Intent(),
+                PendingIntent.FLAG_IMMUTABLE,
+            ))
             .setTitle(createItem)
             .setStartIcon(Icon.createWithResource(context, R.drawable.ysnp_inline).apply {
                 this.setTintBlendMode(BlendMode.DST)
@@ -196,7 +206,12 @@ object AutofillHelper30 {
     ): InlinePresentation {
         val generatedPassword = context.getString(R.string.use_generated_password)
         val slice = InlineSuggestionUi
-            .newContentBuilder(PendingIntent.getActivity(context, 0, Intent(), 0))
+            .newContentBuilder(PendingIntent.getActivity(
+                context,
+                0,
+                Intent(),
+                PendingIntent.FLAG_IMMUTABLE,
+            ))
             .setTitle(generatedPassword)
             .setStartIcon(Icon.createWithResource(context, R.drawable.ysnp_inline).apply {
                 this.setTintBlendMode(BlendMode.DST)
@@ -212,7 +227,12 @@ object AutofillHelper30 {
         inlinePresentationSpec: InlinePresentationSpec,
     ): InlinePresentation {
         val slice = InlineSuggestionUi
-            .newContentBuilder(PendingIntent.getActivity(context, 0, Intent(), 0))
+            .newContentBuilder(PendingIntent.getActivity(
+                context,
+                0,
+                Intent(),
+                PendingIntent.FLAG_IMMUTABLE,
+            ))
             .setTitle(item.title)
             .setSubtitle(item.login.orEmpty())
             .setStartIcon(Icon.createWithResource(context, R.drawable.ysnp_inline).apply {
@@ -229,7 +249,12 @@ object AutofillHelper30 {
     ): InlinePresentation {
         val noItemFound = context.getString(R.string.no_results_found)
         val slice = InlineSuggestionUi
-            .newContentBuilder(PendingIntent.getActivity(context, 0, Intent(), 0))
+            .newContentBuilder(PendingIntent.getActivity(
+                context,
+                0,
+                Intent(),
+                PendingIntent.FLAG_IMMUTABLE,
+            ))
             .setTitle(noItemFound)
             .setStartIcon(Icon.createWithResource(context, R.drawable.ysnp_inline).apply {
                 this.setTintBlendMode(BlendMode.DST)

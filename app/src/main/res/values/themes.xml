@@ -3,11 +3,12 @@
     <!--Top level DayNight theme to be used in AndroidManifest.xml-->
     <style name="Theme.YouShallNotPass" parent="Theme.Light.YouShallNotPass" />
 
-    <style name="Theme.YouShallNotPass.Splash" parent="Theme.YouShallNotPass">
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowTranslucentNavigation">true</item>
-        <item name="android:windowBackground">@drawable/splash_background</item>
-        <item name="android:windowAnimationStyle">@null</item>
+    <style name="Theme.YouShallNotPass.Starting" parent="Theme.SplashScreen">
+        <!-- Set the splash screen background, animated icon, and animation duration.-->
+        <item name="windowSplashScreenBackground">?android:colorBackground</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ynsp_full_splash</item>
+        <!-- Set the theme of the Activity that directly follows your splash screen.-->
+        <item name="postSplashScreenTheme">@style/Theme.YouShallNotPass</item>
     </style>
     <!--Base custom theme which will be shared between both light and dark theme variants-->
     <style name="Theme.Light.YouShallNotPass" parent="Base.Theme.YouShallNotPass">
