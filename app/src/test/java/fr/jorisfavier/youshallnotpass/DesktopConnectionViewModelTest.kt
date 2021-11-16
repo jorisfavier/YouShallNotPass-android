@@ -98,4 +98,37 @@ class DesktopConnectionViewModelTest {
         TestCase.assertEquals(State.Error, stateList[1])
     }
 
+    @Test
+    fun `onCodeFound with a correct formatted code should emit a success state only once`() {
+        //given
+        val urlSlot = slot<String>()
+        val publicKeySlot = slot<String>()
+        val stateList = mutableListOf<State<Unit>>()
+        val fakeUrl = "192.168.0.1:8080"
+        val cleanedKey = "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtFidODAnunzeGxbO8Kt5"
+        val fakeKey = "-----BEGIN PUBLIC KEY-----\n" +
+                cleanedKey +
+                "\n-----END PUBLIC KEY-----"
+        val fakeCode = "$fakeUrl#ysnp#$fakeKey"
+        coEvery {
+            desktopRepository.updateDesktopInfo(capture(urlSlot), capture(publicKeySlot))
+        } just runs
+
+        //when
+        viewModel.qrCodeAnalyseState.observeForever {
+            stateList.add(it)
+        }
+        viewModel.onCodeFound(fakeCode)
+        viewModel.onCodeFound(fakeCode)
+        viewModel.onCodeFound(fakeCode)
+        viewModel.onCodeFound(fakeCode)
+
+        //then
+        TestCase.assertEquals(2, stateList.size)
+        TestCase.assertEquals(State.Loading, stateList.firstOrNull())
+        TestCase.assertTrue(stateList[1] is State.Success)
+        TestCase.assertEquals("http://$fakeUrl", urlSlot.captured)
+        TestCase.assertEquals(cleanedKey, publicKeySlot.captured)
+    }
+
 }

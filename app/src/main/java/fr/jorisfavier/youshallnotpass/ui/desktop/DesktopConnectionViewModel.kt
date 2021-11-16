@@ -18,6 +18,9 @@ class DesktopConnectionViewModel @Inject constructor(private val desktopReposito
     val qrCodeAnalyseState: LiveData<State<Unit>> = _qrCodeAnalyseState
 
     fun onCodeFound(code: String?) {
+        //If we already found a valid code no need to go through the logic again
+        if (_qrCodeAnalyseState.value is State.Success) return
+
         code?.let { qrCode ->
             _qrCodeAnalyseState.value = State.Loading
             val elements = qrCode.split("#ysnp#")
