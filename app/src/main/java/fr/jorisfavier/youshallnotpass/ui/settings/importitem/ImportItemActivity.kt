@@ -8,6 +8,7 @@ import com.github.appintro.AppIntroPageTransformerType
 import dagger.hilt.android.AndroidEntryPoint
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.ui.settings.importitem.review.ReviewImportedItemsFragment
+import fr.jorisfavier.youshallnotpass.utils.State
 import fr.jorisfavier.youshallnotpass.utils.extensions.getThemeColor
 
 @AndroidEntryPoint
@@ -48,7 +49,10 @@ class ImportItemActivity : AppIntro() {
     }
 
     override fun onIntroFinished() {
-        finish()
+        val importState = viewModel.importItemsState.value
+        if (importState == State.Error || importState is State.Success) {
+            finish()
+        }
     }
 
     override fun onSkipPressed(currentFragment: Fragment?) {

@@ -14,7 +14,9 @@ import fr.jorisfavier.youshallnotpass.ui.settings.importitem.review.ExternalItem
 import fr.jorisfavier.youshallnotpass.utils.Event
 import fr.jorisfavier.youshallnotpass.utils.State
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -22,7 +24,7 @@ import javax.inject.Inject
 class ImportItemViewModel @Inject constructor(
     private val externalItemRepository: ExternalItemRepository,
     private val cryptoManager: CryptoManager,
-    private val itemRepository: ItemRepository
+    private val itemRepository: ItemRepository,
 ) : ViewModel() {
 
     private val _navigate = MutableLiveData<Event<Unit>>()
@@ -116,28 +118,33 @@ class ImportItemViewModel @Inject constructor(
             Timber.w(throwable, "An error occurred while importing items")
             _importItemsState.postValue(State.Error)
         }
+        _importItemsState.value = State.Loading
         viewModelScope.launch(exceptionHandler) {
-            _importItemsState.postValue(State.Loading)
-            _importedItems.value?.asSequence()?.filter { it.selected }?.map { it.externalItem }
-                ?.toList()?.let { selectedItems ->
-                    if (selectedItems.isEmpty()) {
-                        _importItemsState.postValue(State.Error)
-                    } else {
-                        val itemsToImport = selectedItems.map { externalItem ->
-                            val password = cryptoManager.encryptData(externalItem.password)
-                            Item(
-                                0,
-                                externalItem.title,
-                                externalItem.login,
-                                password.ciphertext,
-                                password.initializationVector
-                            )
+            withContext(Dispatchers.IO) {
+                _importedItems.value
+                    ?.asSequence()
+                    ?.filter { it.selected }
+                    ?.map { it.externalItem }
+                    ?.toList()?.let { selectedItems ->
+                        if (selectedItems.isEmpty()) {
+                            _importItemsState.postValue(State.Error)
+                        } else {
+                            val itemsToImport = selectedItems.map { externalItem ->
+                                val password = cryptoManager.encryptData(externalItem.password)
+                                Item(
+                                    0,
+                                    externalItem.title,
+                                    externalItem.login,
+                                    password.ciphertext,
+                                    password.initializationVector
+                                )
+                            }
+                            itemRepository.insertItems(itemsToImport)
+                            _importItemsState.postValue(State.Success(Unit))
                         }
-                        itemRepository.insertItems(itemsToImport)
-                        _importItemsState.postValue(State.Success(Unit))
-                    }
-                } ?: run {
-                _importItemsState.postValue(State.Error)
+                    } ?: run {
+                    _importItemsState.postValue(State.Error)
+                }
             }
         }
     }
