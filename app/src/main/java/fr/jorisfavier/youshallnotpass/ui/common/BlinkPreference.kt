@@ -10,7 +10,10 @@ import fr.jorisfavier.youshallnotpass.R
 /**
  * Preference element exposing a blink method that allow to play a blink animation
  */
-class BlinkPreference @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : Preference(context, attrs) {
+class BlinkPreference @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+) : Preference(context, attrs) {
 
     private var blink = false
 

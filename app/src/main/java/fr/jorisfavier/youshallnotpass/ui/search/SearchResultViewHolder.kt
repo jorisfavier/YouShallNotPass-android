@@ -17,7 +17,7 @@ import fr.jorisfavier.youshallnotpass.utils.extensions.toast
 import timber.log.Timber
 
 class SearchResultViewHolder(
-    private val binding: ViewholderSearchResultBinding
+    private val binding: ViewholderSearchResultBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     var view = itemView
@@ -38,48 +38,50 @@ class SearchResultViewHolder(
         onDeleteItemClicked: (Item) -> Unit,
         decryptPassword: (Item) -> Result<String>,
         copyToClipboard: (Item, ItemDataType) -> Unit,
-        sendToDesktop: (Item, ItemDataType) -> Unit
+        sendToDesktop: (Item, ItemDataType) -> Unit,
     ) {
-        toggleViewState(false, animate = false)
-        isExpanded = false
-        binding.item = result
-        hasLoginField = result.hasLogin
-        binding.searchResultItemShowHideButton.setOnClickListener {
-            decryptPassword(result)
-                .onSuccess { togglePasswordVisibility(it) }
-                .onFailure {
-                    Timber.e(it, "An error occurred while decrypting password")
-                    view.context.toast(R.string.error_occurred)
-                }
+        with(binding) {
+            toggleViewState(false, animate = false)
+            isExpanded = false
+            item = result
+            hasLoginField = result.hasLogin
+            searchResultItemShowHideButton.setOnClickListener {
+                decryptPassword(result)
+                    .onSuccess { togglePasswordVisibility(it) }
+                    .onFailure {
+                        Timber.e(it, "An error occurred while decrypting password")
+                        view.context.toast(R.string.error_occurred)
+                    }
 
+            }
+            searchResultItemCopyPasswordButton.setOnClickListener {
+                copyToClipboard(
+                    result,
+                    ItemDataType.PASSWORD
+                )
+            }
+            searchResultItemCopyLoginButton.setOnClickListener {
+                copyToClipboard(
+                    result,
+                    ItemDataType.LOGIN
+                )
+            }
+            searchResultItemEditButton.setOnClickListener { onEditItemClicked.invoke(result) }
+            searchResultItemDeleteButton.setOnClickListener { onDeleteItemClicked.invoke(result) }
+            searchResultItemPasswordDesktopButton.setOnClickListener {
+                sendToDesktop.invoke(
+                    result,
+                    ItemDataType.PASSWORD
+                )
+            }
+            searchResultItemLoginDesktopButton.setOnClickListener {
+                sendToDesktop.invoke(
+                    result,
+                    ItemDataType.LOGIN
+                )
+            }
+            executePendingBindings()
         }
-        binding.searchResultItemCopyPasswordButton.setOnClickListener {
-            copyToClipboard(
-                result,
-                ItemDataType.PASSWORD
-            )
-        }
-        binding.searchResultItemCopyLoginButton.setOnClickListener {
-            copyToClipboard(
-                result,
-                ItemDataType.LOGIN
-            )
-        }
-        binding.searchResultItemEditButton.setOnClickListener { onEditItemClicked.invoke(result) }
-        binding.searchResultItemDeleteButton.setOnClickListener { onDeleteItemClicked.invoke(result) }
-        binding.searchResultItemPasswordDesktopButton.setOnClickListener {
-            sendToDesktop.invoke(
-                result,
-                ItemDataType.PASSWORD
-            )
-        }
-        binding.searchResultItemLoginDesktopButton.setOnClickListener {
-            sendToDesktop.invoke(
-                result,
-                ItemDataType.LOGIN
-            )
-        }
-        binding.executePendingBindings()
     }
 
     fun toggleViewState(expand: Boolean, animate: Boolean = true) {
@@ -118,17 +120,19 @@ class SearchResultViewHolder(
     }
 
     private fun togglePasswordVisibility(password: String) {
-        isPasswordVisible = !isPasswordVisible
-        var text = view.context.getText(R.string.item_password)
-        if (isPasswordVisible) {
-            text = password
-            binding.searchResultItemPassword.inputType =
-                InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-        } else {
-            binding.searchResultItemPassword.inputType =
-                InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_PASSWORD
+        with(binding) {
+            isPasswordVisible = !isPasswordVisible
+            var text = view.context.getText(R.string.item_password)
+            if (isPasswordVisible) {
+                text = password
+                searchResultItemPassword.inputType =
+                    InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+            } else {
+                searchResultItemPassword.inputType =
+                    InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_PASSWORD
+            }
+            searchResultItemPassword.text = text
         }
-        binding.searchResultItemPassword.text = text
     }
 
     companion object {

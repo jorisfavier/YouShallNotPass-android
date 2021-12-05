@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authManager: AuthManager,
-    private val keyguardManager: KeyguardManager
+    private val keyguardManager: KeyguardManager,
 ) : ViewModel() {
 
     sealed class AuthResult {
@@ -35,19 +35,19 @@ class AuthViewModel @Inject constructor(
             } else {
                 R.string.auth_fail_try_again
             }
-            _authSuccess.postValue(Event(AuthResult.Failure(message)))
+            _authSuccess.value = Event(AuthResult.Failure(message))
             Timber.e("Error during authentication: $errorCode - $errString")
         }
 
         override fun onAuthenticationFailed() {
             super.onAuthenticationFailed()
-            _authSuccess.postValue(Event(AuthResult.Failure(R.string.auth_fail_try_again)))
+            _authSuccess.value = Event(AuthResult.Failure(R.string.auth_fail_try_again))
         }
 
         override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
             super.onAuthenticationSucceeded(result)
             authManager.isUserAuthenticated = true
-            _authSuccess.postValue(Event(AuthResult.Success))
+            _authSuccess.value = Event(AuthResult.Success)
         }
     }
 

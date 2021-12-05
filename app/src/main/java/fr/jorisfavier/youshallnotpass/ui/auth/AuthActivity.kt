@@ -14,6 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.ui.home.HomeActivity
+import fr.jorisfavier.youshallnotpass.utils.observeEvent
 
 @AndroidEntryPoint
 class AuthActivity : AppCompatActivity() {
@@ -40,15 +41,13 @@ class AuthActivity : AppCompatActivity() {
     }
 
     private fun initObserver() {
-        viewModel.authSuccess.observe(this) { event ->
-            event.getContentIfNotHandled()?.let { authResult ->
-                when (authResult) {
-                    is AuthViewModel.AuthResult.Failure -> {
-                        displayErrorModal(messageResId = authResult.errorMessage)
-                    }
-                    is AuthViewModel.AuthResult.Success -> {
-                        redirectToSearchPage()
-                    }
+        viewModel.authSuccess.observeEvent(this) { authResult ->
+            when (authResult) {
+                is AuthViewModel.AuthResult.Failure -> {
+                    displayErrorModal(messageResId = authResult.errorMessage)
+                }
+                is AuthViewModel.AuthResult.Success -> {
+                    redirectToSearchPage()
                 }
             }
         }

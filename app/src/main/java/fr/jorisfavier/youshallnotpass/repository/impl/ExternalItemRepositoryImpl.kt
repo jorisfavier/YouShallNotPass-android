@@ -16,17 +16,20 @@ import kotlinx.serialization.json.Json
 
 class ExternalItemRepositoryImpl(
     private val externalItemDataSource: ExternalItemDataSource,
-    private val cryptoManager: CryptoManager
+    private val cryptoManager: CryptoManager,
 ) : ExternalItemRepository {
 
     override suspend fun saveExternalItems(items: List<ExternalItem>, password: String?): Uri {
         return withContext(Dispatchers.IO) {
             val itemsToSave = items.map { ModelToDto.externalItemToItemDto(it) }
-            password?.let {
+            if (password != null) {
                 val itemsJson = Json.encodeToString(itemsToSave)
-                val data = cryptoManager.encryptDataWithPassword(password, itemsJson.toByteArray(Charsets.UTF_8))
+                val data = cryptoManager.encryptDataWithPassword(
+                    password,
+                    itemsJson.toByteArray(Charsets.UTF_8),
+                )
                 return@withContext externalItemDataSource.saveToYsnpFile(data)
-            } ?: run {
+            } else {
                 return@withContext externalItemDataSource.saveToCsv(itemsToSave)
             }
         }
@@ -35,16 +38,17 @@ class ExternalItemRepositoryImpl(
 
     override suspend fun getExternalItemsFromUri(uri: Uri, password: String?): List<ExternalItem> {
         return withContext(Dispatchers.IO) {
-            val items = password?.let {
+            val items = if (password != null) {
                 val encryptedData = externalItemDataSource.getDataFromYsnpFile(uri)
                 val decrypted = cryptoManager.decryptDataWithPassword(password, encryptedData)
                 Json.decodeFromString<List<ItemDto>>(decrypted.toString(Charsets.UTF_8))
-            } ?: run {
+            } else {
                 externalItemDataSource.getItemsFromTextFile(uri)
             }
             return@withContext DtoToModel.itemDtoListToExternalItemList(items)
         }
     }
 
-    override suspend fun isSecuredWithPassword(uri: Uri): Boolean = !externalItemDataSource.isTextFile(uri)
+    override suspend fun isSecuredWithPassword(uri: Uri): Boolean =
+        !externalItemDataSource.isTextFile(uri)
 }

@@ -6,22 +6,18 @@ import fr.jorisfavier.youshallnotpass.api.HostInterceptor
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
 import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class DesktopRepositoryImpl(
     private val api: DesktopApi,
     private val appPreference: AppPreferenceDataSource,
     private val hostInterceptor: HostInterceptor,
-    private val cryptoManager: CryptoManager
+    private val cryptoManager: CryptoManager,
 ) : DesktopRepository {
 
     override suspend fun updateDesktopInfo(url: String, publicKey: String) {
-        withContext(Dispatchers.IO) {
-            appPreference.setDesktopAddress(url)
-            hostInterceptor.host = url
-            appPreference.setDesktopPublicKey(publicKey)
-        }
+        appPreference.setDesktopAddress(url)
+        hostInterceptor.host = url
+        appPreference.setDesktopPublicKey(publicKey)
     }
 
     override suspend fun sendData(data: String) {

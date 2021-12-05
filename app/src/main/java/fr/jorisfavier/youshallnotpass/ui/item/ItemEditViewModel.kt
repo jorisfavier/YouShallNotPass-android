@@ -93,13 +93,12 @@ class ItemEditViewModel @Inject constructor(
                             packageCertificate = currentItem?.packageCertificate.orEmpty()
                         )
                     )
-                    val successResourceId: Int
-                    if (id == 0) {
+                    val successResourceId = if (id == 0) {
                         val clip = ClipData.newPlainText(ItemDataType.PASSWORD.name, passwordValue)
                         clipboardManager.setPrimaryClip(clip)
-                        successResourceId = R.string.item_creation_success
+                        R.string.item_creation_success
                     } else {
-                        successResourceId = R.string.item_update_success
+                        R.string.item_update_success
                     }
                     emit(Result.success(successResourceId))
                 }

@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import fr.jorisfavier.youshallnotpass.ui.search.SearchBaseFragment
 import fr.jorisfavier.youshallnotpass.utils.autofill.AutofillHelperCompat
+import fr.jorisfavier.youshallnotpass.utils.observeEvent
 
 @AndroidEntryPoint
 @RequiresApi(Build.VERSION_CODES.O)
@@ -42,24 +43,22 @@ class AutofillSearchFragment : SearchBaseFragment() {
     }
 
     private fun initObservers() {
-        viewModel.autofillResponse.observe(viewLifecycleOwner) {
-            it.getContentIfNotHandled()?.let { data ->
-                val itemDataSet = AutofillHelperCompat.buildItemDataSet(
-                    context = requireContext(),
-                    fillRequest = data.fillRequest,
-                    autofillItems = data.autofillItems,
-                    item = data.item,
-                    password = data.itemPassword,
-                )
-                requireActivity().apply {
-                    setResult(
-                        Activity.RESULT_OK, Intent().putExtra(
-                            AutofillManager.EXTRA_AUTHENTICATION_RESULT,
-                            itemDataSet,
-                        )
+        viewModel.autofillResponse.observeEvent(viewLifecycleOwner) { data ->
+            val itemDataSet = AutofillHelperCompat.buildItemDataSet(
+                context = requireContext(),
+                fillRequest = data.fillRequest,
+                autofillItems = data.autofillItems,
+                item = data.item,
+                password = data.itemPassword,
+            )
+            requireActivity().apply {
+                setResult(
+                    Activity.RESULT_OK, Intent().putExtra(
+                        AutofillManager.EXTRA_AUTHENTICATION_RESULT,
+                        itemDataSet,
                     )
-                    finish()
-                }
+                )
+                finish()
             }
         }
     }

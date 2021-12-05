@@ -121,28 +121,25 @@ class ImportItemViewModel @Inject constructor(
         _importItemsState.value = State.Loading
         viewModelScope.launch(exceptionHandler) {
             withContext(Dispatchers.IO) {
-                _importedItems.value
+                val itemsToImport = _importedItems.value
                     ?.asSequence()
                     ?.filter { it.selected }
-                    ?.map { it.externalItem }
-                    ?.toList()?.let { selectedItems ->
-                        if (selectedItems.isEmpty()) {
-                            _importItemsState.postValue(State.Error)
-                        } else {
-                            val itemsToImport = selectedItems.map { externalItem ->
-                                val password = cryptoManager.encryptData(externalItem.password)
-                                Item(
-                                    0,
-                                    externalItem.title,
-                                    externalItem.login,
-                                    password.ciphertext,
-                                    password.initializationVector
-                                )
-                            }
-                            itemRepository.insertItems(itemsToImport)
-                            _importItemsState.postValue(State.Success(Unit))
-                        }
-                    } ?: run {
+                    ?.map {
+                        val externalItem = it.externalItem
+                        val password = cryptoManager.encryptData(externalItem.password)
+                        Item(
+                            0,
+                            externalItem.title,
+                            externalItem.login,
+                            password.ciphertext,
+                            password.initializationVector
+                        )
+                    }
+                    ?.toList()
+                if (itemsToImport != null && itemsToImport.isNotEmpty()) {
+                    itemRepository.insertItems(itemsToImport)
+                    _importItemsState.postValue(State.Success(Unit))
+                } else {
                     _importItemsState.postValue(State.Error)
                 }
             }

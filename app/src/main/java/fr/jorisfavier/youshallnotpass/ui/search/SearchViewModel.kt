@@ -16,12 +16,9 @@ import fr.jorisfavier.youshallnotpass.utils.State
 import fr.jorisfavier.youshallnotpass.utils.extensions.combine
 import fr.jorisfavier.youshallnotpass.utils.extensions.debounce
 import fr.jorisfavier.youshallnotpass.utils.extensions.default
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
 import timber.log.Timber
-import java.lang.reflect.Constructor
 import javax.inject.Inject
 
 @HiltViewModel
@@ -51,10 +48,13 @@ class SearchViewModel(
     )
 
 
-    override val results = search
-        .combine(appPreference.observeShouldHideItems().asLiveData())
-        .switchMap { (query, hideAll) ->
-            liveData<State<List<Item>>> {
+    override val results = combine(
+        search.asFlow(),
+        appPreference.observeShouldHideItems(),
+        itemRepository.getAllItems(),
+    ) { query, hideAll, allItems -> Triple(query, hideAll, allItems) }
+        .flatMapLatest { (query, hideAll, allItems) ->
+            flow {
                 emit(State.Loading)
                 try {
                     when {
@@ -62,7 +62,7 @@ class SearchViewModel(
                             emit(State.Success(itemRepository.searchItem("%$query%")))
                         }
                         !hideAll -> {
-                            emit(State.Success(itemRepository.getAllItems()))
+                            emit(State.Success(allItems))
                         }
                         else -> {
                             emit(State.Success(listOf()))
@@ -73,7 +73,7 @@ class SearchViewModel(
                     emit(State.Success(listOf()))
                 }
             }
-        }.debounce(duration = debounceDurationMs, coroutineScope = viewModelScope)
+        }.asLiveData().debounce(duration = debounceDurationMs, coroutineScope = viewModelScope)
 
     override val hasNoResult: LiveData<Boolean> = results.map { state ->
         state is State.Success && state.value.count() == 0

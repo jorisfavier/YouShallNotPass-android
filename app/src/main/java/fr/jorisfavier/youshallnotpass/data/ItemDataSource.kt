@@ -2,6 +2,7 @@ package fr.jorisfavier.youshallnotpass.data
 
 import androidx.room.*
 import fr.jorisfavier.youshallnotpass.data.model.ItemEntity
+import kotlinx.coroutines.flow.Flow
 
 
 @Dao
@@ -12,7 +13,7 @@ interface ItemDataSource {
      * @return a list of item
      */
     @Query("SELECT * from ItemEntity order by title asc")
-    fun getAllItems(): List<ItemEntity>
+    fun getAllItems(): Flow<List<ItemEntity>>
 
     /***
      *  Search for an item in the database based on his name
@@ -20,7 +21,7 @@ interface ItemDataSource {
      *  @return a list of item
      */
     @Query("SELECT * from ItemEntity where title like :title")
-    fun searchItem(title: String): List<ItemEntity>
+    suspend fun searchItem(title: String): List<ItemEntity>
 
     /***
      *  Search for an item in the database based on his name
@@ -28,7 +29,7 @@ interface ItemDataSource {
      *  @return a list of item
      */
     @Query("SELECT * from ItemEntity where packageCertificates = :certificates")
-    fun searchItemByCertificate(certificates: String): List<ItemEntity>
+    suspend fun searchItemByCertificate(certificates: String): List<ItemEntity>
 
     /**
      * Insert an item into the database
@@ -36,7 +37,7 @@ interface ItemDataSource {
      * @param items
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertItems(vararg items: ItemEntity)
+    suspend fun insertItems(vararg items: ItemEntity)
 
     /**
      * Returns all the item with the given id
@@ -44,26 +45,26 @@ interface ItemDataSource {
      * @return a list of item, if the item hasn't been found it will return an empty list
      */
     @Query("SELECT * from ItemEntity where id=:id")
-    fun getItemById(id: Int): List<ItemEntity>
+    suspend fun getItemById(id: Int): List<ItemEntity>
 
     /**
      * Update items to the database
      * @param items
      */
     @Update
-    fun updateItems(vararg items: ItemEntity)
+    suspend fun updateItems(vararg items: ItemEntity)
 
     /**
      * Delete items from the database
      * @param items
      */
     @Delete
-    fun deleteItems(vararg items: ItemEntity)
+    suspend fun deleteItems(vararg items: ItemEntity)
 
     /**
      * Delete all the items from the database
      */
     @Query("DELETE FROM ItemEntity")
-    fun deleteAllItems()
+    suspend fun deleteAllItems()
 
 }

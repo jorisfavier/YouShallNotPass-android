@@ -5,8 +5,8 @@ import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.repository.mapper.EntityToModel
 import fr.jorisfavier.youshallnotpass.repository.mapper.ModelToEntity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
@@ -14,66 +14,52 @@ import javax.inject.Inject
 class ItemRepositoryImpl @Inject constructor(private var itemDataSource: ItemDataSource) :
     ItemRepository {
 
-    override suspend fun getAllItems(): List<Item> {
-        return withContext(Dispatchers.IO) {
-            itemDataSource.getAllItems().map { EntityToModel.itemEntityToItem(it) }
+    override fun getAllItems(): Flow<List<Item>> {
+        return itemDataSource.getAllItems().map { items ->
+            items.map(EntityToModel::itemEntityToItem)
         }
     }
 
     override suspend fun searchItem(title: String): List<Item> {
-        return withContext(Dispatchers.IO) {
-            itemDataSource.searchItem(title).map { EntityToModel.itemEntityToItem(it) }
-        }
+        return itemDataSource.searchItem(title).map { EntityToModel.itemEntityToItem(it) }
     }
 
     override suspend fun searchItemByCertificates(certificates: List<String>): List<Item> {
-        return withContext(Dispatchers.IO) {
-            if (certificates.isEmpty()) {
-                listOf()
-            } else {
-                val certificatesString = Json.encodeToString(certificates)
-                itemDataSource.searchItemByCertificate(certificatesString)
-                    .map { EntityToModel.itemEntityToItem(it) }
-            }
+        return if (certificates.isEmpty()) {
+            listOf()
+        } else {
+            val certificatesString = Json.encodeToString(certificates)
+            itemDataSource.searchItemByCertificate(certificatesString)
+                .map { EntityToModel.itemEntityToItem(it) }
         }
     }
 
     override suspend fun getItemById(id: Int): Item? {
-        return withContext(Dispatchers.IO) {
-            itemDataSource.getItemById(id).firstOrNull()?.let {
-                EntityToModel.itemEntityToItem(it)
-            }
+        return itemDataSource.getItemById(id).firstOrNull()?.let {
+            EntityToModel.itemEntityToItem(it)
         }
     }
 
     override suspend fun updateOrCreateItem(item: Item) {
-        withContext(Dispatchers.IO) {
-            val entity = ModelToEntity.itemToItemEntity(item)
-            if (entity.id == 0) {
-                itemDataSource.insertItems(entity)
-            } else {
-                itemDataSource.updateItems(entity)
-            }
+        val entity = ModelToEntity.itemToItemEntity(item)
+        if (entity.id == 0) {
+            itemDataSource.insertItems(entity)
+        } else {
+            itemDataSource.updateItems(entity)
         }
     }
 
     override suspend fun deleteItem(item: Item) {
-        withContext(Dispatchers.IO) {
-            itemDataSource.deleteItems(ModelToEntity.itemToItemEntity(item))
-        }
+        itemDataSource.deleteItems(ModelToEntity.itemToItemEntity(item))
     }
 
     override suspend fun insertItems(items: List<Item>) {
-        withContext(Dispatchers.IO) {
-            val entities = items.map { ModelToEntity.itemToItemEntity(it) }.toTypedArray()
-            itemDataSource.insertItems(*entities)
-        }
+        val entities = items.map { ModelToEntity.itemToItemEntity(it) }.toTypedArray()
+        itemDataSource.insertItems(*entities)
     }
 
     override suspend fun deleteAllItems() {
-        withContext(Dispatchers.IO) {
-            itemDataSource.deleteAllItems()
-        }
+        itemDataSource.deleteAllItems()
     }
 
 }

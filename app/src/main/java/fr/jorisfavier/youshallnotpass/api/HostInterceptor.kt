@@ -14,8 +14,9 @@ class HostInterceptor @Inject constructor() : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
-        host?.let {
-            val url = request.url.newBuilder().hostWithPort(it).build()
+        val hostValue = host
+        if (hostValue != null) {
+            val url = request.url.newBuilder().hostWithPort(hostValue).build()
             request = request.newBuilder().url(url).build()
         }
         return chain.proceed(request)

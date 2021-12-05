@@ -16,6 +16,7 @@ import fr.jorisfavier.youshallnotpass.databinding.ActivityAutofillBinding
 import fr.jorisfavier.youshallnotpass.ui.auth.AuthActivity
 import fr.jorisfavier.youshallnotpass.ui.item.ItemFragmentArgs
 import fr.jorisfavier.youshallnotpass.utils.extensions.findNavControllerFromFragmentContainerView
+import fr.jorisfavier.youshallnotpass.utils.observeEvent
 
 @RequiresApi(Build.VERSION_CODES.O)
 @AndroidEntryPoint
@@ -63,14 +64,12 @@ class AutofillActivity : AppCompatActivity() {
     }
 
     private fun initObservers() {
-        viewModel.appName.observe(this) { event ->
-            event.getContentIfNotHandled()?.let {
-                if (redirectToItemCreation) {
-                    navController.navigate(
-                        R.id.ItemFragment,
-                        ItemFragmentArgs(itemName = it).toBundle()
-                    )
-                }
+        viewModel.appName.observeEvent(this) { name ->
+            if (redirectToItemCreation) {
+                navController.navigate(
+                    R.id.ItemFragment,
+                    ItemFragmentArgs(itemName = name).toBundle()
+                )
             }
         }
     }

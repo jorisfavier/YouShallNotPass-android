@@ -11,6 +11,7 @@ import fr.jorisfavier.youshallnotpass.ui.settings.SettingsViewModel
 import io.mockk.*
 import junit.framework.TestCase
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
@@ -27,7 +28,8 @@ class SettingsViewModelTest {
     private val cryptoManager: CryptoManager = mockk()
     private val appPreferences: AppPreferenceDataSource = mockk()
     private val externalItemRepository: ExternalItemRepository = mockk()
-    private val viewModel = SettingsViewModel(appPreferences, itemRepository, externalItemRepository, cryptoManager)
+    private val viewModel =
+        SettingsViewModel(appPreferences, itemRepository, externalItemRepository, cryptoManager)
 
     private val fakeItem = Item(
         id = 1,
@@ -39,21 +41,25 @@ class SettingsViewModelTest {
     private val fakePassword = "fake password"
 
     @Test
-    fun `exportPassword without password should emit an Intent containing a file Uri`() = runBlocking {
-        //given
-        val externalItemSlot = slot<List<ExternalItem>>()
-        every { cryptoManager.decryptData(any(), any()) } returns fakePassword
-        coEvery { externalItemRepository.saveExternalItems(capture(externalItemSlot), null) } returns mockk()
-        coEvery { itemRepository.getAllItems() } returns listOf(fakeItem)
+    fun `exportPassword without password should emit an Intent containing a file Uri`() =
+        runBlocking {
+            //given
+            val externalItemSlot = slot<List<ExternalItem>>()
+            every { cryptoManager.decryptData(any(), any()) } returns fakePassword
+            coEvery {
+                externalItemRepository.saveExternalItems(capture(externalItemSlot),
+                    null)
+            } returns mockk()
+            coEvery { itemRepository.getAllItems() } returns flow { emit(listOf(fakeItem)) }
 
-        //when
-        viewModel.exportPasswords(null).first()
+            //when
+            viewModel.exportPasswords(null).first()
 
-        //then
-        TestCase.assertEquals(fakeItem.title, externalItemSlot.captured.first().title)
-        TestCase.assertEquals(fakeItem.login, externalItemSlot.captured.first().login)
-        TestCase.assertEquals(fakePassword, externalItemSlot.captured.first().password)
-    }
+            //then
+            TestCase.assertEquals(fakeItem.title, externalItemSlot.captured.first().title)
+            TestCase.assertEquals(fakeItem.login, externalItemSlot.captured.first().login)
+            TestCase.assertEquals(fakePassword, externalItemSlot.captured.first().password)
+        }
 
     @Test
     fun `exportPassword with password should emit an Intent containing a file Uri`() = runBlocking {
@@ -62,8 +68,13 @@ class SettingsViewModelTest {
         val passwordSlot = slot<String>()
         val filePassword = "test"
         every { cryptoManager.decryptData(any(), any()) } returns fakePassword
-        coEvery { externalItemRepository.saveExternalItems(capture(externalItemSlot), capture(passwordSlot)) } returns mockk()
-        coEvery { itemRepository.getAllItems() } returns listOf(fakeItem)
+        coEvery {
+            externalItemRepository.saveExternalItems(
+                capture(externalItemSlot),
+                capture(passwordSlot),
+            )
+        } returns mockk()
+        coEvery { itemRepository.getAllItems() } returns flow { emit(listOf(fakeItem)) }
 
         //when
         viewModel.exportPasswords(filePassword).first()
@@ -88,14 +99,15 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `deleteAllItems with an exception thrown from the repository should emit a failure`() = runBlocking {
-        //given
-        coEvery { itemRepository.deleteAllItems() } throws Exception()
+    fun `deleteAllItems with an exception thrown from the repository should emit a failure`() =
+        runBlocking {
+            //given
+            coEvery { itemRepository.deleteAllItems() } throws Exception()
 
-        //when
-        val result = viewModel.deleteAllItems().first()
+            //when
+            val result = viewModel.deleteAllItems().first()
 
-        //then
-        TestCase.assertTrue(result.isFailure)
-    }
+            //then
+            TestCase.assertTrue(result.isFailure)
+        }
 }

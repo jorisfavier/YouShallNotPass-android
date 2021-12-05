@@ -1,6 +1,7 @@
 package fr.jorisfavier.youshallnotpass.repository
 
 import fr.jorisfavier.youshallnotpass.model.Item
+import kotlinx.coroutines.flow.Flow
 
 interface ItemRepository {
 
@@ -8,7 +9,7 @@ interface ItemRepository {
      * Return all items stored in the app
      * @return a list of item
      */
-    suspend fun getAllItems(): List<Item>
+    fun getAllItems(): Flow<List<Item>>
 
     /***
      *  Search for an item based on his title

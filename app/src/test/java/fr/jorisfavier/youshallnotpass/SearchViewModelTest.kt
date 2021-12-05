@@ -62,7 +62,7 @@ class SearchViewModelTest {
             every { appPreferences.observeShouldHideItems() } returns flow {
                 emit(false)
             }
-            coEvery { itemRepository.getAllItems() } returns listOf()
+            coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
 
             //when
             viewModel.search.value = ""
@@ -83,7 +83,7 @@ class SearchViewModelTest {
         every { appPreferences.observeShouldHideItems() } returns flow {
             emit(true)
         }
-        coEvery { itemRepository.getAllItems() } returns listOf()
+        coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
 
         //when
         viewModel.hasNoResult.observeForever {}
@@ -104,6 +104,7 @@ class SearchViewModelTest {
             emit(false)
         }
         coEvery { itemRepository.getAllItems() } throws Exception()
+        coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
 
         //when
         viewModel.hasNoResult.observeForever {}
@@ -122,7 +123,7 @@ class SearchViewModelTest {
         every { appPreferences.observeShouldHideItems() } returns flow {
             emit(true)
         }
-        coEvery { itemRepository.getAllItems() } returns listOf()
+        coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
         coEvery { itemRepository.searchItem(any()) } returns listOf()
 
         //when
@@ -144,7 +145,7 @@ class SearchViewModelTest {
         every { appPreferences.observeShouldHideItems() } returns flow {
             emit(true)
         }
-        coEvery { itemRepository.getAllItems() } returns listOf()
+        coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
         coEvery { itemRepository.searchItem(any()) } returns listOf(fakeItem)
 
         //when
@@ -164,7 +165,7 @@ class SearchViewModelTest {
         every { appPreferences.observeShouldHideItems() } returns flow {
             emit(false)
         }
-        coEvery { itemRepository.getAllItems() } returns listOf(fakeItem)
+        coEvery { itemRepository.getAllItems() } returns flow { emit(listOf(fakeItem)) }
         coEvery { itemRepository.searchItem(any()) } throws Exception()
 
         //when
@@ -185,7 +186,7 @@ class SearchViewModelTest {
             emit(true)
             emit(false)
         }
-        coEvery { itemRepository.getAllItems() } returns listOf(fakeItem)
+        coEvery { itemRepository.getAllItems() } returns flow { emit(listOf(fakeItem)) }
 
         //when
         viewModel.results.observeForever { }
@@ -202,7 +203,10 @@ class SearchViewModelTest {
         every { appPreferences.observeShouldHideItems() } returns flow {
             emit(false)
         }
-        coEvery { itemRepository.getAllItems() } returnsMany listOf(listOf(), listOf(fakeItem))
+        coEvery { itemRepository.getAllItems() } returns flow {
+            emit(emptyList<Item>())
+            emit(listOf(fakeItem))
+        }
 
         //when
         viewModel.results.observeForever { }
@@ -224,6 +228,7 @@ class SearchViewModelTest {
         every { cryptoManager.decryptData(any(), any()) } returns fakePassword
         every { clipboardManager.setPrimaryClip(any()) } just runs
         every { ClipData.newPlainText(any(), capture(slot)) } returns mockk()
+        coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
         //when
         val result = viewModel.copyToClipboard(fakeItem, ItemDataType.LOGIN)
 
@@ -244,6 +249,7 @@ class SearchViewModelTest {
         every { cryptoManager.decryptData(any(), any()) } returns fakePassword
         every { clipboardManager.setPrimaryClip(any()) } just runs
         every { ClipData.newPlainText(any(), capture(slot)) } returns mockk()
+        coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
         //when
         val result = viewModel.copyToClipboard(fakeItem, ItemDataType.PASSWORD)
 
@@ -261,6 +267,8 @@ class SearchViewModelTest {
         }
         every { cryptoManager.decryptData(any(), any()) } throws Exception()
         every { clipboardManager.setPrimaryClip(any()) } just runs
+        coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
+
         //when
         val result = viewModel.copyToClipboard(fakeItem, ItemDataType.PASSWORD)
 
@@ -278,6 +286,7 @@ class SearchViewModelTest {
                 emit(false)
             }
             coEvery { itemRepository.deleteItem(any()) } just runs
+            coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
             //when
             val result = viewModel.deleteItem(fakeItem).first()
 
@@ -293,6 +302,7 @@ class SearchViewModelTest {
                 emit(false)
             }
             coEvery { itemRepository.deleteItem(any()) } throws Exception()
+            coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
             //when
             val result = viewModel.deleteItem(fakeItem).first()
 
@@ -309,6 +319,7 @@ class SearchViewModelTest {
             }
             val slot = slot<String>()
             coEvery { desktopRepository.sendData(capture(slot)) } just runs
+            coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
             //when
             val result = viewModel.sendToDesktop(fakeItem, ItemDataType.LOGIN).first()
 
@@ -327,6 +338,7 @@ class SearchViewModelTest {
             val slot = slot<String>()
             coEvery { desktopRepository.sendData(capture(slot)) } just runs
             every { cryptoManager.decryptData(any(), any()) } returns fakePassword
+            coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
             //when
             val result = viewModel.sendToDesktop(fakeItem, ItemDataType.PASSWORD).first()
 
@@ -344,6 +356,8 @@ class SearchViewModelTest {
             }
             coEvery { desktopRepository.sendData(any()) } just runs
             every { cryptoManager.decryptData(any(), any()) } throws Exception()
+            coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
+
             //when
             val result = viewModel.sendToDesktop(fakeItem, ItemDataType.PASSWORD).first()
 
@@ -361,6 +375,7 @@ class SearchViewModelTest {
                 emit(false)
             }
             coEvery { desktopRepository.sendData(any()) } throws Exception()
+            coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
             //when
             val result = viewModel.sendToDesktop(fakeItem, ItemDataType.LOGIN).first()
 

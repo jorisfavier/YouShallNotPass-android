@@ -20,25 +20,24 @@ class DesktopConnectionViewModel @Inject constructor(private val desktopReposito
     fun onCodeFound(code: String?) {
         //If we already found a valid code no need to go through the logic again
         if (_qrCodeAnalyseState.value is State.Success) return
+        val qrCode = code ?: return
 
-        code?.let { qrCode ->
-            _qrCodeAnalyseState.value = State.Loading
-            val elements = qrCode.split("#ysnp#")
-            val ipRegex = "(\\d+\\.){3}\\d+(:\\d{4})?".toRegex()
-            if (elements.size == 2 && elements[0].matches(ipRegex) && elements[1].contains("KEY")) {
-                viewModelScope.launch {
-                    kotlin.runCatching {
-                        desktopRepository.updateDesktopInfo(
-                            "http://" + elements[0],
-                            cleanUpKey(elements[1])
-                        )
-                    }
-                        .onSuccess { _qrCodeAnalyseState.value = State.Success(Unit) }
-                        .onFailure { _qrCodeAnalyseState.value = State.Error }
+        _qrCodeAnalyseState.value = State.Loading
+        val elements = qrCode.split("#ysnp#")
+        val ipRegex = "(\\d+\\.){3}\\d+(:\\d{4})?".toRegex()
+        if (elements.size == 2 && elements[0].matches(ipRegex) && elements[1].contains("KEY")) {
+            viewModelScope.launch {
+                kotlin.runCatching {
+                    desktopRepository.updateDesktopInfo(
+                        "http://" + elements[0],
+                        cleanUpKey(elements[1])
+                    )
                 }
-            } else {
-                _qrCodeAnalyseState.value = State.Error
+                    .onSuccess { _qrCodeAnalyseState.value = State.Success(Unit) }
+                    .onFailure { _qrCodeAnalyseState.value = State.Error }
             }
+        } else {
+            _qrCodeAnalyseState.value = State.Error
         }
     }
 
