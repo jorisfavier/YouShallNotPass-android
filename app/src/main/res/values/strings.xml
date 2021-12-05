@@ -43,6 +43,7 @@
     <string name="ysnp_file">YSNP file</string>
     <string name="ysnp_export_explanation">The file exported with this option will be encrypted and only readable from the YSNP app.</string>
     <string name="export">Export</string>
+    <string name="export_in_progress">Export in progress</string>
     <string name="password">Password</string>
     <string name="import_items">Import items</string>
     <string name="import_step1">You can import items from csv and ysnp file.</string>

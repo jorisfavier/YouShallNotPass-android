@@ -7,8 +7,10 @@ import fr.jorisfavier.youshallnotpass.data.impl.ExternalItemDataSourceImpl
 import fr.jorisfavier.youshallnotpass.data.model.ItemDto
 import fr.jorisfavier.youshallnotpass.manager.ContentResolverManager
 import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
+import fr.jorisfavier.youshallnotpass.utils.CoroutineDispatchers
 import io.mockk.*
 import junit.framework.TestCase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Rule
@@ -24,10 +26,14 @@ class ExternalItemDataSourceImplTest {
 
     private val appContext: Context = mockk()
     private val contentResolver: ContentResolverManager = mockk()
-    private val dataSource = ExternalItemDataSourceImpl(appContext, contentResolver)
-    private val fakeItemDto = ItemDto(title = "FakeTitle", login = "fakeLogin", password = "fakePassword")
-    private val fakeItemDtoWithUrl = ItemDto(title = "Test", login = "fakeLogin", password = "fakePassword")
-    private val fakeItemDtoWithLocalUrl = ItemDto(title = "Http://localhost:8080", login = "fakeLogin", password = "fakePassword")
+    private val dataSource =
+        ExternalItemDataSourceImpl(appContext, contentResolver, Dispatchers.Main)
+    private val fakeItemDto =
+        ItemDto(title = "FakeTitle", login = "fakeLogin", password = "fakePassword")
+    private val fakeItemDtoWithUrl =
+        ItemDto(title = "Test", login = "fakeLogin", password = "fakePassword")
+    private val fakeItemDtoWithLocalUrl =
+        ItemDto(title = "Http://localhost:8080", login = "fakeLogin", password = "fakePassword")
 
     private val onePasswordExport = listOf(
         "\"Notes\",\"Password\",\"Title\",\"Type\",\"URL\",\"Username\",\n",
@@ -86,7 +92,8 @@ class ExternalItemDataSourceImplTest {
         TestCase.assertTrue(fileContent.isNotEmpty())
         TestCase.assertEquals(3, lines.size)
         TestCase.assertEquals("title,username,password", lines[0])
-        TestCase.assertEquals("${fakeItemDto.title},${fakeItemDto.login},${fakeItemDto.password}", lines[1])
+        TestCase.assertEquals("${fakeItemDto.title},${fakeItemDto.login},${fakeItemDto.password}",
+            lines[1])
     }
 
     @Test

@@ -8,6 +8,7 @@ import fr.jorisfavier.youshallnotpass.model.ExternalItem
 import fr.jorisfavier.youshallnotpass.repository.ExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.mapper.DtoToModel
 import fr.jorisfavier.youshallnotpass.repository.mapper.ModelToDto
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
@@ -17,10 +18,11 @@ import kotlinx.serialization.json.Json
 class ExternalItemRepositoryImpl(
     private val externalItemDataSource: ExternalItemDataSource,
     private val cryptoManager: CryptoManager,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : ExternalItemRepository {
 
     override suspend fun saveExternalItems(items: List<ExternalItem>, password: String?): Uri {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val itemsToSave = items.map { ModelToDto.externalItemToItemDto(it) }
             if (password != null) {
                 val itemsJson = Json.encodeToString(itemsToSave)
@@ -37,7 +39,7 @@ class ExternalItemRepositoryImpl(
 
 
     override suspend fun getExternalItemsFromUri(uri: Uri, password: String?): List<ExternalItem> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val items = if (password != null) {
                 val encryptedData = externalItemDataSource.getDataFromYsnpFile(uri)
                 val decrypted = cryptoManager.decryptDataWithPassword(password, encryptedData)

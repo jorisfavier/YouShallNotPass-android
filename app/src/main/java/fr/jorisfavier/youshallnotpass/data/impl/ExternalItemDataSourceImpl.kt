@@ -11,6 +11,7 @@ import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.utils.FileUtil
 import fr.jorisfavier.youshallnotpass.utils.extensions.firstNotNull
 import fr.jorisfavier.youshallnotpass.utils.extensions.getDomainIfUrl
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -20,11 +21,12 @@ import javax.inject.Inject
 
 class ExternalItemDataSourceImpl @Inject constructor(
     private val appContext: Context,
-    private val contentResolver: ContentResolverManager
+    private val contentResolver: ContentResolverManager,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : ExternalItemDataSource {
 
     override suspend fun saveToCsv(items: List<ItemDto>): Uri {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val res = StringBuilder()
             res.append("title,username,password\n")
             items.forEach {
@@ -43,7 +45,7 @@ class ExternalItemDataSourceImpl @Inject constructor(
     }
 
     override suspend fun saveToYsnpFile(data: ByteArray): Uri {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val exportPath = appContext.getExternalFilesDir(EXPORT_FOLDER)
             val file = File(exportPath, YSNP_EXPORT_NAME)
             file.writeBytes(data)
@@ -52,14 +54,14 @@ class ExternalItemDataSourceImpl @Inject constructor(
     }
 
     override suspend fun isTextFile(uri: Uri): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val mimeType = contentResolver.getMimeType(uri)
             return@withContext FileUtil.isTextFile(mimeType)
         }
     }
 
     override suspend fun getItemsFromTextFile(uri: Uri): List<ItemDto> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val items = mutableListOf<ItemDto>()
             val fileContent = contentResolver.getFileContent(uri)
             var passwordIndex: Int? = null

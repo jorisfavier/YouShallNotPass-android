@@ -1,18 +1,23 @@
 package fr.jorisfavier.youshallnotpass.ui.settings
 
 import android.app.Activity
+import android.app.ProgressDialog
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.view.autofill.AutofillManager
+import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.setPadding
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -23,6 +28,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import fr.jorisfavier.youshallnotpass.BuildConfig
 import fr.jorisfavier.youshallnotpass.R
@@ -30,6 +36,7 @@ import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.HID
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.THEME_PREFERENCE_KEY
 import fr.jorisfavier.youshallnotpass.ui.common.BlinkPreference
 import fr.jorisfavier.youshallnotpass.ui.home.HomeViewModel
+import fr.jorisfavier.youshallnotpass.utils.extensions.dp
 import fr.jorisfavier.youshallnotpass.utils.extensions.getEntryforValue
 import fr.jorisfavier.youshallnotpass.utils.extensions.toast
 import kotlinx.coroutines.flow.collect
@@ -210,7 +217,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun exportPasswords(password: String?) {
         lifecycleScope.launchWhenStarted {
+            val dialog = ProgressDialog(requireContext(),
+                R.style.ThemeOverlay_YouShallNotPass_ProgressDialog).apply {
+                isIndeterminate = true
+                setMessage(getString(R.string.export_in_progress))
+                setCancelable(false)
+                show()
+            }
             viewModel.exportPasswords(password).collect {
+                dialog.dismiss()
                 if (it.isFailure) {
                     context?.toast(R.string.password_export_failed)
                 } else {

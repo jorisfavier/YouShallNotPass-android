@@ -12,11 +12,8 @@ import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.model.ExternalItem
 import fr.jorisfavier.youshallnotpass.repository.ExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
+import fr.jorisfavier.youshallnotpass.utils.CoroutineDispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
@@ -27,6 +24,7 @@ class SettingsViewModel @Inject constructor(
     private val itemRepository: ItemRepository,
     private val externalItemRepository: ExternalItemRepository,
     private val cryptoManager: CryptoManager,
+    private val dispatchers: CoroutineDispatchers,
 ) : ViewModel() {
 
     val themeValues: Array<String>
@@ -69,20 +67,18 @@ class SettingsViewModel @Inject constructor(
 
     fun exportPasswords(password: String?): Flow<Result<Intent>> {
         return flow {
-            withContext(Dispatchers.IO) {
-                val intent = Intent(Intent.ACTION_SEND)
-                intent.type = "*/*"
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                val items = itemRepository.getAllItems().first().map {
-                    val itemPassword =
-                        cryptoManager.decryptData(it.password, it.initializationVector)
-                    ExternalItem(it.title, it.login, itemPassword)
-                }
-                val uri = externalItemRepository.saveExternalItems(items, password)
-                intent.putExtra(Intent.EXTRA_STREAM, uri)
-                emit(Result.success(intent))
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.type = "plain/text"
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            val items = itemRepository.getAllItems().first().map {
+                val itemPassword =
+                    cryptoManager.decryptData(it.password, it.initializationVector)
+                ExternalItem(it.title, it.login, itemPassword)
             }
-        }.catch { e ->
+            val uri = externalItemRepository.saveExternalItems(items, password)
+            intent.putExtra(Intent.EXTRA_STREAM, uri)
+            emit(Result.success(intent))
+        }.flowOn(dispatchers.io).catch { e ->
             Timber.e(e, "Error while exporting items")
             emit(Result.failure(e))
         }

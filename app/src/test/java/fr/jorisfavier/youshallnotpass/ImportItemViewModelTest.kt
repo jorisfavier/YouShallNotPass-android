@@ -12,10 +12,12 @@ import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemViewModel
 import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemViewModel.Companion.PASSWORD_NEEDED_SLIDE
 import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemViewModel.Companion.REVIEW_ITEM_SLIDE
 import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemViewModel.Companion.SUCCESS_FAIL_SLIDE
+import fr.jorisfavier.youshallnotpass.utils.CoroutineDispatchers
 import fr.jorisfavier.youshallnotpass.utils.State
 import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
 import io.mockk.*
 import junit.framework.TestCase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
@@ -31,8 +33,17 @@ class ImportItemViewModelTest {
     private val itemRepository: ItemRepository = mockk()
     private val cryptoManager: CryptoManager = mockk()
     private val externalItemRepository: ExternalItemRepository = mockk()
-    private val viewModel =
-        ImportItemViewModel(externalItemRepository, cryptoManager, itemRepository)
+    private val coroutineDispatchers = CoroutineDispatchers(
+        default = Dispatchers.Main,
+        io = Dispatchers.Main,
+        unconfined = Dispatchers.Main,
+    )
+    private val viewModel = ImportItemViewModel(
+        externalItemRepository,
+        cryptoManager,
+        itemRepository,
+        coroutineDispatchers,
+    )
 
     private val fakeItem = ExternalItem(
         title = "Test title",
@@ -242,7 +253,6 @@ class ImportItemViewModelTest {
             viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
             viewModel.importedItems.value?.forEach { it.selected = true }
             viewModel.onSlideChanged(SUCCESS_FAIL_SLIDE)
-            delay(3000)
             //then
             TestCase.assertEquals(2, states.size)
             TestCase.assertTrue(states[0] is State.Loading)

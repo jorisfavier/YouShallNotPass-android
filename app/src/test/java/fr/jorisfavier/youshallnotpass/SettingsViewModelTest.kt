@@ -8,8 +8,10 @@ import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.repository.ExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.settings.SettingsViewModel
+import fr.jorisfavier.youshallnotpass.utils.CoroutineDispatchers
 import io.mockk.*
 import junit.framework.TestCase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
@@ -28,8 +30,18 @@ class SettingsViewModelTest {
     private val cryptoManager: CryptoManager = mockk()
     private val appPreferences: AppPreferenceDataSource = mockk()
     private val externalItemRepository: ExternalItemRepository = mockk()
-    private val viewModel =
-        SettingsViewModel(appPreferences, itemRepository, externalItemRepository, cryptoManager)
+    private val coroutineDispatchers = CoroutineDispatchers(
+        default = Dispatchers.Main,
+        io = Dispatchers.Main,
+        unconfined = Dispatchers.Main,
+    )
+    private val viewModel = SettingsViewModel(
+        appPreferences,
+        itemRepository,
+        externalItemRepository,
+        cryptoManager,
+        coroutineDispatchers,
+    )
 
     private val fakeItem = Item(
         id = 1,

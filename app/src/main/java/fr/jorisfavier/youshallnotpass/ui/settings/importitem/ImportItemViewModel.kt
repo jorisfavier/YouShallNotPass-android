@@ -11,12 +11,10 @@ import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.repository.ExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.settings.importitem.review.ExternalItemViewModel
+import fr.jorisfavier.youshallnotpass.utils.CoroutineDispatchers
 import fr.jorisfavier.youshallnotpass.utils.Event
 import fr.jorisfavier.youshallnotpass.utils.State
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -25,6 +23,7 @@ class ImportItemViewModel @Inject constructor(
     private val externalItemRepository: ExternalItemRepository,
     private val cryptoManager: CryptoManager,
     private val itemRepository: ItemRepository,
+    private val dispatchers: CoroutineDispatchers,
 ) : ViewModel() {
 
     private val _navigate = MutableLiveData<Event<Unit>>()
@@ -120,7 +119,7 @@ class ImportItemViewModel @Inject constructor(
         }
         _importItemsState.value = State.Loading
         viewModelScope.launch(exceptionHandler) {
-            withContext(Dispatchers.IO) {
+            withContext(dispatchers.io) {
                 val itemsToImport = _importedItems.value
                     ?.asSequence()
                     ?.filter { it.selected }

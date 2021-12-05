@@ -88,5 +88,6 @@
     <string name="create_new_item">Créer un item</string>
     <string name="privacy_policy">Politique de confidentialité</string>
     <string name="error_desktop_transmission">Un erreur s\'est produite. Vos appareils sont-ils bien connectés au même réseau wifi ?</string>
+    <string name="export_in_progress">Exportation en cours</string>
 
 </resources>

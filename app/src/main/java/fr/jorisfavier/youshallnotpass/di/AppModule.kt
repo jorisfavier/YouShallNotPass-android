@@ -10,6 +10,7 @@ import androidx.preference.PreferenceManager
 import androidx.room.Room
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,6 +37,7 @@ import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.repository.impl.DesktopRepositoryImpl
 import fr.jorisfavier.youshallnotpass.repository.impl.ExternalItemRepositoryImpl
 import fr.jorisfavier.youshallnotpass.repository.impl.ItemRepositoryImpl
+import fr.jorisfavier.youshallnotpass.utils.CoroutineDispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
@@ -107,8 +109,13 @@ object AppModule {
         sharedPreferences: SharedPreferences,
         @Named("SecuredSharedPreferences")
         securedSharedPreferences: SharedPreferences,
+        coroutineDispatcher: CoroutineDispatchers,
     ): AppPreferenceDataSource {
-        return AppPreferenceDataSourceImpl(sharedPreferences, securedSharedPreferences)
+        return AppPreferenceDataSourceImpl(
+            sharedPreferences,
+            securedSharedPreferences,
+            coroutineDispatcher.io,
+        )
     }
 
     @Singleton
@@ -116,8 +123,13 @@ object AppModule {
     fun provideExternalItemDataSource(
         app: Application,
         contentResolver: ContentResolverManager,
+        coroutineDispatcher: CoroutineDispatchers,
     ): ExternalItemDataSource {
-        return ExternalItemDataSourceImpl(app.applicationContext, contentResolver)
+        return ExternalItemDataSourceImpl(
+            app.applicationContext,
+            contentResolver,
+            coroutineDispatcher.io,
+        )
     }
 
     @Singleton
@@ -125,14 +137,25 @@ object AppModule {
     fun provideExternalItemRepository(
         externalItemDataSource: ExternalItemDataSource,
         cryptoManager: CryptoManager,
+        coroutineDispatcher: CoroutineDispatchers,
     ): ExternalItemRepository {
-        return ExternalItemRepositoryImpl(externalItemDataSource, cryptoManager)
+        return ExternalItemRepositoryImpl(
+            externalItemDataSource,
+            cryptoManager,
+            coroutineDispatcher.io,
+        )
     }
 
     @Singleton
     @Provides
-    fun provideContentResolver(app: Application): ContentResolverManager {
-        return ContentResolverManagerImpl(app.contentResolver)
+    fun provideContentResolver(
+        app: Application,
+        coroutineDispatcher: CoroutineDispatchers,
+    ): ContentResolverManager {
+        return ContentResolverManagerImpl(
+            app.contentResolver,
+            coroutineDispatcher.io,
+        )
     }
 
     @Singleton
@@ -233,4 +256,9 @@ object AppModule {
         return YSNPAnalyticsImpl(api = analyticsApi)
     }
 
+    @Singleton
+    @Provides
+    fun provideCoroutineDispatchers(): CoroutineDispatchers {
+        return CoroutineDispatchers()
+    }
 }

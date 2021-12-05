@@ -7,7 +7,7 @@ import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.DES
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.DESKTOP_KEY_PREFERENCE_KEY
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.HIDE_ITEMS_PREFERENCE_KEY
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.THEME_PREFERENCE_KEY
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onSubscription
@@ -15,7 +15,8 @@ import kotlinx.coroutines.withContext
 
 class AppPreferenceDataSourceImpl(
     private val sharedPreferences: SharedPreferences,
-    private val securedSharedPreferences: SharedPreferences
+    private val securedSharedPreferences: SharedPreferences,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : AppPreferenceDataSource {
 
     private val _shouldHideItems = MutableStateFlow(false)
@@ -32,20 +33,20 @@ class AppPreferenceDataSourceImpl(
     }
 
     override suspend fun getTheme(): String? {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             sharedPreferences.getString(THEME_PREFERENCE_KEY, null)
         }
     }
 
     override suspend fun setTheme(theme: String) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             sharedPreferences.edit(commit = true) { putString(THEME_PREFERENCE_KEY, theme) }
         }
     }
 
     override fun observeShouldHideItems(): Flow<Boolean> {
         return _shouldHideItems.onSubscription {
-            withContext(Dispatchers.IO) {
+            withContext(ioDispatcher) {
                 _shouldHideItems.value =
                     sharedPreferences.getBoolean(HIDE_ITEMS_PREFERENCE_KEY, false)
             }
@@ -53,20 +54,20 @@ class AppPreferenceDataSourceImpl(
     }
 
     override suspend fun setShouldHideItems(hide: Boolean) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             sharedPreferences.edit(commit = true) { putBoolean(HIDE_ITEMS_PREFERENCE_KEY, hide) }
             _shouldHideItems.value = hide
         }
     }
 
     override suspend fun getDesktopAddress(): String? {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             sharedPreferences.getString(DESKTOP_ADDRESS_PREFERENCE_KEY, null)
         }
     }
 
     override suspend fun setDesktopAddress(address: String) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             sharedPreferences.edit(commit = true) {
                 putString(
                     DESKTOP_ADDRESS_PREFERENCE_KEY,
@@ -77,7 +78,7 @@ class AppPreferenceDataSourceImpl(
     }
 
     override suspend fun setDesktopPublicKey(key: String) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             securedSharedPreferences.edit(commit = true) {
                 putString(
                     DESKTOP_KEY_PREFERENCE_KEY,
@@ -88,7 +89,7 @@ class AppPreferenceDataSourceImpl(
     }
 
     override suspend fun getDesktopPublicKey(): String? {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             securedSharedPreferences.getString(DESKTOP_KEY_PREFERENCE_KEY, null)
         }
     }
