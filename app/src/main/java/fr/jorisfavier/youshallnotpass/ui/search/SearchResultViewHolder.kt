@@ -1,7 +1,11 @@
 package fr.jorisfavier.youshallnotpass.ui.search
 
 import android.animation.ValueAnimator
+import android.graphics.Rect
 import android.text.InputType
+import android.text.method.PasswordTransformationMethod
+import android.text.method.TransformationMethod
+import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.core.animation.doOnStart
 import androidx.core.view.updatePadding
@@ -45,6 +49,7 @@ class SearchResultViewHolder(
             isExpanded = false
             item = result
             hasLoginField = result.hasLogin
+            searchResultItemPassword.transformationMethod = PasswordTransformationMethod()
             searchResultItemShowHideButton.setOnClickListener {
                 decryptPassword(result)
                     .onSuccess { togglePasswordVisibility(it) }
@@ -125,13 +130,12 @@ class SearchResultViewHolder(
             var text = view.context.getText(R.string.item_password)
             if (isPasswordVisible) {
                 text = password
-                searchResultItemPassword.inputType =
-                    InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                searchResultItemPassword.transformationMethod = null
             } else {
-                searchResultItemPassword.inputType =
-                    InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_VARIATION_PASSWORD
+                searchResultItemPassword.transformationMethod = PasswordTransformationMethod()
             }
             searchResultItemPassword.text = text
+            searchResultItemPassword.requestLayout()
         }
     }
 

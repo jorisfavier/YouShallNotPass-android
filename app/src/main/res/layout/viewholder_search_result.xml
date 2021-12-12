@@ -105,12 +105,15 @@
 
                     <TextView
                         android:id="@+id/search_result_item_password"
-                        android:layout_width="wrap_content"
-                        android:layout_height="0dp"
-                        android:inputType="textPassword"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="5dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
                         android:text="@string/item_password"
                         android:textAppearance="?attr/textAppearanceBody1"
                         app:layout_constraintBaseline_toBaselineOf="@id/search_result_item_copy_password_button"
+                        app:layout_constraintEnd_toStartOf="@id/search_result_item_password_desktop_button"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/search_result_item_password_title" />
 
