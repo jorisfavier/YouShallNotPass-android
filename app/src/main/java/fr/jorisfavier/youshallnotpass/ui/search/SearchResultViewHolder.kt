@@ -7,6 +7,7 @@ import android.text.method.PasswordTransformationMethod
 import android.text.method.TransformationMethod
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
+import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.RecyclerView
@@ -35,6 +36,8 @@ class SearchResultViewHolder(
 
     private val detailHeight
         get() = if (hasLoginField) DETAIL_HEIGHT_WITH_LOGIN else DETAIL_HEIGHT_WITHOUT_LOGIN
+
+    private var isAnimating = false
 
     fun bind(
         result: Item,
@@ -90,6 +93,7 @@ class SearchResultViewHolder(
     }
 
     fun toggleViewState(expand: Boolean, animate: Boolean = true) {
+        if (isAnimating) return
         val currentHeight = binding.searchResultItemCard.measuredHeight
         val currentSidePadding = binding.searchResultMainContainer.paddingStart
         val coeff = if (expand) 1f else -1f
@@ -119,7 +123,9 @@ class SearchResultViewHolder(
                         binding.searchResultItemDetail.fadeOut(animationDuration)
                     }
                 }
+                doOnEnd { isAnimating = false }
             }
+            isAnimating = true
             anim.start()
         }
     }
