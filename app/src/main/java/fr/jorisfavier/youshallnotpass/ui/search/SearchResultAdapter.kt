@@ -13,10 +13,14 @@ class SearchResultAdapter(
     private val onDeleteItemClicked: (Item) -> Unit,
     private val decryptPassword: (Item) -> Result<String>,
     private val copyPasswordToClipboard: (Item, ItemDataType) -> Unit,
-    private val sendToDesktop: (Item, ItemDataType) -> Unit
+    private val sendToDesktop: (Item, ItemDataType) -> Unit,
 ) : ListAdapter<Item, RecyclerView.ViewHolder>(Item.diffCallback) {
 
-    private var lastExpandedViewHolder: SearchResultViewHolder? = null
+    sealed class Payload {
+        data class Selection(val selectedId: Int) : Payload()
+    }
+
+    private var lastSelectedId: Int? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val binding = ViewholderSearchResultBinding.inflate(
@@ -29,27 +33,37 @@ class SearchResultAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val holder = holder as? SearchResultViewHolder ?: return
+        val item = getItem(position)
         holder.bind(
-            getItem(position),
-            onItemEditClicked,
-            onDeleteItemClicked,
-            decryptPassword,
-            copyPasswordToClipboard,
-            sendToDesktop
+            result = getItem(position),
+            isSelected = lastSelectedId == item.id,
+            onEditItemClicked = onItemEditClicked,
+            onDeleteItemClicked = onDeleteItemClicked,
+            decryptPassword = decryptPassword,
+            copyToClipboard = copyPasswordToClipboard,
+            sendToDesktop = sendToDesktop,
         )
         holder.itemView.setOnClickListener {
-            if (lastExpandedViewHolder != holder) {
-                lastExpandedViewHolder?.toggleViewState(false)
-            }
-            lastExpandedViewHolder = holder
-            holder.toggleViewState(!holder.isExpanded)
+            val itemId = if (item.id == lastSelectedId) 0 else item.id
+            lastSelectedId = itemId
+            notifyItemRangeChanged(0, itemCount, Payload.Selection(itemId))
         }
     }
 
-    fun removeItem(item: Item) {
-        val newList = currentList.toMutableList().apply {
-            remove(item)
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: MutableList<Any>,
+    ) {
+        val holder = holder as? SearchResultViewHolder ?: return
+        val item = getItem(position)
+        val payload = payloads.firstOrNull() as? Payload
+        if (payload != null) {
+            when (payload) {
+                is Payload.Selection -> holder.bindSelection(item.id == payload.selectedId)
+            }
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
         }
-        submitList(newList)
     }
 }

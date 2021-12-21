@@ -28,9 +28,7 @@ class SearchResultViewHolder(
     var view = itemView
         private set
 
-    var isExpanded = false
-        private set
-
+    private var isExpanded = false
     private var isPasswordVisible = false
     private var hasLoginField = false
 
@@ -41,6 +39,7 @@ class SearchResultViewHolder(
 
     fun bind(
         result: Item,
+        isSelected: Boolean,
         onEditItemClicked: (Item) -> Unit,
         onDeleteItemClicked: (Item) -> Unit,
         decryptPassword: (Item) -> Result<String>,
@@ -48,8 +47,7 @@ class SearchResultViewHolder(
         sendToDesktop: (Item, ItemDataType) -> Unit,
     ) {
         with(binding) {
-            toggleViewState(false, animate = false)
-            isExpanded = false
+            toggleViewState(isSelected, animate = false)
             item = result
             hasLoginField = result.hasLogin
             searchResultItemPassword.transformationMethod = PasswordTransformationMethod()
@@ -92,7 +90,11 @@ class SearchResultViewHolder(
         }
     }
 
-    fun toggleViewState(expand: Boolean, animate: Boolean = true) {
+    fun bindSelection(isSelected: Boolean) {
+        toggleViewState(expand = isSelected)
+    }
+
+    private fun toggleViewState(expand: Boolean, animate: Boolean = true) {
         if (isAnimating) return
         val currentHeight = binding.searchResultItemCard.measuredHeight
         val currentSidePadding = binding.searchResultMainContainer.paddingStart

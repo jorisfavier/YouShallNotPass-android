@@ -59,7 +59,6 @@ class SearchFragment : SearchBaseFragment() {
                     viewModel.deleteItem(item).collect {
                         var message = R.string.error_occurred
                         if (it.isSuccess) {
-                            searchAdapter.removeItem(item)
                             message = R.string.delete_success
                         }
                         Toast.makeText(context, getString(message), Toast.LENGTH_LONG).show()
