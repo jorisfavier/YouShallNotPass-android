@@ -73,7 +73,9 @@ class SearchViewModel(
                     emit(State.Success(listOf()))
                 }
             }
-        }.asLiveData().debounce(duration = debounceDurationMs, coroutineScope = viewModelScope)
+        }
+        .asLiveData(timeoutInMs = 0)
+        .debounce(duration = debounceDurationMs, coroutineScope = viewModelScope)
 
     override val hasNoResult: LiveData<Boolean> = results.map { state ->
         state is State.Success && state.value.count() == 0
