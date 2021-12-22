@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.jorisfavier.youshallnotpass.analytics.ScreenName
 import fr.jorisfavier.youshallnotpass.analytics.YSNPAnalytics
 import fr.jorisfavier.youshallnotpass.manager.AuthManager
+import fr.jorisfavier.youshallnotpass.model.Frequency
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -48,7 +49,7 @@ class HomeViewModel @Inject constructor(
 
     fun trackScreenView() {
         viewModelScope.launch {
-            analytics.trackScreenView(ScreenName.Home)
+            analytics.trackScreenView(ScreenName.Home, Frequency.DAILY)
         }
     }
 

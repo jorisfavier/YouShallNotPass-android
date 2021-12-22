@@ -252,8 +252,14 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideAnalytics(analyticsApi: AnalyticsApi): YSNPAnalytics {
-        return YSNPAnalyticsImpl(api = analyticsApi)
+    fun provideAnalytics(
+        analyticsApi: AnalyticsApi,
+        appPreferenceDataSource: AppPreferenceDataSource,
+    ): YSNPAnalytics {
+        return YSNPAnalyticsImpl(
+            api = analyticsApi,
+            appPreferenceDataSource = appPreferenceDataSource,
+        )
     }
 
     @Singleton

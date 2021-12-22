@@ -1,6 +1,8 @@
 package fr.jorisfavier.youshallnotpass.data
 
+import fr.jorisfavier.youshallnotpass.analytics.ScreenName
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDateTime
 
 interface AppPreferenceDataSource {
     /**
@@ -48,6 +50,19 @@ interface AppPreferenceDataSource {
      * @return null if unknown
      */
     suspend fun getDesktopPublicKey(): String?
+
+    /**
+     * Save a date for a given screenName
+     * @param screenName the analytic screen name
+     * @param date the date when the event was sent
+     */
+    suspend fun setAnalyticEventDate(screenName: ScreenName, date: LocalDateTime)
+
+    /**
+     * Retrieve the date for an analytic screen name
+     * @return the date when the event was sent or null if not found
+     */
+    suspend fun getAnalyticEventDate(screenName: ScreenName): LocalDateTime?
 
     companion object {
         const val THEME_PREFERENCE_KEY = "theme"

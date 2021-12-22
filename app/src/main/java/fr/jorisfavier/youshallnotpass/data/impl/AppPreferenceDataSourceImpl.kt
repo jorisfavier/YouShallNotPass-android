@@ -2,6 +2,7 @@ package fr.jorisfavier.youshallnotpass.data.impl
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import fr.jorisfavier.youshallnotpass.analytics.ScreenName
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.DESKTOP_ADDRESS_PREFERENCE_KEY
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.DESKTOP_KEY_PREFERENCE_KEY
@@ -12,6 +13,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.util.*
 
 class AppPreferenceDataSourceImpl(
     private val sharedPreferences: SharedPreferences,
@@ -91,6 +95,21 @@ class AppPreferenceDataSourceImpl(
     override suspend fun getDesktopPublicKey(): String? {
         return withContext(ioDispatcher) {
             securedSharedPreferences.getString(DESKTOP_KEY_PREFERENCE_KEY, null)
+        }
+    }
+
+    override suspend fun setAnalyticEventDate(screenName: ScreenName, date: LocalDateTime) {
+        withContext(ioDispatcher) {
+            sharedPreferences.edit(commit = true) {
+                putLong(screenName.event, date.toEpochSecond(ZoneOffset.UTC))
+            }
+        }
+    }
+
+    override suspend fun getAnalyticEventDate(screenName: ScreenName): LocalDateTime? {
+        return withContext(ioDispatcher) {
+            val time = sharedPreferences.getLong(screenName.event, 0)
+            if (time != 0L) LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.UTC) else null
         }
     }
 
