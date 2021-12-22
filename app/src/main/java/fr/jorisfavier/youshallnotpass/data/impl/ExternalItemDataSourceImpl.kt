@@ -11,6 +11,7 @@ import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.utils.FileUtil
 import fr.jorisfavier.youshallnotpass.utils.extensions.firstNotNull
 import fr.jorisfavier.youshallnotpass.utils.extensions.getDomainIfUrl
+import fr.jorisfavier.youshallnotpass.utils.extensions.titleCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -75,7 +76,7 @@ class ExternalItemDataSourceImpl @Inject constructor(
                 if (i == 0) {
                     lineContent
                         .asSequence()
-                        .map { it.toLowerCase(Locale.ROOT) }
+                        .map { it.lowercase(Locale.ROOT) }
                         .forEachIndexed { index, header ->
                             when {
                                 header == "title" -> titleIndex = index
@@ -102,7 +103,7 @@ class ExternalItemDataSourceImpl @Inject constructor(
                                     )
                                 )
                                 ?.getDomainIfUrl()
-                                ?.capitalize(Locale.getDefault()),
+                                ?.titleCase(),
                             login = lineContent.getOrNull(
                                 firstNotNull(
                                     defaultValue = DEFAULT_LOGIN_INDEX,

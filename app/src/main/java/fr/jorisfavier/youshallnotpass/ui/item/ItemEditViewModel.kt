@@ -12,6 +12,7 @@ import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.utils.PasswordOptions
 import fr.jorisfavier.youshallnotpass.utils.PasswordUtil
+import fr.jorisfavier.youshallnotpass.utils.extensions.titleCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -75,7 +76,7 @@ class ItemEditViewModel @Inject constructor(
     fun updateOrCreateItem(): Flow<Result<Int>> {
         return flow {
             val passwordValue = password.value
-            val nameValue = name.value?.capitalize(Locale.ROOT)
+            val nameValue = name.value?.titleCase()
             val id = currentItem?.id ?: 0
             if (passwordValue != null && nameValue != null) {
                 val encryptedData = cryptoManager.encryptData(passwordValue)

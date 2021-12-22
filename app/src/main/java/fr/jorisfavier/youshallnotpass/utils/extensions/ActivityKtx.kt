@@ -9,7 +9,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavHost
 import androidx.navigation.fragment.NavHostFragment
-import fr.jorisfavier.youshallnotpass.R
 
 fun FragmentActivity?.hideKeyboard() {
     val imm =
@@ -32,6 +31,6 @@ fun FragmentActivity?.hideKeyboard() {
  */
 fun AppCompatActivity.findNavControllerFromFragmentContainerView(@IdRes viewId: Int): NavController {
     val navHost =
-        supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        supportFragmentManager.findFragmentById(viewId) as NavHostFragment
     return navHost.navController
 }

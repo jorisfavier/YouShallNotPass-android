@@ -1,6 +1,7 @@
 package fr.jorisfavier.youshallnotpass.utils.extensions
 
 import java.security.MessageDigest
+import java.util.*
 
 
 fun String.md5(): ByteArray? {
@@ -29,4 +30,14 @@ fun String.getDomainIfUrl(): String {
         }
     }
     return this
+}
+
+/**
+ * Returns a copy of this string having its first letter titlecased using the rules of the specified locale,
+ * or the original string if it's empty or already starts with a title case letter.
+ */
+fun String.titleCase(locale: Locale = Locale.getDefault()): String {
+    return this.replaceFirstChar {
+        if (it.isLowerCase()) it.titlecase(locale) else it.toString()
+    }
 }
