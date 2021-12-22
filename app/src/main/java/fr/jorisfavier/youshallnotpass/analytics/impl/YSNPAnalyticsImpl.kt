@@ -18,7 +18,7 @@ class YSNPAnalyticsImpl @Inject constructor(
         try {
             if (frequency != null) {
                 val lastTimeEventWasSent = appPreferenceDataSource.getAnalyticEventDate(screen)
-                if (lastTimeEventWasSent != null && frequency.isOutdated(lastTimeEventWasSent)) {
+                if (lastTimeEventWasSent == null || frequency.isOutdated(lastTimeEventWasSent)) {
                     appPreferenceDataSource.setAnalyticEventDate(screen, LocalDateTime.now())
                 } else {
                     return
