@@ -89,5 +89,11 @@
     <string name="privacy_policy">Politique de confidentialité</string>
     <string name="error_desktop_transmission">Un erreur s\'est produite. Vos appareils sont-ils bien connectés au même réseau wifi ?</string>
     <string name="export_in_progress">Exportation en cours</string>
+    <string name="setup_biometric">Configuration biométrique</string>
+    <string name="setup_security">Configurer la sécurité</string>
+    <string name="please_setup_biometric">Pour utiliser cette application, vous devez configurer une authentification biométrique.</string>
+    <string name="register_credentials">Configurer</string>
+    <string name="device_not_compatible">Appareil incompatible</string>
+    <string name="unfortunately_you_cant_use_the_app">Malheureusement, votre appareil n\'est pas compatible avec cette application. Afin de sécuriser vos mots de passe, vous avez besoin d\'un appareil permettant l\'authentification biométrique.</string>
 
 </resources>

@@ -4,8 +4,11 @@ import android.app.Application
 import android.app.KeyguardManager
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Context.BIOMETRIC_SERVICE
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import androidx.biometric.BiometricManager
+import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import androidx.room.Room
 import androidx.security.crypto.EncryptedSharedPreferences
@@ -162,6 +165,12 @@ object AppModule {
     @Provides
     fun provideKeyguardManager(app: Application): KeyguardManager {
         return app.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+    }
+
+    @Singleton
+    @Provides
+    fun provideBiometricManager(app: Application): BiometricManager {
+        return BiometricManager.from(app)
     }
 
     @Singleton

@@ -34,7 +34,7 @@ class AuthViewModelTest {
         viewModel.authCallback.onAuthenticationSucceeded(mockk())
 
         //then
-        assertEquals(viewModel.authSuccess.getOrAwaitValue().peekContent(), AuthViewModel.AuthResult.Success)
+        assertEquals(viewModel.authStatus.getOrAwaitValue().peekContent(), AuthViewModel.AuthStatus.Success)
         verify { authManager setProperty "isUserAuthenticated" value true }
     }
 
@@ -50,8 +50,8 @@ class AuthViewModelTest {
         viewModel.authCallback.onAuthenticationError(BiometricPrompt.ERROR_UNABLE_TO_PROCESS, "")
 
         //then
-        val authResult = viewModel.authSuccess.getOrAwaitValue().peekContent() as? AuthViewModel.AuthResult.Failure
-        assertTrue(authResult is AuthViewModel.AuthResult.Failure)
+        val authResult = viewModel.authStatus.getOrAwaitValue().peekContent() as? AuthViewModel.AuthStatus.Failure
+        assertTrue(authResult is AuthViewModel.AuthStatus.Failure)
         assertEquals(authResult?.errorMessage, R.string.auth_fail_try_again)
     }
 
@@ -67,8 +67,8 @@ class AuthViewModelTest {
         viewModel.authCallback.onAuthenticationError(BiometricPrompt.ERROR_NO_BIOMETRICS, "")
 
         //then
-        val authResult = viewModel.authSuccess.getOrAwaitValue().peekContent() as? AuthViewModel.AuthResult.Failure
-        assertTrue(authResult is AuthViewModel.AuthResult.Failure)
+        val authResult = viewModel.authStatus.getOrAwaitValue().peekContent() as? AuthViewModel.AuthStatus.Failure
+        assertTrue(authResult is AuthViewModel.AuthStatus.Failure)
         assertEquals(authResult?.errorMessage, R.string.auth_fail_no_biometrics)
     }
 
@@ -84,6 +84,6 @@ class AuthViewModelTest {
         viewModel.authCallback.onAuthenticationFailed()
 
         //then
-        assertTrue(viewModel.authSuccess.getOrAwaitValue().peekContent() is AuthViewModel.AuthResult.Failure)
+        assertTrue(viewModel.authStatus.getOrAwaitValue().peekContent() is AuthViewModel.AuthStatus.Failure)
     }
 }

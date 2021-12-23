@@ -89,4 +89,10 @@
     <string name="create_new_item">Create new item</string>
     <string name="privacy_policy">Privacy policy</string>
     <string name="error_desktop_transmission">An error occurred. Are your phone and computer connected to the same wifi?</string>
+    <string name="setup_biometric">Setup biometric</string>
+    <string name="setup_security">Setup security</string>
+    <string name="please_setup_biometric">In order to use this app you need to setup a biometric authentication.</string>
+    <string name="register_credentials">Register credentials</string>
+    <string name="device_not_compatible">Device not compatible</string>
+    <string name="unfortunately_you_cant_use_the_app">Unfortunately your device is not compatible with this app. To properly secure your passwords you need a device allowing biometric authentication.</string>
 </resources>
