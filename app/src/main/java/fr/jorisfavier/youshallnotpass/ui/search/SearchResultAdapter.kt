@@ -21,6 +21,7 @@ class SearchResultAdapter(
     }
 
     private var lastSelectedId: Int? = null
+    private var isItemAnimated = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val binding = ViewholderSearchResultBinding.inflate(
@@ -28,7 +29,10 @@ class SearchResultAdapter(
             parent,
             false
         )
-        return SearchResultViewHolder(binding)
+        return SearchResultViewHolder(
+            binding,
+            onAnimationEnd = { isItemAnimated = false },
+        )
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -44,9 +48,13 @@ class SearchResultAdapter(
             sendToDesktop = sendToDesktop,
         )
         holder.itemView.setOnClickListener {
-            val itemId = if (item.id == lastSelectedId) 0 else item.id
-            lastSelectedId = itemId
-            notifyItemRangeChanged(0, itemCount, Payload.Selection(itemId))
+            //Prevent multiple items to be animated at the same time
+            if (!isItemAnimated) {
+                isItemAnimated = true
+                val itemId = if (item.id == lastSelectedId) 0 else item.id
+                lastSelectedId = itemId
+                notifyItemRangeChanged(0, itemCount, Payload.Selection(itemId))
+            }
         }
     }
 

@@ -20,15 +20,15 @@ interface ItemDataSource {
      *  @param title the item's name to search for
      *  @return a list of item
      */
-    @Query("SELECT * from ItemEntity where title like :title")
+    @Query("SELECT * from ItemEntity where title like :title order by title asc")
     suspend fun searchItem(title: String): List<ItemEntity>
 
     /***
-     *  Search for an item in the database based on his name
-     *  @param title the item's name to search for
+     *  Search for an item in the database based on his certificates
+     *  @param certificates the item's certificates
      *  @return a list of item
      */
-    @Query("SELECT * from ItemEntity where packageCertificates = :certificates")
+    @Query("SELECT * from ItemEntity where packageCertificates = :certificates order by title asc")
     suspend fun searchItemByCertificate(certificates: String): List<ItemEntity>
 
     /**
