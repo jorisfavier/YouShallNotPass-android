@@ -46,7 +46,7 @@ class DesktopConnectionActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        cameraLifecycle = CustomLifecycle(this)
+        cameraLifecycle = CustomLifecycle(this.lifecycle)
         supportActionBar?.hide()
         binding = ActivityDesktopConnectionBinding.inflate(layoutInflater)
         setContentView(binding.root)

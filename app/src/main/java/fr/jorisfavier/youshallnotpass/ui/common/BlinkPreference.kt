@@ -26,11 +26,11 @@ class BlinkPreference @JvmOverloads constructor(
         blink = true
     }
 
-    override fun onBindViewHolder(holder: PreferenceViewHolder?) {
+    override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)
         if (blink) {
             blink = false
-            holder?.itemView?.apply {
+            holder.itemView.apply {
                 setBackgroundResource(R.drawable.blink)
                 (background as? AnimationDrawable)?.start()
             }

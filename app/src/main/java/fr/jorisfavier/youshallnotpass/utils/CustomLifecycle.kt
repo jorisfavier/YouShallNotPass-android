@@ -1,18 +1,23 @@
 package fr.jorisfavier.youshallnotpass.utils
 
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.OnLifecycleEvent
 
-class CustomLifecycle(parentLifecycleOwner: LifecycleOwner) : LifecycleOwner, LifecycleObserver {
+class CustomLifecycle(override val lifecycle: Lifecycle) : LifecycleOwner, LifecycleObserver {
 
     private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
 
     init {
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
-        parentLifecycleOwner.lifecycle.addObserver(this)
+        lifecycle.addObserver(this)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun doOnStart() {
+
         lifecycleRegistry.currentState = Lifecycle.State.STARTED
     }
 
@@ -34,9 +39,5 @@ class CustomLifecycle(parentLifecycleOwner: LifecycleOwner) : LifecycleOwner, Li
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun doOnDestroy() {
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
-    }
-
-    override fun getLifecycle(): Lifecycle {
-        return lifecycleRegistry
     }
 }
