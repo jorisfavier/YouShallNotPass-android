@@ -1,43 +1,50 @@
 package fr.jorisfavier.youshallnotpass.utils
 
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
-import androidx.lifecycle.OnLifecycleEvent
 
-class CustomLifecycle(override val lifecycle: Lifecycle) : LifecycleOwner, LifecycleObserver {
+class CustomLifecycle(
+    parentLifecycle: Lifecycle,
+) : LifecycleOwner {
 
     private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
 
+    override val lifecycle: Lifecycle = lifecycleRegistry
+
     init {
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
-        lifecycle.addObserver(this)
+        parentLifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStart(owner: LifecycleOwner) {
+                lifecycleRegistry.currentState = Lifecycle.State.STARTED
+            }
+
+            override fun onResume(owner: LifecycleOwner) {
+                lifecycleRegistry.currentState = Lifecycle.State.RESUMED
+            }
+
+            override fun onPause(owner: LifecycleOwner) {
+                lifecycleRegistry.currentState = Lifecycle.State.STARTED
+            }
+
+            override fun onStop(owner: LifecycleOwner) {
+                lifecycleRegistry.currentState = Lifecycle.State.CREATED
+            }
+
+            override fun onDestroy(owner: LifecycleOwner) {
+                lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
+            }
+        })
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun doOnStart() {
-
+    fun pause() {
         lifecycleRegistry.currentState = Lifecycle.State.STARTED
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun doOnResume() {
+    fun resume() {
         lifecycleRegistry.currentState = Lifecycle.State.RESUMED
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    fun doOnPause() {
-        lifecycleRegistry.currentState = Lifecycle.State.STARTED
-    }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun doOnStop() {
-        lifecycleRegistry.currentState = Lifecycle.State.CREATED
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    fun doOnDestroy() {
-        lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
-    }
 }

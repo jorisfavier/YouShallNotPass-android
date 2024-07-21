@@ -11,8 +11,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DesktopConnectionViewModel @Inject constructor(private val desktopRepository: DesktopRepository) :
-    ViewModel() {
+class DesktopConnectionViewModel @Inject constructor(
+    private val desktopRepository: DesktopRepository,
+) : ViewModel() {
 
     private val _qrCodeAnalyseState = MutableLiveData<State<Unit>>()
     val qrCodeAnalyseState: LiveData<State<Unit>> = _qrCodeAnalyseState
@@ -27,7 +28,7 @@ class DesktopConnectionViewModel @Inject constructor(private val desktopReposito
         val ipRegex = "(\\d+\\.){3}\\d+(:\\d{4})?".toRegex()
         if (elements.size == 2 && elements[0].matches(ipRegex) && elements[1].contains("KEY")) {
             viewModelScope.launch {
-                kotlin.runCatching {
+                runCatching {
                     desktopRepository.updateDesktopInfo(
                         "http://" + elements[0],
                         cleanUpKey(elements[1])

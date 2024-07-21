@@ -49,6 +49,7 @@ class DesktopConnectionActivity : AppCompatActivity() {
         cameraLifecycle = CustomLifecycle(this.lifecycle)
         supportActionBar?.hide()
         binding = ActivityDesktopConnectionBinding.inflate(layoutInflater)
+        cameraExecutor = Executors.newSingleThreadExecutor()
         setContentView(binding.root)
         binding.close.setOnClickListener { onBackPressed() }
         initObserver()
@@ -56,16 +57,20 @@ class DesktopConnectionActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        cameraExecutor = Executors.newSingleThreadExecutor()
         requestPermissionIfNeeded()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cameraExecutor.shutdown()
     }
 
     private fun initObserver() {
         viewModel.qrCodeAnalyseState.observe(this) { state ->
             when (state) {
-                is State.Loading -> cameraLifecycle.doOnPause()
+                is State.Loading -> cameraLifecycle.pause()
                 is State.Error -> {
-                    cameraLifecycle.doOnResume()
+                    cameraLifecycle.resume()
                     toast(R.string.unable_to_read_qr_code)
                 }
                 is State.Success<*> -> {
