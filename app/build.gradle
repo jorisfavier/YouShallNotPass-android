@@ -29,7 +29,6 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
-        freeCompilerArgs = ["-Xallow-result-return-type"]
     }
     testOptions {
         unitTests.returnDefaultValues = true

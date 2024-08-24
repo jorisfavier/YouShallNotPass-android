@@ -2,7 +2,11 @@ package fr.jorisfavier.youshallnotpass.ui.search
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
@@ -16,7 +20,14 @@ import fr.jorisfavier.youshallnotpass.utils.State
 import fr.jorisfavier.youshallnotpass.utils.extensions.combine
 import fr.jorisfavier.youshallnotpass.utils.extensions.debounce
 import fr.jorisfavier.youshallnotpass.utils.extensions.default
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import timber.log.Timber
 import javax.inject.Inject
@@ -48,6 +59,7 @@ class SearchViewModel(
     )
 
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override val results = combine(
         search.asFlow(),
         appPreference.observeShouldHideItems(),
@@ -56,21 +68,22 @@ class SearchViewModel(
         .flatMapLatest { (query, hideAll, allItems) ->
             flow {
                 emit(State.Loading)
-                try {
-                    when {
-                        query.isNotBlank() && query.isNotEmpty() -> {
-                            emit(State.Success(itemRepository.searchItem("%$query%")))
-                        }
-                        !hideAll -> {
-                            emit(State.Success(allItems))
-                        }
-                        else -> {
-                            emit(State.Success(listOf()))
-                        }
+                when {
+                    query.isNotBlank() && query.isNotEmpty() -> {
+                        emit(
+                            State.Success(
+                                itemRepository.searchItem("%$query%").getOrDefault(emptyList())
+                            )
+                        )
                     }
-                } catch (e: Exception) {
-                    Timber.e(e, "Error while searching for items")
-                    emit(State.Success(listOf()))
+
+                    !hideAll -> {
+                        emit(State.Success(allItems))
+                    }
+
+                    else -> {
+                        emit(State.Success(listOf()))
+                    }
                 }
             }
         }
@@ -102,32 +115,49 @@ class SearchViewModel(
         }
     }
 
-    fun decryptPassword(item: Item): Result<String> = runCatching {
-        cryptoManager.decryptData(item.password, item.initializationVector)
+    suspend fun decryptPassword(item: Item): Result<String> {
+        return cryptoManager.decryptData(item.password, item.initializationVector)
     }
 
-    fun copyToClipboard(item: Item, type: ItemDataType): Result<Int> = runCatching {
+
+    fun copyToClipboard(item: Item, type: ItemDataType): Flow<Result<Int>> = flow {
         val (data, resId) = when (type) {
-            ItemDataType.PASSWORD -> (decryptPassword(item).getOrThrow() to R.string.copy_password_to_clipboard_success)
+            ItemDataType.PASSWORD -> {
+                val pwd = decryptPassword(item).getOrElse {
+                    emit(Result.failure(it))
+                    currentCoroutineContext().cancel()
+                    return@flow
+                }
+                (pwd to R.string.copy_password_to_clipboard_success)
+            }
+
             ItemDataType.LOGIN -> (item.login to R.string.copy_login_to_clipboard_success)
         }
         val clip = ClipData.newPlainText(type.name, data)
         clipboardManager.setPrimaryClip(clip)
-        return Result.success(resId)
+        emit(Result.success(resId))
     }
 
-    fun sendToDesktop(item: Item, type: ItemDataType) = flow {
+    fun sendToDesktop(item: Item, type: ItemDataType): Flow<Result<Int>> = flow {
         val data = when (type) {
-            ItemDataType.PASSWORD -> decryptPassword(item).getOrThrow()
+            ItemDataType.PASSWORD -> decryptPassword(item).getOrElse {
+                emit(Result.failure(YsnpException(R.string.error_occurred)))
+                currentCoroutineContext().cancel()
+                return@flow
+            }
+
             ItemDataType.LOGIN -> item.login.orEmpty()
         }
         desktopRepository.sendData(data)
-        emit(Result.success(R.string.ysnp_desktop_communication_success))
-    }.catch { error ->
-        if (error is HttpException) {
-            emit(Result.failure(YsnpException(R.string.ysnp_desktop_communication_fail)))
-        } else {
-            emit(Result.failure(error))
-        }
+            .onSuccess {
+                emit(Result.success(R.string.ysnp_desktop_communication_success))
+            }
+            .onFailure { error ->
+                if (error is HttpException) {
+                    emit(Result.failure(YsnpException(R.string.ysnp_desktop_communication_fail)))
+                } else {
+                    emit(Result.failure(error))
+                }
+            }
     }
 }

@@ -11,7 +11,7 @@ import fr.jorisfavier.youshallnotpass.model.ItemDataType
 class SearchResultAdapter(
     private val onItemEditClicked: (Item) -> Unit,
     private val onDeleteItemClicked: (Item) -> Unit,
-    private val decryptPassword: (Item) -> Result<String>,
+    private val decryptPassword: suspend (Item) -> Result<String>,
     private val copyPasswordToClipboard: (Item, ItemDataType) -> Unit,
     private val sendToDesktop: (Item, ItemDataType) -> Unit,
 ) : ListAdapter<Item, RecyclerView.ViewHolder>(Item.diffCallback) {

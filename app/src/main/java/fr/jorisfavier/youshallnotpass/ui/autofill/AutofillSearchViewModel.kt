@@ -5,7 +5,12 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.service.autofill.FillRequest
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.liveData
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.manager.CryptoManager
@@ -21,7 +26,6 @@ import fr.jorisfavier.youshallnotpass.utils.extensions.debounce
 import fr.jorisfavier.youshallnotpass.utils.extensions.default
 import fr.jorisfavier.youshallnotpass.utils.extensions.getDomainIfUrl
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -44,38 +48,40 @@ class AutofillSearchViewModel @Inject constructor(
     override val results = search.combine(autofillParsedStructure)
         .switchMap { (query, parsedStructure) ->
             liveData<State<List<Item>>> {
-                try {
-                    when {
-                        query.isNotBlank() && query.isNotEmpty() -> {
-                            emit(State.Success(itemRepository.searchItem("%$query%")))
-                        }
-                        parsedStructure.certificatesHashes.isNotEmpty() -> {
-                            val byCertificatesResult =
-                                itemRepository.searchItemByCertificates(parsedStructure.certificatesHashes)
-                            if (byCertificatesResult.isNotEmpty()) {
-                                emit(State.Success(byCertificatesResult))
-                            } else if (!firstSearchProcessed) {
-                                //When landing to this fragment the first time
-                                //if we haven't found any result from the certificate
-                                //we try to find some items from the app name or web domain
-                                search.value = parsedStructure.webDomain?.getDomainIfUrl()
-                                    ?: parsedStructure.appName
-                                firstSearchProcessed = true
-                            }
-                        }
-                        else -> {
-                            emit(State.Success(listOf()))
+                when {
+                    query.isNotBlank() && query.isNotEmpty() -> {
+                        emit(
+                            State.Success(
+                                itemRepository.searchItem("%$query%").getOrDefault(emptyList())
+                            )
+                        )
+                    }
+
+                    parsedStructure.certificatesHashes.isNotEmpty() -> {
+                        val byCertificatesResult = itemRepository
+                            .searchItemByCertificates(parsedStructure.certificatesHashes)
+                            .getOrDefault(emptyList())
+                        if (byCertificatesResult.isNotEmpty()) {
+                            emit(State.Success(byCertificatesResult))
+                        } else if (!firstSearchProcessed) {
+                            //When landing to this fragment the first time
+                            //if we haven't found any result from the certificate
+                            //we try to find some items from the app name or web domain
+                            search.value = parsedStructure.webDomain?.getDomainIfUrl()
+                                ?: parsedStructure.appName
+                            firstSearchProcessed = true
                         }
                     }
-                } catch (e: Exception) {
-                    Timber.e(e, "Error while searching for items")
-                    emit(State.Success(listOf()))
+
+                    else -> {
+                        emit(State.Success(listOf()))
+                    }
                 }
             }
         }.debounce(duration = 300, coroutineScope = viewModelScope)
 
     override val hasNoResult: LiveData<Boolean> = results.map { state ->
-        state is State.Success && state.value.count() == 0
+        state is State.Success && state.value.isEmpty()
     }
 
     override val noResultTextIdRes = search.switchMap { search ->
@@ -96,9 +102,10 @@ class AutofillSearchViewModel @Inject constructor(
             val parsedStructure = autofillParsedStructure.value ?: return@launch
             if (parsedStructure.certificatesHashes.isNotEmpty()) {
                 val updatedItem = item.copy(packageCertificate = parsedStructure.certificatesHashes)
-                runCatching { itemRepository.updateOrCreateItem(updatedItem) }
+                itemRepository.updateOrCreateItem(updatedItem)
             }
-            val itemPassword = cryptoManager.decryptData(item.password, item.initializationVector)
+            val itemPassword =
+                cryptoManager.decryptData(item.password, item.initializationVector).getOrDefault("")
             val data = AutofillDataSetInfo(
                 autofillItems = parsedStructure.items,
                 item = item,

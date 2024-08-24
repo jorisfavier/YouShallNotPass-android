@@ -16,43 +16,43 @@ interface ItemRepository {
      *  @param title the item's name to search for
      *  @return a list of item
      */
-    suspend fun searchItem(title: String): List<Item>
+    suspend fun searchItem(title: String): Result<List<Item>>
 
     /***
      *  Search for an item based on his certificates
      *  @param certificates a list of certificate associated with an Item
      *  @return a list of item
      */
-    suspend fun searchItemByCertificates(certificates: List<String>): List<Item>
+    suspend fun searchItemByCertificates(certificates: List<String>): Result<List<Item>>
 
     /**
      * Retrieves an item base on the given id
      * @param id the item's identifier
      * @return an item or null if not found
      */
-    suspend fun getItemById(id: Int): Item?
+    suspend fun getItemById(id: Int): Result<Item?>
 
     /**
      * Persist an item into the app
      * Updates or creates an item
      * @param item
      */
-    suspend fun updateOrCreateItem(item: Item)
+    suspend fun updateOrCreateItem(item: Item): Result<Unit>
 
     /**
      * Delete an item from the app
      * @param item
      */
-    suspend fun deleteItem(item: Item)
+    suspend fun deleteItem(item: Item): Result<Unit>
 
     /**
      * Persist a list of item into the app
      * @param items
      */
-    suspend fun insertItems(items: List<Item>)
+    suspend fun insertItems(items: List<Item>): Result<Unit>
 
     /**
      * Delete all the items from the app
      */
-    suspend fun deleteAllItems()
+    suspend fun deleteAllItems(): Result<Unit>
 }

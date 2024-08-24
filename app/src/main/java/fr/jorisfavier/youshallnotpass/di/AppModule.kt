@@ -4,16 +4,13 @@ import android.app.Application
 import android.app.KeyguardManager
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.Context.BIOMETRIC_SERVICE
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import androidx.biometric.BiometricManager
-import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import androidx.room.Room
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,6 +31,7 @@ import fr.jorisfavier.youshallnotpass.data.impl.ExternalItemDataSourceImpl
 import fr.jorisfavier.youshallnotpass.manager.ContentResolverManager
 import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.manager.impl.ContentResolverManagerImpl
+import fr.jorisfavier.youshallnotpass.manager.impl.CryptoManagerImpl
 import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
 import fr.jorisfavier.youshallnotpass.repository.ExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
@@ -140,12 +138,10 @@ object AppModule {
     fun provideExternalItemRepository(
         externalItemDataSource: ExternalItemDataSource,
         cryptoManager: CryptoManager,
-        coroutineDispatcher: CoroutineDispatchers,
     ): ExternalItemRepository {
         return ExternalItemRepositoryImpl(
             externalItemDataSource,
             cryptoManager,
-            coroutineDispatcher.io,
         )
     }
 
@@ -171,6 +167,16 @@ object AppModule {
     @Provides
     fun provideBiometricManager(app: Application): BiometricManager {
         return BiometricManager.from(app)
+    }
+
+    @Singleton
+    @Provides
+    fun provideCryptoManager(
+        coroutineDispatcher: CoroutineDispatchers,
+    ): CryptoManager {
+        return CryptoManagerImpl(
+            ioDispatcher = coroutineDispatcher.io,
+        )
     }
 
     @Singleton

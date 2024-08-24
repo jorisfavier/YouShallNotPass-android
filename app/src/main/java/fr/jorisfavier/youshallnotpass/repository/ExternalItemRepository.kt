@@ -11,7 +11,7 @@ interface ExternalItemRepository {
      * @param password the password used to encrypt the list
      * @return Uri the place where the data are stored
      */
-    suspend fun saveExternalItems(items: List<ExternalItem>, password: String? = null): Uri
+    suspend fun saveExternalItems(items: List<ExternalItem>, password: String? = null): Result<Uri>
 
     /**
      * Retrieves a list of ExternalItem by decrypting it with a given password
@@ -19,12 +19,12 @@ interface ExternalItemRepository {
      * @param password the key to decrypt the data
      * @return List<ExternalItem>
      */
-    suspend fun getExternalItemsFromUri(uri: Uri, password: String?): List<ExternalItem>
+    suspend fun getExternalItemsFromUri(uri: Uri, password: String?): Result<List<ExternalItem>>
 
     /**
      * Check if data at a given uri are encrypted or not
      * @param uri the place where to find the data
      * @return Boolean true if the data are encrypted
      */
-    suspend fun isSecuredWithPassword(uri: Uri): Boolean
+    suspend fun isSecuredWithPassword(uri: Uri): Result<Boolean>
 }

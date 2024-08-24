@@ -7,7 +7,13 @@ import android.content.IntentSender
 import android.os.Build
 import android.os.Bundle
 import android.os.CancellationSignal
-import android.service.autofill.*
+import android.service.autofill.AutofillService
+import android.service.autofill.FillCallback
+import android.service.autofill.FillContext
+import android.service.autofill.FillRequest
+import android.service.autofill.FillResponse
+import android.service.autofill.SaveCallback
+import android.service.autofill.SaveRequest
 import androidx.annotation.RequiresApi
 import androidx.core.os.bundleOf
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,15 +59,18 @@ class YsnpAutofillService : AutofillService() {
                         clientState = request.clientState ?: bundleOf(),
                     )
                 }
+
                 parsedStructure.items.isEmpty() -> {
                     null
                 }
+
                 parsedStructure.webDomain != null || !authManager.isAutofillUnlocked -> {
                     buildRequiresAuthResponse(
                         fillRequest = request,
                         parsedStructure = parsedStructure,
                     )
                 }
+
                 else -> {
                     buildAutofillResponse(
                         fillRequest = request,
@@ -85,7 +94,7 @@ class YsnpAutofillService : AutofillService() {
             if (it.type == ItemDataType.LOGIN) login = it.value else password = it.value
         }
         if (password != null && parsedStructure.appName != null) {
-            val encryptedPass = cryptoManager.encryptData(password!!)
+            val encryptedPass = runBlocking { cryptoManager.encryptData(password!!).getOrThrow() }
             val item = Item(
                 id = 0,
                 title = parsedStructure.appName,
@@ -124,11 +133,17 @@ class YsnpAutofillService : AutofillService() {
     ): FillResponse.Builder {
         val items = runBlocking {
             itemRepository.searchItemByCertificates(parsedStructure.certificatesHashes)
+                .getOrDefault(emptyList())
         }
         val responseBuilder = FillResponse.Builder()
         if (items.isNotEmpty()) {
             items.forEach { item ->
-                val pass = cryptoManager.decryptData(item.password, item.initializationVector)
+                val pass = runBlocking {
+                    cryptoManager.decryptData(
+                        item.password,
+                        item.initializationVector
+                    ).getOrThrow()
+                }
                 responseBuilder.addDataset(
                     AutofillHelperCompat.buildItemDataSet(
                         context = this,

@@ -2,7 +2,11 @@ package fr.jorisfavier.youshallnotpass.ui.item
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.manager.CryptoManager
@@ -13,12 +17,12 @@ import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.utils.PasswordOptions
 import fr.jorisfavier.youshallnotpass.utils.PasswordUtil
 import fr.jorisfavier.youshallnotpass.utils.extensions.titleCase
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -54,23 +58,22 @@ class ItemEditViewModel @Inject constructor(
     fun initData(itemId: Int, itemName: String? = null) {
         if (itemId > 0) {
             viewModelScope.launch {
-                currentItem = runCatching { itemRepository.getItemById(itemId) }.getOrNull()
-                currentItem?.let {
-                    _createOrUpdateText.value = R.string.item_update
-                    name.value = it.title
-                    password.value = cryptoManager.decryptData(it.password, it.initializationVector)
-                    login.value = it.login.orEmpty()
-                }
+                val item = itemRepository.getItemById(itemId).getOrNull() ?: return@launch
+                currentItem = item
+                _createOrUpdateText.value = R.string.item_update
+                name.value = item.title
+                password.value = cryptoManager.decryptData(item.password, item.initializationVector)
+                    .getOrDefault("")
+                login.value = item.login.orEmpty()
             }
         } else if (itemName != null) {
-            name.value = itemName.orEmpty()
+            name.value = itemName
         }
     }
 
     fun generateSecurePassword() {
-        passwordLengthValue.value?.let {
-            password.value = PasswordUtil.getSecurePassword(passwordOptions, it)
-        }
+        val pwdLength = passwordLengthValue.value ?: return
+        password.value = PasswordUtil.getSecurePassword(passwordOptions, pwdLength)
     }
 
     fun updateOrCreateItem(): Flow<Result<Int>> {
@@ -79,10 +82,15 @@ class ItemEditViewModel @Inject constructor(
             val nameValue = name.value?.titleCase()
             val id = currentItem?.id ?: 0
             if (passwordValue != null && nameValue != null) {
-                val encryptedData = cryptoManager.encryptData(passwordValue)
-
-                if (id == 0 && itemRepository.searchItem(nameValue).isNotEmpty()) {
-                    emit(Result.failure<Int>(YsnpException(R.string.item_already_exist)))
+                val encryptedData = cryptoManager.encryptData(passwordValue).getOrElse {
+                    emit(Result.failure(YsnpException(R.string.error_occurred)))
+                    currentCoroutineContext().cancel()
+                    return@flow
+                }
+                if (id == 0 && itemRepository.searchItem(nameValue).getOrDefault(emptyList())
+                        .isNotEmpty()
+                ) {
+                    emit(Result.failure(YsnpException(R.string.item_already_exist)))
                 } else {
                     itemRepository.updateOrCreateItem(
                         Item(
@@ -104,10 +112,8 @@ class ItemEditViewModel @Inject constructor(
                     emit(Result.success(successResourceId))
                 }
             } else {
-                emit(Result.failure<Int>(YsnpException(R.string.item_name_or_password_missing)))
+                emit(Result.failure(YsnpException(R.string.item_name_or_password_missing)))
             }
-        }.catch {
-            emit(Result.failure(YsnpException(R.string.error_occurred)))
         }
     }
 

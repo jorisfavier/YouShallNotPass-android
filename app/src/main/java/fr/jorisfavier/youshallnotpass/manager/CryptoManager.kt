@@ -8,7 +8,7 @@ interface CryptoManager {
      * @param plaintext the text to be encrypted
      * @return
      */
-    fun encryptData(plaintext: String): EncryptedData
+    suspend fun encryptData(plaintext: String): Result<EncryptedData>
 
     /**
      * Decrypt a given byte array using the initialization vector
@@ -16,7 +16,7 @@ interface CryptoManager {
      * @param initializationVector the initialization vector that has been used to encrypt the data
      * @return the decrypted data as a String
      */
-    fun decryptData(ciphertext: ByteArray, initializationVector: ByteArray): String
+    suspend fun decryptData(ciphertext: ByteArray, initializationVector: ByteArray): Result<String>
 
     /**
      * Encrypt the given data using a given password
@@ -24,7 +24,7 @@ interface CryptoManager {
      * @param data the content to be encrypted
      * @return an encrypted byte array
      */
-    fun encryptDataWithPassword(password: String, data: ByteArray): ByteArray
+    suspend fun encryptDataWithPassword(password: String, data: ByteArray): Result<ByteArray>
 
     /**
      * Decrypt the given data using a given password
@@ -32,7 +32,10 @@ interface CryptoManager {
      * @param encryptedData the encrypted data as a byte array
      * @return the decrypted data as ByteArray
      */
-    fun decryptDataWithPassword(password: String, encryptedData: ByteArray): ByteArray
+    suspend fun decryptDataWithPassword(
+        password: String,
+        encryptedData: ByteArray,
+    ): Result<ByteArray>
 
     /**
      * Encrypt the given data using a given public rsa key
@@ -40,6 +43,6 @@ interface CryptoManager {
      * @param data the data to encrypt
      * @return an encrypted byte array
      */
-    fun encryptDataWithPublicKey(key: String, data: String): ByteArray
+    suspend fun encryptDataWithPublicKey(key: String, data: String): Result<ByteArray>
 
 }

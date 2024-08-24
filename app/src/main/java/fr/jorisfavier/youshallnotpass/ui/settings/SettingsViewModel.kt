@@ -13,8 +13,11 @@ import fr.jorisfavier.youshallnotpass.model.ExternalItem
 import fr.jorisfavier.youshallnotpass.repository.ExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.utils.CoroutineDispatchers
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -72,16 +75,18 @@ class SettingsViewModel @Inject constructor(
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             val items = itemRepository.getAllItems().first().map {
                 val itemPassword =
-                    cryptoManager.decryptData(it.password, it.initializationVector)
+                    cryptoManager.decryptData(it.password, it.initializationVector).getOrThrow()
                 ExternalItem(it.title, it.login, itemPassword)
             }
-            val uri = externalItemRepository.saveExternalItems(items, password)
+            val uri = externalItemRepository.saveExternalItems(items, password).getOrThrow()
             intent.putExtra(Intent.EXTRA_STREAM, uri)
             emit(Result.success(intent))
-        }.flowOn(dispatchers.io).catch { e ->
-            Timber.e(e, "Error while exporting items")
-            emit(Result.failure(e))
         }
+            .flowOn(dispatchers.io)
+            .catch { e ->
+                Timber.e(e, "Error while exporting items")
+                emit(Result.failure(e))
+            }
     }
 
     fun deleteAllItems(): Flow<Result<Unit>> {

@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,7 +18,7 @@ import fr.jorisfavier.youshallnotpass.databinding.FragmentItemBinding
 import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.utils.autoCleared
 import fr.jorisfavier.youshallnotpass.utils.extensions.toast
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ItemFragment : Fragment(R.layout.fragment_item) {
@@ -57,17 +59,20 @@ class ItemFragment : Fragment(R.layout.fragment_item) {
     }
 
     private fun createOrUpdateItem() {
-        lifecycleScope.launchWhenStarted {
-            viewModel.updateOrCreateItem().collect {
-                val messageResourceId = when {
-                    it.isSuccess -> it.getOrDefault(R.string.item_creation_success)
-                    it.isFailure -> (it.exceptionOrNull() as? YsnpException)?.messageResId
-                        ?: R.string.error_occurred
-                    else -> R.string.error_occurred
-                }
-                context?.toast(messageResourceId)
-                if (it.isSuccess) {
-                    findNavController().popBackStack()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.updateOrCreateItem().collect {
+                    val messageResourceId = when {
+                        it.isSuccess -> it.getOrDefault(R.string.item_creation_success)
+                        it.isFailure -> (it.exceptionOrNull() as? YsnpException)?.messageResId
+                            ?: R.string.error_occurred
+
+                        else -> R.string.error_occurred
+                    }
+                    context?.toast(messageResourceId)
+                    if (it.isSuccess) {
+                        findNavController().popBackStack()
+                    }
                 }
             }
         }

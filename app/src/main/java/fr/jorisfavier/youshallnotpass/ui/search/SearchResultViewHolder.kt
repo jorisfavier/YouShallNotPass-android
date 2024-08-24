@@ -1,17 +1,14 @@
 package fr.jorisfavier.youshallnotpass.ui.search
 
 import android.animation.ValueAnimator
-import android.graphics.Rect
-import android.text.InputType
 import android.text.method.PasswordTransformationMethod
-import android.text.method.TransformationMethod
-import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.core.view.doOnLayout
 import androidx.core.view.updatePadding
-import androidx.databinding.adapters.ViewGroupBindingAdapter
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.ViewholderSearchResultBinding
@@ -21,7 +18,7 @@ import fr.jorisfavier.youshallnotpass.utils.extensions.fadeIn
 import fr.jorisfavier.youshallnotpass.utils.extensions.fadeOut
 import fr.jorisfavier.youshallnotpass.utils.extensions.px
 import fr.jorisfavier.youshallnotpass.utils.extensions.toast
-import timber.log.Timber
+import kotlinx.coroutines.launch
 
 class SearchResultViewHolder(
     private val binding: ViewholderSearchResultBinding,
@@ -45,7 +42,7 @@ class SearchResultViewHolder(
         isSelected: Boolean,
         onEditItemClicked: (Item) -> Unit,
         onDeleteItemClicked: (Item) -> Unit,
-        decryptPassword: (Item) -> Result<String>,
+        decryptPassword: suspend (Item) -> Result<String>,
         copyToClipboard: (Item, ItemDataType) -> Unit,
         sendToDesktop: (Item, ItemDataType) -> Unit,
     ) {
@@ -55,12 +52,13 @@ class SearchResultViewHolder(
             hasLoginField = result.hasLogin
             searchResultItemPassword.transformationMethod = PasswordTransformationMethod()
             searchResultItemShowHideButton.setOnClickListener {
-                decryptPassword(result)
-                    .onSuccess { togglePasswordVisibility(it) }
-                    .onFailure {
-                        Timber.e(it, "An error occurred while decrypting password")
-                        view.context.toast(R.string.error_occurred)
-                    }
+                view.findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+                    decryptPassword(result)
+                        .onSuccess { togglePasswordVisibility(it) }
+                        .onFailure {
+                            view.context.toast(R.string.error_occurred)
+                        }
+                }
 
             }
             searchResultItemCopyPasswordButton.setOnClickListener {

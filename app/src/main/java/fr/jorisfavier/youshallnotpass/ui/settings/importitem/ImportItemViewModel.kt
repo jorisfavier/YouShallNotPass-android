@@ -14,7 +14,15 @@ import fr.jorisfavier.youshallnotpass.ui.settings.importitem.review.ExternalItem
 import fr.jorisfavier.youshallnotpass.utils.CoroutineDispatchers
 import fr.jorisfavier.youshallnotpass.utils.Event
 import fr.jorisfavier.youshallnotpass.utils.State
-import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -64,7 +72,8 @@ class ImportItemViewModel @Inject constructor(
     fun setUri(uri: Uri) {
         viewModelScope.launch {
             currentUri = uri
-            _isSecureFile.value = externalItemRepository.isSecuredWithPassword(uri)
+            _isSecureFile.value =
+                externalItemRepository.isSecuredWithPassword(uri).getOrDefault(false)
             _navigate.postValue(Event(Unit))
         }
     }
@@ -77,9 +86,11 @@ class ImportItemViewModel @Inject constructor(
                     _navigate.postValue(Event(Unit))
                 }
             }
+
             REVIEW_ITEM_SLIDE -> {
                 loadExternalItemsFromUri()
             }
+
             SUCCESS_FAIL_SLIDE -> {
                 importItems()
             }
@@ -92,55 +103,47 @@ class ImportItemViewModel @Inject constructor(
     }
 
     private fun loadExternalItemsFromUri() {
-        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-            Timber.w(throwable, "An error occurred while loading items from uri")
-            _loadFromUriState.postValue(State.Error)
-            _navigate.postValue(Event(Unit))
-        }
-
-        viewModelScope.launch(exceptionHandler) {
+        viewModelScope.launch {
             _loadFromUriState.postValue(State.Loading)
-            currentUri?.let { uri ->
-                val items = externalItemRepository.getExternalItemsFromUri(uri, password.value)
-                if (items.isNullOrEmpty()) {
-                    _loadFromUriState.postValue(State.Error)
-                } else {
+            val uri = currentUri ?: return@launch
+            externalItemRepository.getExternalItemsFromUri(uri, password.value)
+                .onSuccess { items ->
                     _importedItems.postValue(items.map { ExternalItemViewModel(it, false) })
                     _loadFromUriState.postValue(State.Success(Unit))
                 }
-            }
+                .onFailure {
+                    _loadFromUriState.postValue(State.Error)
+                    _navigate.postValue(Event(Unit))
+                }
         }
     }
 
+
     private fun importItems() {
-        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-            Timber.w(throwable, "An error occurred while importing items")
-            _importItemsState.postValue(State.Error)
-        }
         _importItemsState.value = State.Loading
-        viewModelScope.launch(exceptionHandler) {
-            withContext(dispatchers.io) {
-                val itemsToImport = _importedItems.value
-                    ?.asSequence()
-                    ?.filter { it.selected }
-                    ?.map {
-                        val externalItem = it.externalItem
-                        val password = cryptoManager.encryptData(externalItem.password)
-                        Item(
-                            0,
-                            externalItem.title,
-                            externalItem.login,
-                            password.ciphertext,
-                            password.initializationVector
-                        )
-                    }
-                    ?.toList()
-                if (itemsToImport != null && itemsToImport.isNotEmpty()) {
-                    itemRepository.insertItems(itemsToImport)
-                    _importItemsState.postValue(State.Success(Unit))
-                } else {
-                    _importItemsState.postValue(State.Error)
+        viewModelScope.launch {
+            val itemsToImport = _importedItems.value
+                ?.asFlow()
+                ?.filter { it.selected }
+                ?.map {
+                    val externalItem = it.externalItem
+                    val password = cryptoManager.encryptData(externalItem.password).getOrThrow()
+                    Item(
+                        0,
+                        externalItem.title,
+                        externalItem.login,
+                        password.ciphertext,
+                        password.initializationVector
+                    )
                 }
+                ?.flowOn(dispatchers.io)
+                ?.catch { emitAll(emptyFlow()) }
+                ?.toList()
+            if (!itemsToImport.isNullOrEmpty()) {
+                itemRepository.insertItems(itemsToImport)
+                _importItemsState.postValue(State.Success(Unit))
+            } else {
+                _importItemsState.postValue(State.Error)
             }
         }
     }
