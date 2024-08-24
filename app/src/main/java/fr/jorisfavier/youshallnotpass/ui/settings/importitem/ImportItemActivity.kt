@@ -36,7 +36,7 @@ class ImportItemActivity : AppIntro() {
 
     private fun initObserver() {
         viewModel.navigate.observe(this) { event ->
-            event.getContentIfNotHandled()?.let {
+            if (event.getContentIfNotHandled() != null) {
                 goToNextSlide()
             }
         }

@@ -75,10 +75,10 @@ class AutofillActivity : AppCompatActivity() {
     }
 
     private fun requireAuthentication() {
-        Intent(this, AuthActivity::class.java).let {
-            it.putExtra(AuthActivity.REDIRECT_TO_HOME_EXTRA, false)
-            startActivity(it)
+        val intent = Intent(this, AuthActivity::class.java).apply {
+            putExtra(AuthActivity.REDIRECT_TO_HOME_EXTRA, false)
         }
+        startActivity(intent)
     }
 
     companion object {

@@ -142,8 +142,9 @@ class CryptoManagerImpl(
         val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE)
         // Keystore must be loaded before it can be accessed
         keyStore.load(null)
-        keyStore.getKey(KEY_NAME, null)?.let {
-            return it as SecretKey
+        val secretKey = keyStore.getKey(KEY_NAME, null)
+        if (secretKey != null) {
+            return secretKey as SecretKey
         }
 
         // if you reach here, then a new SecretKey must be generated

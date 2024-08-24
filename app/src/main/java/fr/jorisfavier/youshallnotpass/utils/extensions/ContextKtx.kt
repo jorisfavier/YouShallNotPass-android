@@ -15,10 +15,9 @@ import androidx.annotation.StringRes
 fun Context.getThemeColor(
     @AttrRes attrColor: Int,
 ): Int {
-    return TypedValue().let {
-        theme.resolveAttribute(attrColor, it, true)
-        it.data
-    }
+    return TypedValue().apply {
+        theme.resolveAttribute(attrColor, this, true)
+    }.data
 }
 
 fun Context.toast(@StringRes stringResId: Int) {

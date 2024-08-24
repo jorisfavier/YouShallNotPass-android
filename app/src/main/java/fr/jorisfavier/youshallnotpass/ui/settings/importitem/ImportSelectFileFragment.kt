@@ -23,15 +23,14 @@ class ImportSelectFileFragment : Fragment(R.layout.fragment_import_select_file),
 
     private val getContent =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            uri?.let {
-                viewModel.setUri(uri)
-            }
+            val uriValue = uri ?: return@registerForActivityResult
+            viewModel.setUri(uriValue)
         }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentImportSelectFileBinding.inflate(layoutInflater, container, false)
         return binding.root

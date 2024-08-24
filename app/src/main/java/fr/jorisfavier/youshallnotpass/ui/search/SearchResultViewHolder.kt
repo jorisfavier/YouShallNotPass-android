@@ -108,17 +108,16 @@ class SearchResultViewHolder(
                     duration = animationDuration
                     interpolator = AccelerateDecelerateInterpolator()
                     addUpdateListener {
-                        (it.animatedValue as Float).let { progress ->
-                            binding.searchResultItemCard.layoutParams.height =
-                                currentHeight + (detailHeight.toFloat() * progress * coeff).toInt()
-                            val padding =
-                                currentSidePadding + (DETAIL_PADDING * progress * coeff).toInt()
-                            binding.searchResultMainContainer.updatePadding(
-                                left = padding,
-                                right = padding
-                            )
-                            binding.searchResultItemCard.requestLayout()
-                        }
+                        val progress = (it.animatedValue as Float)
+                        binding.searchResultItemCard.layoutParams.height =
+                            currentHeight + (detailHeight.toFloat() * progress * coeff).toInt()
+                        val padding =
+                            currentSidePadding + (DETAIL_PADDING * progress * coeff).toInt()
+                        binding.searchResultMainContainer.updatePadding(
+                            left = padding,
+                            right = padding
+                        )
+                        binding.searchResultItemCard.requestLayout()
                     }
                     doOnStart {
                         if (isExpanded) {

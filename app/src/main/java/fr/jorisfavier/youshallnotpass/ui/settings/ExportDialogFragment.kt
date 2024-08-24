@@ -23,34 +23,32 @@ class ExportDialogFragment(val onExport: (String?) -> Unit) : DialogFragment() {
 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return requireActivity().let {
-            val customView = layoutInflater.inflate(R.layout.dialog_settings_export, null)
-            radioGroup = customView.findViewById(R.id.settings_export_radioGrp)
-            errorView = customView.findViewById(R.id.settings_export_dialogError)
-            passwordEditText = customView.findViewById(R.id.settings_export_password)
-            scrollView = customView.findViewById(R.id.exportDialogScrollView)
-            passwordContainer = customView.findViewById(R.id.settings_export_password_container)
+        val customView = layoutInflater.inflate(R.layout.dialog_settings_export, null)
+        (customView.parent as? ViewGroup)?.removeView(customView)
 
-            customView.parent?.let {
-                (it as? ViewGroup)?.removeView(customView)
+        radioGroup = customView.findViewById(R.id.settings_export_radioGrp)
+        errorView = customView.findViewById(R.id.settings_export_dialogError)
+        passwordEditText = customView.findViewById(R.id.settings_export_password)
+        scrollView = customView.findViewById(R.id.exportDialogScrollView)
+        passwordContainer = customView.findViewById(R.id.settings_export_password_container)
+
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.export_password)
+            .setView(customView)
+            .setCancelable(false)
+            .setPositiveButton(R.string.export, null)
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                onExportClicked()
             }
-            val dialog = MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.export_password)
-                .setView(customView)
-                .setCancelable(false)
-                .setPositiveButton(R.string.export, null)
-                .setNegativeButton(android.R.string.cancel, null)
-                .create()
-            dialog.setOnShowListener {
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                    onExportClicked()
-                }
-            }
-            radioGroup.setOnCheckedChangeListener { _, _ ->
-                passwordContainer.isVisible = radioGroup.checkedRadioButtonId == R.id.settings_export_ysnp_button
-            }
-            dialog
         }
+        radioGroup.setOnCheckedChangeListener { _, _ ->
+            passwordContainer.isVisible =
+                radioGroup.checkedRadioButtonId == R.id.settings_export_ysnp_button
+        }
+        return dialog
     }
 
 

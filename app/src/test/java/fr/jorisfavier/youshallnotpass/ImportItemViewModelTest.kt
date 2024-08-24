@@ -18,7 +18,6 @@ import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
 import io.mockk.*
 import junit.framework.TestCase
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
@@ -93,7 +92,7 @@ class ImportItemViewModelTest {
 
             //when
             viewModel.navigate.observeForever {
-                it.getContentIfNotHandled()?.let {
+                if (it.getContentIfNotHandled() != null) {
                     count++
                 }
             }
@@ -115,7 +114,7 @@ class ImportItemViewModelTest {
 
             //when
             viewModel.navigate.observeForever {
-                it.getContentIfNotHandled()?.let {
+                if (it.getContentIfNotHandled() != null) {
                     count++
                 }
             }
@@ -213,7 +212,9 @@ class ImportItemViewModelTest {
 
             //when
             viewModel.navigate.observeForever { event ->
-                event.getContentIfNotHandled()?.let { count++ }
+                if (event.getContentIfNotHandled() != null) {
+                    count++
+                }
             }
             viewModel.loadFromUriState.observeForever {
                 states.add(it)

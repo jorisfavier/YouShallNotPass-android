@@ -5,16 +5,14 @@ import timber.log.Timber
 import kotlin.coroutines.cancellation.CancellationException
 
 inline fun <T> Result<T>.onYsnpFailure(action: (exception: YsnpException) -> Unit): Result<T> {
-    exceptionOrNull()?.let {
-        if (it is YsnpException) action(it)
-    }
+    val exception = exceptionOrNull() as? YsnpException
+    if (exception != null) action(exception)
     return this
 }
 
 inline fun <T> Result<T>.onUnknownFailure(action: (exception: Throwable) -> Unit): Result<T> {
-    exceptionOrNull()?.let {
-        if (it !is YsnpException) action(it)
-    }
+    val exception = exceptionOrNull()
+    if (exception != null && exception !is YsnpException) action(exception)
     return this
 }
 
@@ -30,6 +28,6 @@ suspend fun <T> suspendRunCatching(
 } catch (cancellationException: CancellationException) {
     throw cancellationException
 } catch (exception: Exception) {
-    Timber.w(exception)
+    Timber.e(exception, errorMessage)
     Result.failure(exception)
 }

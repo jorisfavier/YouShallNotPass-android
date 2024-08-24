@@ -8,18 +8,21 @@ import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import timber.log.Timber
 
-class QRCodeAnalyzer(private val onSuccessListener: (code: String?) -> Unit) : ImageAnalysis.Analyzer {
+class QRCodeAnalyzer(private val onSuccessListener: (code: String?) -> Unit) :
+    ImageAnalysis.Analyzer {
 
     override fun analyze(imageProxy: ImageProxy) {
         val mediaImage = imageProxy.image
         if (mediaImage != null) {
             val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-            val options = BarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_QR_CODE).build()
+            val options =
+                BarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_QR_CODE).build()
             val scanner = BarcodeScanning.getClient(options)
             scanner.process(image)
                 .addOnSuccessListener { barcodes ->
-                    barcodes.firstOrNull()?.let { onSuccessListener(it.displayValue) }
-                    Timber.d("Success finding code - ${barcodes.firstOrNull()?.displayValue}")
+                    val code = barcodes.firstOrNull() ?: return@addOnSuccessListener
+                    onSuccessListener(code.displayValue)
+                    Timber.d("Success finding code - ${code.displayValue}")
                 }
                 .addOnCompleteListener { imageProxy.close() }
         }
