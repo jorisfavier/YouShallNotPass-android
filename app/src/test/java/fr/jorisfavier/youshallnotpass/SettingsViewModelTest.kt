@@ -9,7 +9,9 @@ import fr.jorisfavier.youshallnotpass.repository.ExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.settings.SettingsViewModel
 import fr.jorisfavier.youshallnotpass.utils.CoroutineDispatchers
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.mockk
+import io.mockk.slot
 import junit.framework.TestCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -57,10 +59,12 @@ class SettingsViewModelTest {
         runBlocking {
             //given
             val externalItemSlot = slot<List<ExternalItem>>()
-            every { cryptoManager.decryptData(any(), any()) } returns fakePassword
+            coEvery { cryptoManager.decryptData(any(), any()) } returns Result.success(fakePassword)
             coEvery {
-                externalItemRepository.saveExternalItems(capture(externalItemSlot),
-                    null)
+                externalItemRepository.saveExternalItems(
+                    capture(externalItemSlot),
+                    null
+                )
             } returns mockk()
             coEvery { itemRepository.getAllItems() } returns flow { emit(listOf(fakeItem)) }
 
@@ -79,7 +83,7 @@ class SettingsViewModelTest {
         val externalItemSlot = slot<List<ExternalItem>>()
         val passwordSlot = slot<String>()
         val filePassword = "test"
-        every { cryptoManager.decryptData(any(), any()) } returns fakePassword
+        coEvery { cryptoManager.decryptData(any(), any()) } returns Result.success(fakePassword)
         coEvery {
             externalItemRepository.saveExternalItems(
                 capture(externalItemSlot),
@@ -101,7 +105,7 @@ class SettingsViewModelTest {
     @Test
     fun `deleteAllItems should delete all items`() = runBlocking {
         //given
-        coEvery { itemRepository.deleteAllItems() } just runs
+        coEvery { itemRepository.deleteAllItems() } returns Result.success(Unit)
 
         //when
         val result = viewModel.deleteAllItems().first()

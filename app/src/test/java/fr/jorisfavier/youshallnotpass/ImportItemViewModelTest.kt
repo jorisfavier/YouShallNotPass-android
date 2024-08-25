@@ -15,7 +15,9 @@ import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemViewModel
 import fr.jorisfavier.youshallnotpass.utils.CoroutineDispatchers
 import fr.jorisfavier.youshallnotpass.utils.State
 import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.mockk
+import io.mockk.slot
 import junit.framework.TestCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -56,7 +58,7 @@ class ImportItemViewModelTest {
     fun `setUri with a ysnp file uri should emit a navigate event`() = runBlocking {
         //given
         val uri: Uri = mockk()
-        coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns true
+        coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(true)
 
         //when
         viewModel.setUri(uri)
@@ -71,7 +73,7 @@ class ImportItemViewModelTest {
     fun `setUri with a csv file uri should emit a navigate event`() = runBlocking {
         //given
         val uri: Uri = mockk()
-        coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns false
+        coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(false)
 
         //when
         viewModel.setUri(uri)
@@ -87,7 +89,9 @@ class ImportItemViewModelTest {
         runBlocking {
             //given
             val uri: Uri = mockk()
-            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns false
+            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(
+                false
+            )
             var count = 0
 
             //when
@@ -109,7 +113,9 @@ class ImportItemViewModelTest {
         runBlocking {
             //given
             val uri: Uri = mockk()
-            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns true
+            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(
+                true
+            )
             var count = 0
 
             //when
@@ -132,13 +138,15 @@ class ImportItemViewModelTest {
             //given
             val uri: Uri = mockk()
             val filePassword = slot<String>()
-            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns true
+            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(
+                true
+            )
             coEvery {
                 externalItemRepository.getExternalItemsFromUri(
                     any(),
                     capture(filePassword)
                 )
-            } returns listOf(fakeItem)
+            } returns Result.success(listOf(fakeItem))
             viewModel.password.value = fakePassword
             val states = mutableListOf<State<Unit>>()
 
@@ -167,13 +175,15 @@ class ImportItemViewModelTest {
             //given
             val uri: Uri = mockk()
             val filePassword = slot<String>()
-            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns true
+            coEvery {
+                externalItemRepository.isSecuredWithPassword(any())
+            } returns Result.success(true)
             coEvery {
                 externalItemRepository.getExternalItemsFromUri(
                     any(),
                     capture(filePassword)
                 )
-            } returns listOf()
+            } returns Result.success(listOf())
             viewModel.password.value = fakePassword
             val states = mutableListOf<State<Unit>>()
 
@@ -199,13 +209,15 @@ class ImportItemViewModelTest {
             //given
             val uri: Uri = mockk()
             val filePassword = slot<String>()
-            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns true
+            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(
+                true
+            )
             coEvery {
                 externalItemRepository.getExternalItemsFromUri(
                     any(),
                     capture(filePassword)
                 )
-            } throws Exception()
+            } returns Result.failure(Exception())
             viewModel.password.value = fakePassword
             val states = mutableListOf<State<Unit>>()
             var count = 0
@@ -238,12 +250,14 @@ class ImportItemViewModelTest {
             //given
             val uri: Uri = mockk()
             val items = slot<List<Item>>()
-            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns false
-            coEvery { externalItemRepository.getExternalItemsFromUri(any(), any()) } returns listOf(
-                fakeItem
+            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(
+                false
             )
-            coEvery { cryptoManager.encryptData(any()) } returns fakeEncryptedData
-            coEvery { itemRepository.insertItems(capture(items)) } just runs
+            coEvery {
+                externalItemRepository.getExternalItemsFromUri(any(), any())
+            } returns Result.success(listOf(fakeItem))
+            coEvery { cryptoManager.encryptData(any()) } returns Result.success(fakeEncryptedData)
+            coEvery { itemRepository.insertItems(capture(items)) } returns Result.success(Unit)
             val states = mutableListOf<State<Unit>>()
 
             //when
@@ -273,10 +287,12 @@ class ImportItemViewModelTest {
         runBlocking {
             //given
             val uri: Uri = mockk()
-            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns false
-            coEvery { externalItemRepository.getExternalItemsFromUri(any(), any()) } returns listOf(
-                fakeItem
+            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(
+                false
             )
+            coEvery {
+                externalItemRepository.getExternalItemsFromUri(any(), any())
+            } returns Result.success(listOf(fakeItem))
             val states = mutableListOf<State<Unit>>()
 
             //when
@@ -299,12 +315,14 @@ class ImportItemViewModelTest {
         runBlocking {
             //given
             val uri: Uri = mockk()
-            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns false
-            coEvery { externalItemRepository.getExternalItemsFromUri(any(), any()) } returns listOf(
-                fakeItem
+            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(
+                false
             )
-            coEvery { cryptoManager.encryptData(any()) } returns fakeEncryptedData
-            coEvery { itemRepository.insertItems(any()) } throws Exception()
+            coEvery {
+                externalItemRepository.getExternalItemsFromUri(any(), any())
+            } returns Result.success(listOf(fakeItem))
+            coEvery { cryptoManager.encryptData(any()) } returns Result.success(fakeEncryptedData)
+            coEvery { itemRepository.insertItems(any()) } returns Result.failure(Exception())
             val states = mutableListOf<State<Unit>>()
 
             //when
@@ -327,13 +345,15 @@ class ImportItemViewModelTest {
         runBlocking {
             //given
             val uri: Uri = mockk()
-            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns false
+            coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(
+                false
+            )
             coEvery {
                 externalItemRepository.getExternalItemsFromUri(
                     any(),
                     any()
                 )
-            } returns listOf()
+            } returns Result.success(listOf())
             val states = mutableListOf<State<Unit>>()
 
             //when
@@ -355,10 +375,10 @@ class ImportItemViewModelTest {
     fun `selectAllItems should select all importedItems`() = runBlocking {
         //given
         val uri: Uri = mockk()
-        coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns false
-        coEvery { externalItemRepository.getExternalItemsFromUri(any(), any()) } returns listOf(
-            fakeItem
-        )
+        coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(false)
+        coEvery {
+            externalItemRepository.getExternalItemsFromUri(any(), any())
+        } returns Result.success(listOf(fakeItem))
 
         //when
         viewModel.setUri(uri)

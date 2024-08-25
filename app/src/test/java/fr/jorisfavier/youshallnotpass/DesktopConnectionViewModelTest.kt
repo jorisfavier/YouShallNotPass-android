@@ -4,7 +4,10 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
 import fr.jorisfavier.youshallnotpass.ui.desktop.DesktopConnectionViewModel
 import fr.jorisfavier.youshallnotpass.utils.State
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
+import io.mockk.slot
 import junit.framework.TestCase
 import org.junit.Rule
 import org.junit.Test
@@ -34,7 +37,7 @@ class DesktopConnectionViewModelTest {
         val fakeCode = "$fakeUrl#ysnp#$fakeKey"
         coEvery {
             desktopRepository.updateDesktopInfo(capture(urlSlot), capture(publicKeySlot))
-        } just runs
+        } returns Result.success(Unit)
 
         //when
         viewModel.qrCodeAnalyseState.observeForever {
@@ -57,7 +60,7 @@ class DesktopConnectionViewModelTest {
         val fakeCode = "fakecode"
         coEvery {
             desktopRepository.updateDesktopInfo(any(), any())
-        } just runs
+        } returns Result.success(Unit)
 
         //when
         viewModel.qrCodeAnalyseState.observeForever {
@@ -112,7 +115,7 @@ class DesktopConnectionViewModelTest {
         val fakeCode = "$fakeUrl#ysnp#$fakeKey"
         coEvery {
             desktopRepository.updateDesktopInfo(capture(urlSlot), capture(publicKeySlot))
-        } just runs
+        } returns Result.success(Unit)
 
         //when
         viewModel.qrCodeAnalyseState.observeForever {

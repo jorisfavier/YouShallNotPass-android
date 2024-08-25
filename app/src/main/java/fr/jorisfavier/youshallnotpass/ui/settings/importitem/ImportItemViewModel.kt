@@ -106,15 +106,15 @@ class ImportItemViewModel @Inject constructor(
         viewModelScope.launch {
             _loadFromUriState.postValue(State.Loading)
             val uri = currentUri ?: return@launch
-            externalItemRepository.getExternalItemsFromUri(uri, password.value)
-                .onSuccess { items ->
-                    _importedItems.postValue(items.map { ExternalItemViewModel(it, false) })
-                    _loadFromUriState.postValue(State.Success(Unit))
-                }
-                .onFailure {
-                    _loadFromUriState.postValue(State.Error)
-                    _navigate.postValue(Event(Unit))
-                }
+            val items =
+                externalItemRepository.getExternalItemsFromUri(uri, password.value).getOrNull()
+            if (!items.isNullOrEmpty()) {
+                _importedItems.postValue(items.map { ExternalItemViewModel(it, false) })
+                _loadFromUriState.postValue(State.Success(Unit))
+            } else {
+                _loadFromUriState.postValue(State.Error)
+                _navigate.postValue(Event(Unit))
+            }
         }
     }
 
@@ -141,7 +141,12 @@ class ImportItemViewModel @Inject constructor(
                 ?.toList()
             if (!itemsToImport.isNullOrEmpty()) {
                 itemRepository.insertItems(itemsToImport)
-                _importItemsState.postValue(State.Success(Unit))
+                    .onSuccess {
+                        _importItemsState.postValue(State.Success(Unit))
+                    }
+                    .onFailure {
+                        _importItemsState.value = State.Error
+                    }
             } else {
                 _importItemsState.postValue(State.Error)
             }

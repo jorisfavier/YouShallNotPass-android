@@ -12,10 +12,17 @@ import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.search.SearchViewModel
 import fr.jorisfavier.youshallnotpass.utils.State
 import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.runs
+import io.mockk.slot
+import io.mockk.verify
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
@@ -104,7 +111,7 @@ class SearchViewModelTest {
             emit(false)
         }
         coEvery { itemRepository.getAllItems() } throws Exception()
-        coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
+        coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList()) }
 
         //when
         viewModel.hasNoResult.observeForever {}
@@ -123,8 +130,8 @@ class SearchViewModelTest {
         every { appPreferences.observeShouldHideItems() } returns flow {
             emit(true)
         }
-        coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
-        coEvery { itemRepository.searchItem(any()) } returns listOf()
+        coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList()) }
+        coEvery { itemRepository.searchItem(any()) } returns Result.success(listOf())
 
         //when
         viewModel.hasNoResult.observeForever {}
@@ -145,16 +152,17 @@ class SearchViewModelTest {
         every { appPreferences.observeShouldHideItems() } returns flow {
             emit(true)
         }
-        coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
-        coEvery { itemRepository.searchItem(any()) } returns listOf(fakeItem)
+        coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList()) }
+        coEvery { itemRepository.searchItem(any()) } returns Result.success(listOf(fakeItem))
 
         //when
+        viewModel.search.value = "test"
+        viewModel.results.observeForever {}
         viewModel.hasNoResult.observeForever {}
         viewModel.noResultTextIdRes.observeForever {}
-        viewModel.search.value = "test"
 
         //then
-        val results = viewModel.results.getOrAwaitValue()
+        val results = viewModel.results.value
         assertEquals(false, viewModel.hasNoResult.value)
         assertTrue(results is State.Success && results.value.isNotEmpty())
     }
@@ -166,117 +174,82 @@ class SearchViewModelTest {
             emit(false)
         }
         coEvery { itemRepository.getAllItems() } returns flow { emit(listOf(fakeItem)) }
-        coEvery { itemRepository.searchItem(any()) } throws Exception()
+        coEvery { itemRepository.searchItem(any()) } returns Result.failure(Exception())
 
         //when
+        viewModel.search.value = "test"
+        viewModel.results.observeForever {}
         viewModel.hasNoResult.observeForever {}
         viewModel.noResultTextIdRes.observeForever {}
-        viewModel.search.value = "test"
 
         //then
-        val results = viewModel.results.getOrAwaitValue()
+        val results = viewModel.results.value
         assertEquals(true, viewModel.hasNoResult.value)
         assertTrue(results is State.Success && results.value.isEmpty())
     }
 
     @Test
-    fun `when changing HIDE_ITEMS_PREFERENCE_KEY shared preference we should emit items`() {
-        //given
-        every { appPreferences.observeShouldHideItems() } returns flow {
-            emit(true)
-            emit(false)
+    fun `when copyToClipboard called with type LOGIN we copy the login to the clipboard`() =
+        runBlocking {
+            //given
+            val slot = slot<String>()
+            mockkStatic(ClipData::class)
+            every { appPreferences.observeShouldHideItems() } returns flow {
+                emit(false)
+            }
+            coEvery { cryptoManager.decryptData(any(), any()) } returns Result.success(fakePassword)
+            every { clipboardManager.setPrimaryClip(any()) } just runs
+            every { ClipData.newPlainText(any(), capture(slot)) } returns mockk()
+            coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList()) }
+            //when
+            val result = viewModel.copyToClipboard(fakeItem, ItemDataType.LOGIN).first()
+
+            //then
+            assertEquals(fakeItem.login, slot.captured)
+            assertTrue(result.isSuccess)
+            assertEquals(R.string.copy_login_to_clipboard_success, result.getOrNull())
         }
-        coEvery { itemRepository.getAllItems() } returns flow { emit(listOf(fakeItem)) }
-
-        //when
-        viewModel.results.observeForever { }
-        viewModel.refreshItems()
-
-        //then
-        val results = viewModel.results.value
-        assertTrue(results is State.Success && results.value.isNotEmpty())
-    }
 
     @Test
-    fun `when refreshItems called we should emit items`() {
-        //given
-        every { appPreferences.observeShouldHideItems() } returns flow {
-            emit(false)
-        }
-        coEvery { itemRepository.getAllItems() } returns flow {
-            emit(emptyList<Item>())
-            emit(listOf(fakeItem))
-        }
+    fun `when copyToClipboard called with type PASSWORD we copy the login to the clipboard`() =
+        runBlocking {
+            //given
+            val slot = slot<String>()
+            mockkStatic(ClipData::class)
+            every { appPreferences.observeShouldHideItems() } returns flow {
+                emit(false)
+            }
+            coEvery { cryptoManager.decryptData(any(), any()) } returns Result.success(fakePassword)
+            every { clipboardManager.setPrimaryClip(any()) } just runs
+            every { ClipData.newPlainText(any(), capture(slot)) } returns mockk()
+            coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList()) }
+            //when
+            val result = viewModel.copyToClipboard(fakeItem, ItemDataType.PASSWORD).first()
 
-        //when
-        viewModel.results.observeForever { }
-        viewModel.refreshItems()
-
-        //then
-        val results = viewModel.results.value
-        assertTrue(results is State.Success && results.value.isNotEmpty())
-    }
+            //then
+            assertEquals(fakePassword, slot.captured)
+            assertTrue(result.isSuccess)
+            assertEquals(R.string.copy_password_to_clipboard_success, result.getOrNull())
+        }
 
     @Test
-    fun `when copyToClipboard called with type LOGIN we copy the login to the clipboard`() {
-        //given
-        val slot = slot<String>()
-        mockkStatic(ClipData::class)
-        every { appPreferences.observeShouldHideItems() } returns flow {
-            emit(false)
+    fun `when copyToClipboard called and cryptoManager throws an exception then nothing should be copied to the clipboard`() =
+        runBlocking {
+            //given
+            every { appPreferences.observeShouldHideItems() } returns flow {
+                emit(false)
+            }
+            coEvery { cryptoManager.decryptData(any(), any()) } returns Result.failure(Exception())
+            every { clipboardManager.setPrimaryClip(any()) } just runs
+            coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList()) }
+
+            //when
+            val result = viewModel.copyToClipboard(fakeItem, ItemDataType.PASSWORD).first()
+
+            //then
+            assertTrue(result.isFailure)
+            verify(inverse = true) { clipboardManager.setPrimaryClip(any()) }
         }
-        every { cryptoManager.decryptData(any(), any()) } returns fakePassword
-        every { clipboardManager.setPrimaryClip(any()) } just runs
-        every { ClipData.newPlainText(any(), capture(slot)) } returns mockk()
-        coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
-        //when
-        val result = viewModel.copyToClipboard(fakeItem, ItemDataType.LOGIN)
-
-        //then
-        assertEquals(fakeItem.login, slot.captured)
-        assertTrue(result.isSuccess)
-        assertEquals(R.string.copy_login_to_clipboard_success, result.getOrNull())
-    }
-
-    @Test
-    fun `when copyToClipboard called with type PASSWORD we copy the login to the clipboard`() {
-        //given
-        val slot = slot<String>()
-        mockkStatic(ClipData::class)
-        every { appPreferences.observeShouldHideItems() } returns flow {
-            emit(false)
-        }
-        every { cryptoManager.decryptData(any(), any()) } returns fakePassword
-        every { clipboardManager.setPrimaryClip(any()) } just runs
-        every { ClipData.newPlainText(any(), capture(slot)) } returns mockk()
-        coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
-        //when
-        val result = viewModel.copyToClipboard(fakeItem, ItemDataType.PASSWORD)
-
-        //then
-        assertEquals(fakePassword, slot.captured)
-        assertTrue(result.isSuccess)
-        assertEquals(R.string.copy_password_to_clipboard_success, result.getOrNull())
-    }
-
-    @Test
-    fun `when copyToClipboard called and cryptoManager throws an exception then nothing should be copied to the clipboard`() {
-        //given
-        every { appPreferences.observeShouldHideItems() } returns flow {
-            emit(false)
-        }
-        every { cryptoManager.decryptData(any(), any()) } throws Exception()
-        every { clipboardManager.setPrimaryClip(any()) } just runs
-        coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
-
-        //when
-        val result = viewModel.copyToClipboard(fakeItem, ItemDataType.PASSWORD)
-
-        //then
-
-        assertTrue(result.isFailure)
-        verify(inverse = true) { clipboardManager.setPrimaryClip(any()) }
-    }
 
     @Test
     fun `when deleteItem called the item should be removed from the repository and the flow should emit a success`() =
@@ -285,8 +258,8 @@ class SearchViewModelTest {
             every { appPreferences.observeShouldHideItems() } returns flow {
                 emit(false)
             }
-            coEvery { itemRepository.deleteItem(any()) } just runs
-            coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
+            coEvery { itemRepository.deleteItem(any()) } returns Result.success(Unit)
+            coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList()) }
             //when
             val result = viewModel.deleteItem(fakeItem).first()
 
@@ -318,8 +291,8 @@ class SearchViewModelTest {
                 emit(false)
             }
             val slot = slot<String>()
-            coEvery { desktopRepository.sendData(capture(slot)) } just runs
-            coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
+            coEvery { desktopRepository.sendData(capture(slot)) } returns Result.success(Unit)
+            coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList()) }
             //when
             val result = viewModel.sendToDesktop(fakeItem, ItemDataType.LOGIN).first()
 
@@ -336,8 +309,8 @@ class SearchViewModelTest {
                 emit(false)
             }
             val slot = slot<String>()
-            coEvery { desktopRepository.sendData(capture(slot)) } just runs
-            every { cryptoManager.decryptData(any(), any()) } returns fakePassword
+            coEvery { desktopRepository.sendData(capture(slot)) } returns Result.success(Unit)
+            coEvery { cryptoManager.decryptData(any(), any()) } returns Result.success(fakePassword)
             coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
             //when
             val result = viewModel.sendToDesktop(fakeItem, ItemDataType.PASSWORD).first()
@@ -354,9 +327,9 @@ class SearchViewModelTest {
             every { appPreferences.observeShouldHideItems() } returns flow {
                 emit(false)
             }
-            coEvery { desktopRepository.sendData(any()) } just runs
-            every { cryptoManager.decryptData(any(), any()) } throws Exception()
-            coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
+            coEvery { desktopRepository.sendData(any()) } returns Result.success(Unit)
+            coEvery { cryptoManager.decryptData(any(), any()) } returns Result.failure(Exception())
+            coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList()) }
 
             //when
             val result = viewModel.sendToDesktop(fakeItem, ItemDataType.PASSWORD).first()
@@ -374,8 +347,8 @@ class SearchViewModelTest {
             every { appPreferences.observeShouldHideItems() } returns flow {
                 emit(false)
             }
-            coEvery { desktopRepository.sendData(any()) } throws Exception()
-            coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
+            coEvery { desktopRepository.sendData(any()) } returns Result.failure(Exception())
+            coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList()) }
             //when
             val result = viewModel.sendToDesktop(fakeItem, ItemDataType.LOGIN).first()
 

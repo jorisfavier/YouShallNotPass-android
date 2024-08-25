@@ -14,8 +14,4 @@ abstract class SearchBaseViewModel : ViewModel() {
     abstract val hasNoResult: LiveData<Boolean>
     abstract val noResultTextIdRes: LiveData<Int>
 
-    fun refreshItems() {
-        search.value = search.value
-    }
-
 }

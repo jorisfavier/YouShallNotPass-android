@@ -91,7 +91,7 @@ class SearchViewModel(
         .debounce(duration = debounceDurationMs, coroutineScope = viewModelScope)
 
     override val hasNoResult: LiveData<Boolean> = results.map { state ->
-        state is State.Success && state.value.count() == 0
+        state is State.Success && state.value.isEmpty()
     }
 
     override val noResultTextIdRes =

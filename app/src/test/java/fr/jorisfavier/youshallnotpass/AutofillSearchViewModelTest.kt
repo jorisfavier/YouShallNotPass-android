@@ -9,7 +9,12 @@ import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.autofill.AutofillDataSetInfo
 import fr.jorisfavier.youshallnotpass.ui.autofill.AutofillSearchViewModel
 import fr.jorisfavier.youshallnotpass.utils.AssistStructureUtil
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.slot
 import junit.framework.TestCase
 import org.junit.Rule
 import org.junit.Test
@@ -60,8 +65,8 @@ class AutofillSearchViewModelTest {
                 any()
             )
         } returns fakeParsedStructure
-        coEvery { itemRepository.searchItemByCertificates(any()) } returns emptyList()
-        coEvery { itemRepository.searchItem(any()) } returns emptyList()
+        coEvery { itemRepository.searchItemByCertificates(any()) } returns Result.success(emptyList())
+        coEvery { itemRepository.searchItem(any()) } returns Result.success(emptyList())
 
         //when
         viewModel.results.observeForever {}
@@ -84,8 +89,8 @@ class AutofillSearchViewModelTest {
                 any()
             )
         } returns fakeParsedStructure
-        coEvery { itemRepository.updateOrCreateItem(capture(slot)) } just runs
-        coEvery { cryptoManager.decryptData(any(), any()) } returns fakePassword
+        coEvery { itemRepository.updateOrCreateItem(capture(slot)) } returns Result.success(Unit)
+        coEvery { cryptoManager.decryptData(any(), any()) } returns Result.success(fakePassword)
 
         //when
         viewModel.setAutofillInfos(mockk(), mockk())
@@ -114,8 +119,8 @@ class AutofillSearchViewModelTest {
                 any()
             )
         } returns fakeParsedStructure
-        coEvery { itemRepository.updateOrCreateItem(any()) } throws Exception()
-        coEvery { cryptoManager.decryptData(any(), any()) } returns fakePassword
+        coEvery { itemRepository.updateOrCreateItem(any()) } returns Result.failure(Exception())
+        coEvery { cryptoManager.decryptData(any(), any()) } returns Result.success(fakePassword)
 
         //when
         viewModel.setAutofillInfos(mockk(), mockk())

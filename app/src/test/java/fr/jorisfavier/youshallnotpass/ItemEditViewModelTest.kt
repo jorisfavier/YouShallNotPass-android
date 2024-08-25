@@ -10,7 +10,13 @@ import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.item.ItemEditViewModel
 import fr.jorisfavier.youshallnotpass.utils.PasswordUtil
 import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.runs
+import io.mockk.slot
+import io.mockk.verify
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.flow.first
@@ -68,13 +74,13 @@ class ItemEditViewModelTest {
     @Test
     fun `on initData with a valid item id ItemEditViewModel should emit an 'update' button text, an item login and an item password`() {
         //given
-        coEvery { itemRepo.getItemById(1) } returns fakeItem
-        every {
+        coEvery { itemRepo.getItemById(1) } returns Result.success(fakeItem)
+        coEvery {
             cryptoManager.decryptData(
                 fakeItem.password,
                 fakeItem.initializationVector
             )
-        } returns fakeDecryptedPassword
+        } returns Result.success(fakeDecryptedPassword)
 
         val viewModel = ItemEditViewModel(
             cryptoManager = cryptoManager,
@@ -95,13 +101,13 @@ class ItemEditViewModelTest {
     fun `on initData should init as a normal item creation when an exception is raised by the itemRepository`() =
         runBlocking {
             //given
-            coEvery { itemRepo.getItemById(1) } throws Exception()
-            every {
+            coEvery { itemRepo.getItemById(1) } returns Result.failure(Exception())
+            coEvery {
                 cryptoManager.decryptData(
                     fakeItem.password,
                     fakeItem.initializationVector
                 )
-            } returns fakeDecryptedPassword
+            } returns Result.success(fakeDecryptedPassword)
 
             val viewModel = ItemEditViewModel(
                 cryptoManager = cryptoManager,
@@ -197,9 +203,11 @@ class ItemEditViewModelTest {
     fun `updateOrCreateItem should return a success when password and name are provided`() =
         runBlocking {
             //given
-            every { cryptoManager.encryptData(fakeDecryptedPassword) } returns fakeEncryptedData
-            coEvery { itemRepo.searchItem(fakeItem.title) } returns listOf()
-            coEvery { itemRepo.updateOrCreateItem(any()) } just runs
+            coEvery { cryptoManager.encryptData(fakeDecryptedPassword) } returns Result.success(
+                fakeEncryptedData
+            )
+            coEvery { itemRepo.searchItem(fakeItem.title) } returns Result.success(listOf())
+            coEvery { itemRepo.updateOrCreateItem(any()) } returns Result.success(Unit)
             every { clipManager.setPrimaryClip(any()) } just runs
 
             //when
@@ -218,9 +226,11 @@ class ItemEditViewModelTest {
     fun `updateOrCreateItem should return an error when password and name are not provided`() =
         runBlocking {
             //given
-            every { cryptoManager.encryptData(fakeDecryptedPassword) } returns fakeEncryptedData
-            coEvery { itemRepo.searchItem(fakeItem.title) } returns listOf()
-            coEvery { itemRepo.updateOrCreateItem(any()) } just runs
+            coEvery { cryptoManager.encryptData(fakeDecryptedPassword) } returns Result.success(
+                fakeEncryptedData
+            )
+            coEvery { itemRepo.searchItem(fakeItem.title) } returns Result.success(listOf())
+            coEvery { itemRepo.updateOrCreateItem(any()) } returns Result.success(Unit)
 
             //when
             viewModel.initData(0)
@@ -238,9 +248,11 @@ class ItemEditViewModelTest {
     fun `updateOrCreateItem should return an error when trying to add an item with a same name`() =
         runBlocking {
             //given
-            every { cryptoManager.encryptData(fakeDecryptedPassword) } returns fakeEncryptedData
-            coEvery { itemRepo.searchItem(fakeItem.title) } returns listOf(fakeItem)
-            coEvery { itemRepo.updateOrCreateItem(any()) } just runs
+            coEvery { cryptoManager.encryptData(fakeDecryptedPassword) } returns Result.success(
+                fakeEncryptedData
+            )
+            coEvery { itemRepo.searchItem(fakeItem.title) } returns Result.success(listOf(fakeItem))
+            coEvery { itemRepo.updateOrCreateItem(any()) } returns Result.success(Unit)
 
             //when
             viewModel.initData(0)
@@ -259,9 +271,11 @@ class ItemEditViewModelTest {
     @Test
     fun `updateOrCreateItem should return an error when an exception is raised`() = runBlocking {
         //given
-        every { cryptoManager.encryptData(fakeDecryptedPassword) } returns fakeEncryptedData
-        coEvery { itemRepo.searchItem(fakeItem.title) } returns listOf()
-        coEvery { itemRepo.updateOrCreateItem(any()) } throws Exception()
+        coEvery { cryptoManager.encryptData(fakeDecryptedPassword) } returns Result.success(
+            fakeEncryptedData
+        )
+        coEvery { itemRepo.searchItem(fakeItem.title) } returns Result.success(listOf())
+        coEvery { itemRepo.updateOrCreateItem(any()) } returns Result.failure(Exception())
 
         //when
         viewModel.initData(0)
@@ -281,15 +295,17 @@ class ItemEditViewModelTest {
     fun `updateOrCreateItem should return a success when updating an Item`() = runBlocking {
         //given
         val slot = slot<Item>()
-        coEvery { itemRepo.getItemById(1) } returns fakeItem
-        every { cryptoManager.encryptData(fakeDecryptedPassword) } returns fakeEncryptedData
-        coEvery { itemRepo.updateOrCreateItem(capture(slot)) } just runs
-        every {
+        coEvery { itemRepo.getItemById(1) } returns Result.success(fakeItem)
+        coEvery { cryptoManager.encryptData(fakeDecryptedPassword) } returns Result.success(
+            fakeEncryptedData
+        )
+        coEvery { itemRepo.updateOrCreateItem(capture(slot)) } returns Result.success(Unit)
+        coEvery {
             cryptoManager.decryptData(
                 fakeItem.password,
                 fakeItem.initializationVector
             )
-        } returns fakeDecryptedPassword
+        } returns Result.success(fakeDecryptedPassword)
 
         //when
         viewModel.initData(1)

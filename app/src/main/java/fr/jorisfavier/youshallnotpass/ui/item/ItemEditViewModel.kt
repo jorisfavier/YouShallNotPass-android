@@ -102,14 +102,20 @@ class ItemEditViewModel @Inject constructor(
                             packageCertificate = currentItem?.packageCertificate.orEmpty()
                         )
                     )
-                    val successResourceId = if (id == 0) {
-                        val clip = ClipData.newPlainText(ItemDataType.PASSWORD.name, passwordValue)
-                        clipboardManager.setPrimaryClip(clip)
-                        R.string.item_creation_success
-                    } else {
-                        R.string.item_update_success
-                    }
-                    emit(Result.success(successResourceId))
+                        .onSuccess {
+                            val successResourceId = if (id == 0) {
+                                val clip =
+                                    ClipData.newPlainText(ItemDataType.PASSWORD.name, passwordValue)
+                                clipboardManager.setPrimaryClip(clip)
+                                R.string.item_creation_success
+                            } else {
+                                R.string.item_update_success
+                            }
+                            emit(Result.success(successResourceId))
+                        }
+                        .onFailure {
+                            emit(Result.failure(YsnpException(R.string.error_occurred)))
+                        }
                 }
             } else {
                 emit(Result.failure(YsnpException(R.string.item_name_or_password_missing)))

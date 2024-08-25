@@ -2,7 +2,6 @@ package fr.jorisfavier.youshallnotpass
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import fr.jorisfavier.youshallnotpass.analytics.ScreenName
-import fr.jorisfavier.youshallnotpass.analytics.YSNPAnalytics
 import fr.jorisfavier.youshallnotpass.analytics.impl.YSNPAnalyticsImpl
 import fr.jorisfavier.youshallnotpass.api.AnalyticsApi
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
@@ -10,7 +9,13 @@ import fr.jorisfavier.youshallnotpass.manager.AuthManager
 import fr.jorisfavier.youshallnotpass.manager.impl.AuthManagerImpl
 import fr.jorisfavier.youshallnotpass.ui.home.HomeViewModel
 import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.runs
+import io.mockk.verify
 import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -93,8 +98,8 @@ class HomeViewModelTest {
     fun `tracking the home screen for the first time is working`() {
         //given
         coEvery { analyticsApi.sendEvent(any()) } just runs
-        coEvery { appPreference.getAnalyticEventDate(any()) } returns null
-        coEvery { appPreference.setAnalyticEventDate(any(), any()) } just runs
+        coEvery { appPreference.getAnalyticEventDate(ScreenName.Home) } returns null
+        coEvery { appPreference.setAnalyticEventDate(ScreenName.Home, any()) } just runs
         val analytics = YSNPAnalyticsImpl(analyticsApi, appPreference)
         val viewModel = HomeViewModel(authManager, analytics = analytics)
 
@@ -110,8 +115,8 @@ class HomeViewModelTest {
     fun `tracking the home screen should only happen once per day`() {
         //given
         coEvery { analyticsApi.sendEvent(any()) } just runs
-        coEvery { appPreference.getAnalyticEventDate(any()) } returns LocalDateTime.now()
-        coEvery { appPreference.setAnalyticEventDate(any(), any()) } just runs
+        coEvery { appPreference.getAnalyticEventDate(ScreenName.Home) } returns LocalDateTime.now()
+        coEvery { appPreference.setAnalyticEventDate(ScreenName.Home, any()) } just runs
         val analytics = YSNPAnalyticsImpl(analyticsApi, appPreference)
         val viewModel = HomeViewModel(authManager, analytics = analytics)
 

@@ -2,6 +2,7 @@ package fr.jorisfavier.youshallnotpass
 
 import android.app.KeyguardManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import fr.jorisfavier.youshallnotpass.manager.AuthManager
 import fr.jorisfavier.youshallnotpass.ui.auth.AuthViewModel
@@ -26,15 +27,19 @@ class AuthViewModelTest {
         //given
         val authManager: AuthManager = mockk()
         val keyguardManager: KeyguardManager = mockk()
+        val biometricManager: BiometricManager = mockk()
         every { authManager setProperty "isUserAuthenticated" value true } just runs
 
-        val viewModel = AuthViewModel(authManager, keyguardManager)
+        val viewModel = AuthViewModel(authManager, keyguardManager, biometricManager)
 
         //when
         viewModel.authCallback.onAuthenticationSucceeded(mockk())
 
         //then
-        assertEquals(viewModel.authStatus.getOrAwaitValue().peekContent(), AuthViewModel.AuthStatus.Success)
+        assertEquals(
+            viewModel.authStatus.getOrAwaitValue().peekContent(),
+            AuthViewModel.AuthStatus.Success
+        )
         verify { authManager setProperty "isUserAuthenticated" value true }
     }
 
@@ -43,14 +48,16 @@ class AuthViewModelTest {
         //given
         val authManager: AuthManager = mockk()
         val keyguardManager: KeyguardManager = mockk()
+        val biometricManager: BiometricManager = mockk()
 
-        val viewModel = AuthViewModel(authManager, keyguardManager)
+        val viewModel = AuthViewModel(authManager, keyguardManager, biometricManager)
 
         //when
         viewModel.authCallback.onAuthenticationError(BiometricPrompt.ERROR_UNABLE_TO_PROCESS, "")
 
         //then
-        val authResult = viewModel.authStatus.getOrAwaitValue().peekContent() as? AuthViewModel.AuthStatus.Failure
+        val authResult = viewModel.authStatus.getOrAwaitValue()
+            .peekContent() as? AuthViewModel.AuthStatus.Failure
         assertTrue(authResult is AuthViewModel.AuthStatus.Failure)
         assertEquals(authResult?.errorMessage, R.string.auth_fail_try_again)
     }
@@ -60,14 +67,16 @@ class AuthViewModelTest {
         //given
         val authManager: AuthManager = mockk()
         val keyguardManager: KeyguardManager = mockk()
+        val biometricManager: BiometricManager = mockk()
 
-        val viewModel = AuthViewModel(authManager, keyguardManager)
+        val viewModel = AuthViewModel(authManager, keyguardManager, biometricManager)
 
         //when
         viewModel.authCallback.onAuthenticationError(BiometricPrompt.ERROR_NO_BIOMETRICS, "")
 
         //then
-        val authResult = viewModel.authStatus.getOrAwaitValue().peekContent() as? AuthViewModel.AuthStatus.Failure
+        val authResult = viewModel.authStatus.getOrAwaitValue()
+            .peekContent() as? AuthViewModel.AuthStatus.Failure
         assertTrue(authResult is AuthViewModel.AuthStatus.Failure)
         assertEquals(authResult?.errorMessage, R.string.auth_fail_no_biometrics)
     }
@@ -77,13 +86,16 @@ class AuthViewModelTest {
         //given
         val authManager: AuthManager = mockk()
         val keyguardManager: KeyguardManager = mockk()
+        val biometricManager: BiometricManager = mockk()
 
-        val viewModel = AuthViewModel(authManager, keyguardManager)
+        val viewModel = AuthViewModel(authManager, keyguardManager, biometricManager)
 
         //when
         viewModel.authCallback.onAuthenticationFailed()
 
         //then
-        assertTrue(viewModel.authStatus.getOrAwaitValue().peekContent() is AuthViewModel.AuthStatus.Failure)
+        assertTrue(
+            viewModel.authStatus.getOrAwaitValue().peekContent() is AuthViewModel.AuthStatus.Failure
+        )
     }
 }
