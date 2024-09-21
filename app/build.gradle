@@ -14,8 +14,8 @@ android {
         applicationId "fr.jorisfavier.youshallnotpass"
         minSdkVersion 23
         targetSdkVersion 33
-        versionCode 7
-        versionName "1.0.0"
+        versionCode 9
+        versionName "1.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         buildConfigField "String", "ANALYTIC_URL", "\"https://app.piratepx.com\""
         buildConfigField "String", "PRIVACY_POLICY_URL", "\"https://jorisfavier.fr/youshallnotpass/privacy-policy\""
@@ -46,6 +46,9 @@ android {
     buildFeatures {
         viewBinding true
         dataBinding true
+    }
+    lintOptions {
+        disable 'NullSafeMutableLiveData'
     }
     namespace 'fr.jorisfavier.youshallnotpass'
 }
@@ -103,8 +106,6 @@ dependencies {
     implementation "androidx.security:security-crypto:1.1.0-alpha01"
 
     implementation 'androidx.autofill:autofill:1.1.0'
-    implementation 'io.sentry:sentry-android:5.3.0'
-
 
     //Retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"

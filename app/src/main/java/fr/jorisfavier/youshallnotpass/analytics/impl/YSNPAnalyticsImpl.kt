@@ -16,15 +16,17 @@ class YSNPAnalyticsImpl @Inject constructor(
 
     override suspend fun trackScreenView(screen: ScreenName, frequency: Frequency?) {
         try {
-            if (frequency != null) {
-                val lastTimeEventWasSent = appPreferenceDataSource.getAnalyticEventDate(screen)
-                if (lastTimeEventWasSent == null || frequency.isOutdated(lastTimeEventWasSent)) {
-                    appPreferenceDataSource.setAnalyticEventDate(screen, LocalDateTime.now())
-                } else {
-                    return
-                }
+            val shouldSendEvent = if (frequency != null) {
+                appPreferenceDataSource.getAnalyticEventDate(screen)?.let { lastTimeEventWasSent ->
+                    frequency.isOutdated(lastTimeEventWasSent)
+                } ?: true
+            } else {
+                true
             }
-            api.sendEvent(screen.event)
+            if (shouldSendEvent) {
+                appPreferenceDataSource.setAnalyticEventDate(screen, LocalDateTime.now())
+                api.sendEvent(screen.event)
+            }
         } catch (e: Exception) {
             Timber.e(e, "Unable to send analytic event")
         }
