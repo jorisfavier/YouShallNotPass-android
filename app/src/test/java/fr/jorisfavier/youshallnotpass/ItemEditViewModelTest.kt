@@ -1,6 +1,7 @@
 package fr.jorisfavier.youshallnotpass
 
 import android.content.ClipboardManager
+import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.manager.model.EncryptedData
@@ -55,19 +56,16 @@ class ItemEditViewModelTest {
     )
 
     @Test
-    fun `on initData ItemEditViewModel should have numbers, symbol, uppercase, a password default size and 'create' button text`() {
+    fun `on initData ItemEditViewModel should have a password default size and a 'create' button text`() {
         //given
         //when
         viewModel.initData(0)
 
         //then
-        assertEquals(true, viewModel.hasNumber.getOrAwaitValue())
-        assertEquals(true, viewModel.hasSymbol.getOrAwaitValue())
-        assertEquals(true, viewModel.hasUppercase.getOrAwaitValue())
         assertEquals(R.string.item_create, viewModel.createOrUpdateText.getOrAwaitValue())
         assertEquals(
             PasswordUtil.MINIMUM_SECURE_SIZE,
-            viewModel.passwordLengthValue.getOrAwaitValue()
+            viewModel.passwordLength.getOrAwaitValue()
         )
     }
 
@@ -93,7 +91,7 @@ class ItemEditViewModelTest {
 
         //then
         assertEquals(R.string.item_update, viewModel.createOrUpdateText.getOrAwaitValue())
-        assertEquals(fakeItem.login, viewModel.login.getOrAwaitValue())
+        assertEquals(fakeItem.login, viewModel.currentItem.getOrAwaitValue()?.login)
         assertEquals(fakeDecryptedPassword, viewModel.password.getOrAwaitValue())
     }
 
@@ -125,16 +123,15 @@ class ItemEditViewModelTest {
     @Test
     fun `generateSecurePassword with symbol disabled should emit a password without symbols`() {
         //given
-        viewModel.hasSymbol.value = false
 
         //when
-
-        //force passwordLengthValue to emit values
-        viewModel.passwordLengthValue.observeForever {}
-        viewModel.generateSecurePassword()
+        val password = viewModel.generateSecurePassword(
+            hasUppercase = true,
+            hasSymbol = false,
+            hasNumber = true,
+        )
 
         //then
-        val password = viewModel.password.getOrAwaitValue()
         assertTrue(password.filter { PasswordUtil.SYMBOLS.contains(it) }.toList().isEmpty())
         assertTrue(password.filter { PasswordUtil.UPPERCASE.contains(it) }.toList().isNotEmpty())
         assertTrue(password.filter { PasswordUtil.NUMBERS.contains(it) }.toList().isNotEmpty())
@@ -145,16 +142,15 @@ class ItemEditViewModelTest {
     @Test
     fun `generateSecurePassword with number disabled should emit a password without numbers`() {
         //given
-        viewModel.hasNumber.value = false
 
         //when
-
-        //force passwordLengthValue to emit values
-        viewModel.passwordLengthValue.observeForever {}
-        viewModel.generateSecurePassword()
+        val password = viewModel.generateSecurePassword(
+            hasUppercase = true,
+            hasSymbol = true,
+            hasNumber = false,
+        )
 
         //then
-        val password = viewModel.password.getOrAwaitValue()
         assertTrue(password.filter { PasswordUtil.NUMBERS.contains(it) }.toList().isEmpty())
         assertTrue(password.filter { PasswordUtil.UPPERCASE.contains(it) }.toList().isNotEmpty())
         assertTrue(password.filter { PasswordUtil.SYMBOLS.contains(it) }.toList().isNotEmpty())
@@ -163,16 +159,14 @@ class ItemEditViewModelTest {
 
     @Test
     fun `generateSecurePassword with uppercase disabled should emit a password without uppercase`() {
-        //given
-        viewModel.hasUppercase.value = false
-
         //when
-        //force passwordLengthValue to emit values
-        viewModel.passwordLengthValue.observeForever {}
-        viewModel.generateSecurePassword()
+        val password = viewModel.generateSecurePassword(
+            hasUppercase = false,
+            hasSymbol = true,
+            hasNumber = true,
+        )
 
         //then
-        val password = viewModel.password.getOrAwaitValue()
         assertTrue(password.filter { PasswordUtil.UPPERCASE.contains(it) }.toList().isEmpty())
         assertTrue(password.filter { PasswordUtil.SYMBOLS.contains(it) }.toList().isNotEmpty())
         assertTrue(password.filter { PasswordUtil.NUMBERS.contains(it) }.toList().isNotEmpty())
@@ -183,16 +177,16 @@ class ItemEditViewModelTest {
     fun `generateSecurePassword with passwordLength changed should emit a password with the correct size`() {
         //given
         val passwordLength = 3
-        viewModel.passwordLength.value = passwordLength
+        viewModel.onPasswordLengthChanged(passwordLength)
 
         //when
-
-        //force passwordLengthValue to emit values
-        viewModel.passwordLengthValue.observeForever {}
-        viewModel.generateSecurePassword()
+        val password = viewModel.generateSecurePassword(
+            hasUppercase = true,
+            hasNumber = true,
+            hasSymbol = true,
+        )
 
         //then
-        val password = viewModel.password.getOrAwaitValue()
         assertTrue(password.length == (passwordLength + PasswordUtil.MINIMUM_SECURE_SIZE))
         assertTrue(password.filter { PasswordUtil.UPPERCASE.contains(it) }.toList().isNotEmpty())
         assertTrue(password.filter { PasswordUtil.NUMBERS.contains(it) }.toList().isNotEmpty())
@@ -212,9 +206,11 @@ class ItemEditViewModelTest {
 
             //when
             viewModel.initData(0)
-            viewModel.password.value = fakeDecryptedPassword
-            viewModel.name.value = fakeItem.title
-            val result = viewModel.updateOrCreateItem().first()
+            val result = viewModel.updateOrCreateItem(
+                name = fakeItem.title,
+                password = fakeDecryptedPassword,
+                login = null,
+            ).first()
 
             //then
             assertTrue(result.isSuccess)
@@ -234,7 +230,11 @@ class ItemEditViewModelTest {
 
             //when
             viewModel.initData(0)
-            val result = viewModel.updateOrCreateItem().first()
+            val result = viewModel.updateOrCreateItem(
+                name = null,
+                password = null,
+                login = null,
+            ).first()
 
             //then
             assertTrue(result.isFailure)
@@ -256,9 +256,11 @@ class ItemEditViewModelTest {
 
             //when
             viewModel.initData(0)
-            viewModel.password.value = fakeDecryptedPassword
-            viewModel.name.value = fakeItem.title
-            val result = viewModel.updateOrCreateItem().first()
+            val result = viewModel.updateOrCreateItem(
+                name = fakeItem.title,
+                password = fakeDecryptedPassword,
+                login = null,
+            ).first()
 
             //then
             assertTrue(result.isFailure)
@@ -279,9 +281,11 @@ class ItemEditViewModelTest {
 
         //when
         viewModel.initData(0)
-        viewModel.password.value = fakeDecryptedPassword
-        viewModel.name.value = fakeItem.title
-        val result = viewModel.updateOrCreateItem().first()
+        val result = viewModel.updateOrCreateItem(
+            name = fakeItem.title,
+            password = fakeDecryptedPassword,
+            login = null,
+        ).first()
 
         //then
         assertTrue(result.isFailure)
@@ -309,8 +313,11 @@ class ItemEditViewModelTest {
 
         //when
         viewModel.initData(1)
-        viewModel.name.value = newFakeTitle
-        val result = viewModel.updateOrCreateItem().first()
+        val result = viewModel.updateOrCreateItem(
+            name = newFakeTitle,
+            password = fakeDecryptedPassword,
+            login = fakeItem.login,
+        ).first()
 
         //then
         assertTrue(result.isSuccess)

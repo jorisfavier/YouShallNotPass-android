@@ -11,7 +11,6 @@ import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.ui.search.SearchViewModel
 import fr.jorisfavier.youshallnotpass.utils.State
-import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -72,7 +71,7 @@ class SearchViewModelTest {
             coEvery { itemRepository.getAllItems() } returns flow { emit(emptyList<Item>()) }
 
             //when
-            viewModel.search.value = ""
+            viewModel.onSearchChanged("")
             viewModel.results.observeForever {}
             viewModel.hasNoResult.observeForever {}
             viewModel.noResultTextIdRes.observeForever {}
@@ -137,7 +136,7 @@ class SearchViewModelTest {
         viewModel.hasNoResult.observeForever {}
         viewModel.noResultTextIdRes.observeForever {}
         viewModel.results.observeForever {}
-        viewModel.search.value = "test"
+        viewModel.onSearchChanged("test")
 
         //then
         val results = viewModel.results.value
@@ -156,7 +155,7 @@ class SearchViewModelTest {
         coEvery { itemRepository.searchItem(any()) } returns Result.success(listOf(fakeItem))
 
         //when
-        viewModel.search.value = "test"
+        viewModel.onSearchChanged("test")
         viewModel.results.observeForever {}
         viewModel.hasNoResult.observeForever {}
         viewModel.noResultTextIdRes.observeForever {}
@@ -177,7 +176,7 @@ class SearchViewModelTest {
         coEvery { itemRepository.searchItem(any()) } returns Result.failure(Exception())
 
         //when
-        viewModel.search.value = "test"
+        viewModel.onSearchChanged("test")
         viewModel.results.observeForever {}
         viewModel.hasNoResult.observeForever {}
         viewModel.noResultTextIdRes.observeForever {}

@@ -147,7 +147,7 @@ class ImportItemViewModelTest {
                     capture(filePassword)
                 )
             } returns Result.success(listOf(fakeItem))
-            viewModel.password.value = fakePassword
+            viewModel.onPasswordChanged(fakePassword)
             val states = mutableListOf<State<Unit>>()
 
             //when
@@ -184,7 +184,7 @@ class ImportItemViewModelTest {
                     capture(filePassword)
                 )
             } returns Result.success(listOf())
-            viewModel.password.value = fakePassword
+            viewModel.onPasswordChanged(fakePassword)
             val states = mutableListOf<State<Unit>>()
 
             //when
@@ -218,7 +218,7 @@ class ImportItemViewModelTest {
                     capture(filePassword)
                 )
             } returns Result.failure(Exception())
-            viewModel.password.value = fakePassword
+            viewModel.onPasswordChanged(fakePassword)
             val states = mutableListOf<State<Unit>>()
             var count = 0
 
