@@ -40,7 +40,6 @@ class ReviewImportedItemsFragment : Fragment(R.layout.fragment_import_review_ite
         super.onViewCreated(view, savedInstanceState)
         initList()
         initObserver()
-        binding.itemTotalCount = 0
         binding.importReviewSelectAll.setOnClickListener {
             viewModel.selectAllItems()
         }
@@ -51,9 +50,9 @@ class ReviewImportedItemsFragment : Fragment(R.layout.fragment_import_review_ite
     }
 
     private fun initObserver() {
-        viewModel.importedItems.observe(viewLifecycleOwner) {
-            binding.itemTotalCount = it.size
-            adapter.updateData(it)
+        viewModel.importedItems.observe(viewLifecycleOwner) { items ->
+            binding.importReviewItemCount.text = getString(R.string.item_found, items.size)
+            adapter.updateData(items)
         }
         viewModel.loadFromUriState.observe(viewLifecycleOwner) { state ->
             binding.importReviewList.isVisible = state is State.Success

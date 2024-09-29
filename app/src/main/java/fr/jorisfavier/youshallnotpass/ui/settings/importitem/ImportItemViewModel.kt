@@ -49,6 +49,8 @@ class ImportItemViewModel @Inject constructor(
     private val _importItemsState = MutableLiveData<State<Unit>>()
     val importItemsState: LiveData<State<Unit>> = _importItemsState
 
+    private val _password = MutableLiveData<String>()
+    val password: LiveData<String> = _password
 
     val isFileSelected: Boolean
         get() = currentUri != null
@@ -59,7 +61,6 @@ class ImportItemViewModel @Inject constructor(
     val isAtLeastOneItemSelected: Boolean
         get() = _importedItems.value.orEmpty().any { it.selected }
 
-    val password = MutableLiveData<String>()
 
     private var currentUri: Uri? = null
 
@@ -95,6 +96,10 @@ class ImportItemViewModel @Inject constructor(
                 importItems()
             }
         }
+    }
+
+    fun onPasswordChanged(password: String) {
+        _password.value = password
     }
 
     fun selectAllItems() {

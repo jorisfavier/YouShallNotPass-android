@@ -67,7 +67,7 @@ class AutofillSearchViewModel @Inject constructor(
                             //When landing to this fragment the first time
                             //if we haven't found any result from the certificate
                             //we try to find some items from the app name or web domain
-                            search.value = parsedStructure.webDomain?.getDomainIfUrl()
+                            _search.value = parsedStructure.webDomain?.getDomainIfUrl()
                                 ?: parsedStructure.appName
                             firstSearchProcessed = true
                         }

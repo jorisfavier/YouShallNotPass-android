@@ -1,67 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:colorBackground"
+    android:paddingTop="@dimen/appintro_statusbar_height"
+    android:paddingBottom="@dimen/appintro2_bottombar_height"
+    tools:context=".ui.settings.importitem.ImportItemActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?android:colorBackground"
-        android:paddingTop="@dimen/appintro_statusbar_height"
-        android:paddingBottom="@dimen/appintro2_bottombar_height"
-        tools:context=".ui.settings.importitem.ImportItemActivity">
+    <TextView
+        android:id="@+id/import_select_file_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/import_items"
+        android:textAllCaps="true"
+        android:textAppearance="?attr/textAppearanceHeadline5"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/import_select_file_title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/import_items"
-            android:textAllCaps="true"
-            android:textAppearance="?attr/textAppearanceHeadline5"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/import_select_file_image"
-            android:layout_width="@dimen/import_image_width"
-            android:layout_height="@dimen/import_image_height"
-            android:layout_marginTop="@dimen/import_image_margin_top"
-            android:scaleType="fitCenter"
-            android:src="@drawable/chest"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/import_select_file_title"
-            app:tint="?attr/colorOnBackground" />
+    <ImageView
+        android:id="@+id/import_select_file_image"
+        android:layout_width="@dimen/import_image_width"
+        android:layout_height="@dimen/import_image_height"
+        android:layout_marginTop="@dimen/import_image_margin_top"
+        android:scaleType="fitCenter"
+        android:src="@drawable/chest"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/import_select_file_title"
+        app:tint="?attr/colorOnBackground" />
 
 
-        <TextView
-            android:id="@+id/import_select_file_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:autoLink="web"
-            android:padding="@dimen/appintro_desc_padding"
-            android:text="@string/import_step1"
-            android:textAlignment="center"
-            android:textAppearance="?attr/textAppearanceHeadline6"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/import_select_file_image" />
+    <TextView
+        android:id="@+id/import_select_file_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:autoLink="web"
+        android:padding="@dimen/appintro_desc_padding"
+        android:text="@string/import_step1"
+        android:textAlignment="center"
+        android:textAppearance="?attr/textAppearanceHeadline6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/import_select_file_image" />
 
-        <Button
-            android:id="@+id/import_select_file_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="20dp"
-            android:text="@string/select_file"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/import_select_file_description" />
+    <Button
+        android:id="@+id/import_select_file_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="20dp"
+        android:text="@string/select_file"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/import_select_file_description" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</layout>
+</androidx.constraintlayout.widget.ConstraintLayout>

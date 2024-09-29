@@ -6,6 +6,7 @@ import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SeekBar
 import androidx.annotation.LayoutRes
 import androidx.camera.core.AspectRatio
 import kotlin.math.abs
@@ -65,6 +66,18 @@ fun View.fadeOut(
 fun View.aspectRatio(): Int {
     val metrics = DisplayMetrics().also { display.getRealMetrics(it) }
     return aspectRatio(metrics.widthPixels, metrics.heightPixels)
+}
+
+fun SeekBar.doOnProgressChanged(callback: (Int) -> Unit) {
+    setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        override fun onProgressChanged(s: SeekBar?, progress: Int, fromUser: Boolean) {
+            callback(progress)
+        }
+
+        override fun onStartTrackingTouch(p0: SeekBar?) {}
+
+        override fun onStopTrackingTouch(p0: SeekBar?) {}
+    })
 }
 
 /**

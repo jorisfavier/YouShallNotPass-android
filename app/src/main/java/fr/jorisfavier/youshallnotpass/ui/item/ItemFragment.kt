@@ -17,6 +17,7 @@ import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentItemBinding
 import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.utils.autoCleared
+import fr.jorisfavier.youshallnotpass.utils.extensions.doOnProgressChanged
 import fr.jorisfavier.youshallnotpass.utils.extensions.toast
 import kotlinx.coroutines.launch
 
@@ -34,8 +35,6 @@ class ItemFragment : Fragment(R.layout.fragment_item) {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentItemBinding.inflate(inflater, container, false)
-        binding.lifecycleOwner = this
-        binding.viewModel = viewModel
         return binding.root
     }
 
@@ -46,22 +45,66 @@ class ItemFragment : Fragment(R.layout.fragment_item) {
                 getString(if (args.itemId == 0) R.string.item_create_title else R.string.item_edit_title)
             show()
         }
-
+        initUI()
+        initObservers()
         viewModel.initData(args.itemId, args.itemName)
+    }
 
-        binding.itemviewCreateOrUpdateItemButton.setOnClickListener {
-            createOrUpdateItem()
-        }
-
-        binding.itemviewGeneratePasswordButton.setOnClickListener {
-            viewModel.generateSecurePassword()
+    private fun initUI() {
+        with(binding) {
+            passwordLengthBar.doOnProgressChanged { length ->
+                viewModel.onPasswordLengthChanged(length)
+            }
+            createOrUpdateItemButton.setOnClickListener {
+                password.text?.toString()
+                createOrUpdateItem(
+                    name = name.text?.toString(),
+                    password = password.text?.toString(),
+                    login = login.text?.toString(),
+                )
+            }
+            generatePasswordButton.setOnClickListener {
+                password.setText(
+                    viewModel.generateSecurePassword(
+                        hasUppercase = uppercaseCheckbox.isChecked,
+                        hasNumber = numberCheckbox.isChecked,
+                        hasSymbol = symbolCheckbox.isChecked,
+                    )
+                )
+            }
         }
     }
 
-    private fun createOrUpdateItem() {
+    private fun initObservers() {
+        viewModel.currentItem.observe(viewLifecycleOwner) { item ->
+            with(binding) {
+                name.setText(item?.title)
+                login.setText(item?.login)
+            }
+        }
+        viewModel.password.observe(viewLifecycleOwner) { password ->
+            binding.password.setText(password)
+        }
+        viewModel.passwordLength.observe(viewLifecycleOwner) { length ->
+            binding.passwordLengthValue.text = length.toString()
+        }
+        viewModel.createOrUpdateText.observe(viewLifecycleOwner) { textResId ->
+            binding.createOrUpdateItemButton.setText(textResId)
+        }
+    }
+
+    private fun createOrUpdateItem(
+        name: String?,
+        password: String?,
+        login: String?,
+    ) {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.updateOrCreateItem().collect {
+                viewModel.updateOrCreateItem(
+                    name = name,
+                    password = password,
+                    login = login,
+                ).collect {
                     val messageResourceId = when {
                         it.isSuccess -> it.getOrDefault(R.string.item_creation_success)
                         it.isFailure -> (it.exceptionOrNull() as? YsnpException)?.messageResId

@@ -6,6 +6,7 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.core.view.doOnLayout
+import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -47,8 +48,13 @@ class SearchResultViewHolder(
         sendToDesktop: (Item, ItemDataType) -> Unit,
     ) {
         with(binding) {
+            searchResultItemTitle.text = result.title
+            searchResultItemLoginTitle.isVisible = result.hasLogin
+            searchResultItemLogin.text = result.login
+            searchResultItemLogin.isVisible = result.hasLogin
+            searchResultItemCopyLoginButton.isVisible = result.hasLogin
+            searchResultItemLoginDesktopButton.isVisible = result.hasLogin
             toggleViewState(isSelected, animate = false)
-            item = result
             hasLoginField = result.hasLogin
             searchResultItemPassword.transformationMethod = PasswordTransformationMethod()
             searchResultItemShowHideButton.setOnClickListener {
@@ -87,7 +93,6 @@ class SearchResultViewHolder(
                     ItemDataType.LOGIN
                 )
             }
-            executePendingBindings()
         }
     }
 

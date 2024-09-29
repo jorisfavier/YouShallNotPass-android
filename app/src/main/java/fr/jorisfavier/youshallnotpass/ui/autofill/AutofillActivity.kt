@@ -58,7 +58,7 @@ class AutofillActivity : AppCompatActivity() {
         return navController.navigateUp()
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         navController.handleDeepLink(intent)
     }
