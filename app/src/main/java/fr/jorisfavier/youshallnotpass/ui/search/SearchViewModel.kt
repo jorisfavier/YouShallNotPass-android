@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import timber.log.Timber
+import java.net.ConnectException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -153,7 +154,12 @@ class SearchViewModel(
                 emit(Result.success(R.string.ysnp_desktop_communication_success))
             }
             .onFailure { error ->
-                if (error is HttpException) {
+                if (listOf(
+                        HttpException::class,
+                        NullPointerException::class,
+                        ConnectException::class,
+                    ).contains(error::class)
+                ) {
                     emit(Result.failure(YsnpException(R.string.ysnp_desktop_communication_fail)))
                 } else {
                     emit(Result.failure(error))

@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,7 +55,7 @@ class SearchFragment : SearchBaseFragment() {
             .setMessage(R.string.delete_confirmation)
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                lifecycleScope.launchWhenStarted {
+                viewLifecycleOwner.lifecycleScope.launch {
                     viewModel.deleteItem(item).collect {
                         var message = R.string.error_occurred
                         if (it.isSuccess) {
@@ -72,38 +70,34 @@ class SearchFragment : SearchBaseFragment() {
 
     private fun copyToClipboard(item: Item, type: ItemDataType) {
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.copyToClipboard(item, type).collect { result ->
-                    result
-                        .onSuccess { context?.toast(it) }
-                        .onFailure { context?.toast(R.string.error_occurred) }
-                }
+            viewModel.copyToClipboard(item, type).collect { result ->
+                result
+                    .onSuccess { context?.toast(it) }
+                    .onFailure { context?.toast(R.string.error_occurred) }
             }
         }
     }
 
     private fun copyToDesktop(item: Item, type: ItemDataType) {
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.sendToDesktop(item, type).collect { result ->
-                    result
-                        .onSuccess { requireContext().toast(it) }
-                        .onYsnpFailure {
-                            MaterialAlertDialogBuilder(requireContext())
-                                .setTitle(R.string.error_occurred)
-                                .setMessage(it.messageResId)
-                                .setNegativeButton(android.R.string.cancel, null)
-                                .setPositiveButton(R.string.sync_desktop_amd_mobile) { _, _ ->
-                                    val direction =
-                                        SearchFragmentDirections.actionSearchFragmentToSettingsFragment(
-                                            highlightItem = SettingsFragment.KEY_DESKTOP
-                                        )
-                                    findNavController().navigate(direction)
-                                }
-                                .show()
-                        }
-                        .onUnknownFailure { requireContext().toast(R.string.error_desktop_transmission) }
-                }
+            viewModel.sendToDesktop(item, type).collect { result ->
+                result
+                    .onSuccess { requireContext().toast(it) }
+                    .onYsnpFailure {
+                        MaterialAlertDialogBuilder(requireContext())
+                            .setTitle(R.string.error_occurred)
+                            .setMessage(it.messageResId)
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .setPositiveButton(R.string.sync_desktop_amd_mobile) { _, _ ->
+                                val direction =
+                                    SearchFragmentDirections.actionSearchFragmentToSettingsFragment(
+                                        highlightItem = SettingsFragment.KEY_DESKTOP
+                                    )
+                                findNavController().navigate(direction)
+                            }
+                            .show()
+                    }
+                    .onUnknownFailure { requireContext().toast(R.string.error_desktop_transmission) }
             }
         }
     }
