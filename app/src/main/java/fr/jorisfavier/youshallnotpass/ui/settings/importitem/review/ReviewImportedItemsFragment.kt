@@ -7,30 +7,34 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.github.appintro.SlidePolicy
+import androidx.recyclerview.widget.ConcatAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentImportReviewItemBinding
 import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemViewModel
 import fr.jorisfavier.youshallnotpass.utils.State
 import fr.jorisfavier.youshallnotpass.utils.autoCleared
-import fr.jorisfavier.youshallnotpass.utils.extensions.toast
 
 @AndroidEntryPoint
-class ReviewImportedItemsFragment : Fragment(R.layout.fragment_import_review_item), SlidePolicy {
+class ReviewImportedItemsFragment : Fragment(R.layout.fragment_import_review_item) {
 
     private val viewModel: ImportItemViewModel by activityViewModels()
 
-    private val adapter = ImportedItemAdapter(listOf())
-    private var binding: FragmentImportReviewItemBinding by autoCleared()
+    private val headerAdapter: ImportedItemHeaderAdapter by lazy {
+        ImportedItemHeaderAdapter(onSelectAll = viewModel::selectAllItems)
+    }
 
-    override val isPolicyRespected: Boolean
-        get() = viewModel.isAtLeastOneItemSelected
+    private val adapter: ImportedItemAdapter by lazy {
+        ImportedItemAdapter(
+            onItemClicked = viewModel::selectItem,
+        )
+    }
+    private var binding: FragmentImportReviewItemBinding by autoCleared()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentImportReviewItemBinding.inflate(layoutInflater, container, false)
         return binding.root
@@ -40,38 +44,23 @@ class ReviewImportedItemsFragment : Fragment(R.layout.fragment_import_review_ite
         super.onViewCreated(view, savedInstanceState)
         initList()
         initObserver()
-        binding.importReviewSelectAll.setOnClickListener {
-            viewModel.selectAllItems()
-        }
-    }
-
-    override fun onUserIllegallyRequestedNextPage() {
-        context?.toast(R.string.please_select_item)
     }
 
     private fun initObserver() {
-        viewModel.importedItems.observe(viewLifecycleOwner) { items ->
-            binding.importReviewItemCount.text = getString(R.string.item_found, items.size)
-            adapter.updateData(items)
-        }
         viewModel.loadFromUriState.observe(viewLifecycleOwner) { state ->
-            binding.importReviewList.isVisible = state is State.Success
-            binding.importReviewDescription.isVisible = state is State.Success
-            binding.importReviewImage.isVisible = state is State.Success
-            binding.importReviewSelectAll.isVisible = state is State.Success
-            binding.importReviewItemCount.isVisible = state is State.Success
-            binding.importReviewLoading.isVisible = state is State.Loading
+            with(binding) {
+                importReviewList.isVisible = state is State.Success
+                importReviewLoading.isVisible = state is State.Loading
+                if (state is State.Success) {
+                    adapter.submitList(state.value)
+                    headerAdapter.onItemCountChanged(state.value.size)
+                }
+            }
         }
     }
 
     private fun initList() {
-        binding.importReviewList.adapter = adapter
+        binding.importReviewList.adapter = ConcatAdapter(headerAdapter, adapter)
         binding.importReviewList.setHasFixedSize(true)
-    }
-
-    companion object {
-        fun newInstance(): ReviewImportedItemsFragment {
-            return ReviewImportedItemsFragment()
-        }
     }
 }

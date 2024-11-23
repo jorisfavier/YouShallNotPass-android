@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.github.appintro.SlidePolicy
 import dagger.hilt.android.AndroidEntryPoint
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentImportSelectFileBinding
@@ -16,7 +15,7 @@ import fr.jorisfavier.youshallnotpass.utils.autoCleared
 import fr.jorisfavier.youshallnotpass.utils.extensions.toast
 
 @AndroidEntryPoint
-class ImportSelectFileFragment : Fragment(R.layout.fragment_import_select_file), SlidePolicy {
+class ImportSelectFileFragment : Fragment(R.layout.fragment_import_select_file) {
 
     private val viewModel: ImportItemViewModel by activityViewModels()
     private var binding: FragmentImportSelectFileBinding by autoCleared()
@@ -41,16 +40,4 @@ class ImportSelectFileFragment : Fragment(R.layout.fragment_import_select_file),
         binding.importSelectFileButton.setOnClickListener { getContent.launch("*/*") }
     }
 
-    override val isPolicyRespected: Boolean
-        get() = viewModel.isFileSelected
-
-    override fun onUserIllegallyRequestedNextPage() {
-        context?.toast(R.string.please_select_file)
-    }
-
-    companion object {
-        fun newInstance(): ImportSelectFileFragment {
-            return ImportSelectFileFragment()
-        }
-    }
 }

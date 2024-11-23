@@ -24,7 +24,7 @@ class ImportResultFragment : Fragment(R.layout.fragment_import_result) {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentImportResultBinding.inflate(layoutInflater, container, false)
         return binding.root
@@ -60,12 +60,6 @@ class ImportResultFragment : Fragment(R.layout.fragment_import_result) {
                     colorResId
                 )
             )
-        }
-    }
-
-    companion object {
-        fun newInstance(): ImportResultFragment {
-            return ImportResultFragment()
         }
     }
 }

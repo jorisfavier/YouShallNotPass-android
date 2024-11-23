@@ -5,8 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?android:colorBackground"
-    android:paddingTop="@dimen/appintro_statusbar_height"
-    android:paddingBottom="@dimen/appintro2_bottombar_height"
     tools:context=".ui.settings.importitem.ImportItemActivity">
 
     <TextView
@@ -48,7 +46,6 @@
         android:id="@+id/import_result_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="@dimen/appintro_desc_padding"
         android:textAlignment="center"
         android:textAppearance="?attr/textAppearanceHeadline6"
         app:layout_constraintBottom_toBottomOf="parent"

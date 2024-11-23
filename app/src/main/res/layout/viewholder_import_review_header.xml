@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/import_review_image"
+        android:layout_width="@dimen/import_image_width"
+        android:layout_height="@dimen/import_image_height"
+        android:layout_marginTop="@dimen/import_image_margin_top"
+        android:scaleType="fitCenter"
+        android:src="@drawable/chest_open"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?attr/colorOnBackground" />
+
+    <TextView
+        android:id="@+id/import_review_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:autoLink="web"
+        android:text="@string/import_step3"
+        android:textAlignment="center"
+        android:textAppearance="?attr/textAppearanceHeadline6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/import_review_image" />
+
+    <Button
+        android:id="@+id/import_review_select_all"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="@string/select_all"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/import_review_description" />
+
+    <TextView
+        android:id="@+id/import_review_item_count"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceSubtitle2"
+        app:layout_constraintBaseline_toBaselineOf="@id/import_review_select_all"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="Item found: 1200" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

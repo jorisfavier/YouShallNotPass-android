@@ -86,6 +86,7 @@ object AssistStructureUtil {
                 value = viewNode.text?.toString().orEmpty(),
                 type = ItemDataType.LOGIN,
             )
+
             viewNode.autofillHints?.any {
                 it == View.AUTOFILL_HINT_PASSWORD
                         || it == HintConstants.AUTOFILL_HINT_NEW_PASSWORD
@@ -95,6 +96,7 @@ object AssistStructureUtil {
                     value = viewNode.text?.toString().orEmpty(),
                     type = ItemDataType.PASSWORD,
                 )
+
             else -> null
         }
     }

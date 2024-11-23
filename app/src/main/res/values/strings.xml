@@ -55,7 +55,7 @@
     <string name="please_select_file">Please select a file to import</string>
     <string name="please_provide_password">Please provide a password to decrypt the file</string>
     <string name="please_select_item">Please select at least one item to import</string>
-    <string name="app_intro_skip_button">Cancel</string>
+    <string name="cancel">Cancel</string>
     <string name="use_the_search">Use the search field above to find items.</string>
     <string name="no_item_yet">You have no item yet, use the button below to add one.</string>
     <string name="about">About this app</string>
@@ -95,4 +95,5 @@
     <string name="register_credentials">Register credentials</string>
     <string name="device_not_compatible">Device not compatible</string>
     <string name="unfortunately_you_cant_use_the_app">Unfortunately your device is not compatible with this app. To properly secure your passwords you need a device allowing biometric authentication.</string>
+    <string name="done">Done</string>
 </resources>

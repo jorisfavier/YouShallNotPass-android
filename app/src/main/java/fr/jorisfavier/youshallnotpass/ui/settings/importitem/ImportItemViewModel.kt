@@ -4,21 +4,25 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.manager.CryptoManager
+import fr.jorisfavier.youshallnotpass.model.ExternalItem
 import fr.jorisfavier.youshallnotpass.model.Item
+import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.repository.ExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
-import fr.jorisfavier.youshallnotpass.ui.settings.importitem.review.ExternalItemViewModel
+import fr.jorisfavier.youshallnotpass.ui.settings.importitem.review.SelectableExternalItem
 import fr.jorisfavier.youshallnotpass.utils.CoroutineDispatchers
 import fr.jorisfavier.youshallnotpass.utils.Event
 import fr.jorisfavier.youshallnotpass.utils.State
+import fr.jorisfavier.youshallnotpass.utils.extensions.combine
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
@@ -34,77 +38,130 @@ class ImportItemViewModel @Inject constructor(
     private val dispatchers: CoroutineDispatchers,
 ) : ViewModel() {
 
-    private val _navigate = MutableLiveData<Event<Unit>>()
-    val navigate: LiveData<Event<Unit>> = _navigate
+    private val _navigate = MutableLiveData<Event<Int>>()
+    val navigate: LiveData<Event<Int>> = _navigate
 
-    private val _isSecureFile = MutableLiveData(false)
-    val isSecureFile: LiveData<Boolean> = _isSecureFile
+    private val isSecureFile = MutableLiveData(false)
+    private val selectedItems = MutableLiveData<Set<ExternalItem>>(emptySet())
+    private val password = MutableLiveData<String>()
 
-    private val _importedItems = MutableLiveData<List<ExternalItemViewModel>>(listOf())
-    val importedItems: LiveData<List<ExternalItemViewModel>> = _importedItems
+    private val _loadFromUriState = MutableLiveData<State<List<SelectableExternalItem>>>()
+    val loadFromUriState: LiveData<State<List<SelectableExternalItem>>> =
+        _loadFromUriState.combine(selectedItems).map { (state, selectedItems) ->
+            if (state is State.Success) {
+                State.Success(
+                    state.value.map {
+                        SelectableExternalItem(
+                            externalItem = it.externalItem,
+                            isSelected = selectedItems.contains(it.externalItem),
+                        )
+                    }
+                )
+            } else {
+                state
+            }
 
-    private val _loadFromUriState = MutableLiveData<State<Unit>>()
-    val loadFromUriState: LiveData<State<Unit>> = _loadFromUriState
+        }
 
     private val _importItemsState = MutableLiveData<State<Unit>>()
     val importItemsState: LiveData<State<Unit>> = _importItemsState
 
-    private val _password = MutableLiveData<String>()
-    val password: LiveData<String> = _password
+    private val _error = MutableLiveData<Event<YsnpException>>()
+    val error: LiveData<Event<YsnpException>> = _error
 
-    val isFileSelected: Boolean
+    private val isFileSelected: Boolean
         get() = currentUri != null
 
-    val isPasswordProvided: Boolean
+    private val isPasswordProvided: Boolean
         get() = !password.value.isNullOrEmpty()
 
-    val isAtLeastOneItemSelected: Boolean
-        get() = _importedItems.value.orEmpty().any { it.selected }
+    private val isAtLeastOneItemSelected: Boolean
+        get() = selectedItems.value?.isNotEmpty() == true
 
 
     private var currentUri: Uri? = null
-
-    companion object {
-        const val PASSWORD_NEEDED_SLIDE = 1
-        const val REVIEW_ITEM_SLIDE = 2
-        const val SUCCESS_FAIL_SLIDE = 3
-    }
+    private var currentStep: ImportItemStep = ImportItemStep.SELECT_FILE
 
     fun setUri(uri: Uri) {
         viewModelScope.launch {
             currentUri = uri
-            _isSecureFile.value =
+            isSecureFile.value =
                 externalItemRepository.isSecuredWithPassword(uri).getOrDefault(false)
-            _navigate.postValue(Event(Unit))
+            _navigate.value = Event(ImportItemStep.PASSWORD_NEEDED.ordinal)
         }
     }
 
     fun onSlideChanged(position: Int) {
         Timber.d("Slide changed to $position")
+        currentStep = ImportItemStep.entries[position]
         when (position) {
-            PASSWORD_NEEDED_SLIDE -> {
-                if (!_isSecureFile.value!!) {
-                    _navigate.postValue(Event(Unit))
+            ImportItemStep.PASSWORD_NEEDED.ordinal -> {
+                if (!isSecureFile.value!!) {
+                    _navigate.value = Event(ImportItemStep.REVIEW_ITEM.ordinal)
                 }
             }
 
-            REVIEW_ITEM_SLIDE -> {
+            ImportItemStep.REVIEW_ITEM.ordinal -> {
                 loadExternalItemsFromUri()
             }
 
-            SUCCESS_FAIL_SLIDE -> {
+            ImportItemStep.SUCCESS_FAIL.ordinal -> {
                 importItems()
             }
         }
     }
 
     fun onPasswordChanged(password: String) {
-        _password.value = password
+        this.password.value = password
+    }
+
+    fun selectItem(item: ExternalItem) {
+        val selectedItems = selectedItems.value.orEmpty()
+        val newList = if (selectedItems.contains(item)) {
+            selectedItems - item
+        } else {
+            selectedItems + item
+        }
+        this.selectedItems.value = newList
     }
 
     fun selectAllItems() {
-        _importedItems.value?.forEach { it.selected = true }
-        _importedItems.postValue(_importedItems.value)
+        selectedItems.value = (_loadFromUriState.value as? State.Success)?.value
+            .orEmpty()
+            .map { it.externalItem }
+            .toSet()
+    }
+
+    fun goToNextStep() {
+        when (currentStep) {
+            ImportItemStep.SELECT_FILE -> {
+                if (isFileSelected) {
+                    _navigate.value = Event(ImportItemStep.PASSWORD_NEEDED.ordinal)
+                } else {
+                    _error.value = Event(YsnpException(R.string.please_select_file))
+                }
+            }
+
+            ImportItemStep.PASSWORD_NEEDED -> {
+                if (isPasswordProvided) {
+                    _navigate.value = Event(ImportItemStep.REVIEW_ITEM.ordinal)
+                } else {
+                    _error.value = Event(YsnpException(R.string.please_provide_password))
+                }
+            }
+
+            ImportItemStep.REVIEW_ITEM -> {
+                if (isAtLeastOneItemSelected) {
+                    _navigate.value = Event(ImportItemStep.SUCCESS_FAIL.ordinal)
+                } else {
+                    _error.value = Event(YsnpException(R.string.please_select_item))
+                }
+            }
+
+            ImportItemStep.SUCCESS_FAIL -> {
+                //nothing
+            }
+        }
     }
 
     private fun loadExternalItemsFromUri() {
@@ -114,11 +171,12 @@ class ImportItemViewModel @Inject constructor(
             val items =
                 externalItemRepository.getExternalItemsFromUri(uri, password.value).getOrNull()
             if (!items.isNullOrEmpty()) {
-                _importedItems.postValue(items.map { ExternalItemViewModel(it, false) })
-                _loadFromUriState.postValue(State.Success(Unit))
+                _loadFromUriState.value = State.Success(
+                    items.map { SelectableExternalItem(it, false) }
+                )
             } else {
-                _loadFromUriState.postValue(State.Error)
-                _navigate.postValue(Event(Unit))
+                _loadFromUriState.value = State.Error
+                _navigate.value = Event(ImportItemStep.SUCCESS_FAIL.ordinal)
             }
         }
     }
@@ -127,11 +185,9 @@ class ImportItemViewModel @Inject constructor(
     private fun importItems() {
         _importItemsState.value = State.Loading
         viewModelScope.launch {
-            val itemsToImport = _importedItems.value
-                ?.asFlow()
-                ?.filter { it.selected }
-                ?.map {
-                    val externalItem = it.externalItem
+            val itemsToImport = selectedItems.value.orEmpty()
+                .asFlow()
+                .map { externalItem ->
                     val password = cryptoManager.encryptData(externalItem.password).getOrThrow()
                     Item(
                         0,
@@ -141,19 +197,19 @@ class ImportItemViewModel @Inject constructor(
                         password.initializationVector
                     )
                 }
-                ?.flowOn(dispatchers.io)
-                ?.catch { emitAll(emptyFlow()) }
-                ?.toList()
-            if (!itemsToImport.isNullOrEmpty()) {
+                .flowOn(dispatchers.io)
+                .catch { emitAll(emptyFlow()) }
+                .toList()
+            if (itemsToImport.isNotEmpty()) {
                 itemRepository.insertItems(itemsToImport)
                     .onSuccess {
-                        _importItemsState.postValue(State.Success(Unit))
+                        _importItemsState.value = State.Success(Unit)
                     }
                     .onFailure {
                         _importItemsState.value = State.Error
                     }
             } else {
-                _importItemsState.postValue(State.Error)
+                _importItemsState.value = State.Error
             }
         }
     }

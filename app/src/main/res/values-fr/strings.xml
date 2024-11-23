@@ -54,7 +54,7 @@
     <string name="please_select_file">Merci de sélectionner un fichier à importer</string>
     <string name="please_provide_password">Merci de renseigner un mot de passe afin de déchiffrer le fichier</string>
     <string name="please_select_item">Merci de sélectionner au moins un item à importer</string>
-    <string name="app_intro_skip_button">Annuler</string>
+    <string name="cancel">Annuler</string>
     <string name="use_the_search">Utiliser le champ de recherche ci-dessus</string>
     <string name="no_item_yet">Vous n\'avez pas encore d\'item, utilisez le bouton ci-dessous pour en ajouter un.</string>
     <string name="about">À propos</string>
@@ -95,5 +95,6 @@
     <string name="register_credentials">Configurer</string>
     <string name="device_not_compatible">Appareil incompatible</string>
     <string name="unfortunately_you_cant_use_the_app">Malheureusement, votre appareil n\'est pas compatible avec cette application. Afin de sécuriser vos mots de passe, vous avez besoin d\'un appareil permettant l\'authentification biométrique.</string>
+    <string name="done">Terminer</string>
 
 </resources>
