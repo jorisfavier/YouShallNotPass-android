@@ -1,7 +1,6 @@
 package fr.jorisfavier.youshallnotpass.ui.settings
 
 import android.app.Activity
-import android.app.ProgressDialog
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
@@ -118,10 +117,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun initExportPreference() {
         exportPreference.setOnPreferenceClickListener {
-            val dialog = ExportDialogFragment(::exportPasswords)
-            dialog.show(
-                requireActivity().supportFragmentManager,
-                ExportDialogFragment::class.java.simpleName
+            ExportDialogFragment().show(
+                childFragmentManager,
+                ExportDialogFragment.TAG,
             )
             true
         }
@@ -206,29 +204,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun playFocusAnimationIfNeeded() {
         val highlightItem = args.highlightItem ?: return
         findPreference<BlinkPreference>(highlightItem)?.blink()
-    }
-
-    private fun exportPasswords(password: String?) {
-        lifecycleScope.launchWhenStarted {
-            val dialog = ProgressDialog(
-                requireContext(),
-                R.style.ThemeOverlay_YouShallNotPass_ProgressDialog
-            ).apply {
-                isIndeterminate = true
-                setMessage(getString(R.string.export_in_progress))
-                setCancelable(false)
-                show()
-            }
-            viewModel.exportPasswords(password).collect {
-                dialog.dismiss()
-                if (it.isFailure) {
-                    context?.toast(R.string.password_export_failed)
-                } else {
-                    homeViewModel.ignoreNextPause()
-                    requireActivity().startActivity(it.getOrThrow())
-                }
-            }
-        }
     }
 
     companion object {

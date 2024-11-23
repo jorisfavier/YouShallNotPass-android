@@ -21,11 +21,6 @@
         <item name="shapeAppearanceOverlay">?attr/shapeAppearanceLargeComponent</item>
     </style>
 
-    <style name="ThemeOverlay.YouShallNotPass.ProgressDialog" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
-        <item name="colorAccent">?colorPrimary</item>
-        <item name="android:background">@color/gray_nurse</item>
-    </style>
-
     <!--Navigation Drawer-->
     <style name="Widget.YouShallNotPass.NavigationView" parent="Widget.MaterialComponents.NavigationView">
         <item name="itemTextAppearance">?attr/textAppearanceBody2</item>

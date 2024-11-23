@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/exportDialogScrollView"
+    android:id="@+id/scrollview"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="10dp">
@@ -11,20 +11,46 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="20dp"
-        android:paddingBottom="20dp"
-        android:paddingTop="0dp">
+        android:paddingTop="0dp"
+        android:paddingBottom="20dp">
 
-        <RadioGroup
-            android:id="@+id/settings_export_radioGrp"
+        <TextView
+            android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:checkedButton="@id/settings_export_ysnp_button"
+            android:text="@string/export_password"
+            android:textAppearance="?textAppearanceHeadline6"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progress_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="cancel, export, password_container, radio_group" />
+
+        <RadioGroup
+            android:id="@+id/radio_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:checkedButton="@id/ysnp_button"
             android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/title">
 
             <RadioButton
-                android:id="@+id/settings_export_csv_button"
+                android:id="@+id/csv_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/csv_file" />
@@ -40,7 +66,7 @@
                 android:textColor="?attr/colorError" />
 
             <RadioButton
-                android:id="@+id/settings_export_ysnp_button"
+                android:id="@+id/ysnp_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/ysnp_file" />
@@ -56,27 +82,27 @@
         </RadioGroup>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/settings_export_password_container"
+            android:id="@+id/password_container"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:hint="@string/password"
             app:endIconMode="password_toggle"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/settings_export_radioGrp">
+            app:layout_constraintTop_toBottomOf="@id/radio_group">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/settings_export_password"
+                android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
                 android:textAppearance="?attr/textAppearanceCaption" />
         </com.google.android.material.textfield.TextInputLayout>
 
-
         <TextView
-            android:id="@+id/settings_export_dialogError"
+            android:id="@+id/error"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -84,10 +110,33 @@
             android:textAppearance="?attr/textAppearanceCaption"
             android:textColor="?attr/colorError"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/cancel"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/settings_export_password_container"
+            app:layout_constraintTop_toBottomOf="@id/password_container"
             tools:visibility="visible" />
+
+        <Button
+            android:id="@+id/cancel"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="5dp"
+            android:text="@string/cancel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/export"
+            app:layout_constraintTop_toBottomOf="@id/error" />
+
+        <Button
+            android:id="@+id/export"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/export"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/error" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
