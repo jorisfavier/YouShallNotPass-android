@@ -8,10 +8,9 @@ import fr.jorisfavier.youshallnotpass.model.ExternalItem
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.repository.ExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
+import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemStep
 import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemViewModel
-import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemViewModel.Companion.PASSWORD_NEEDED_SLIDE
-import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemViewModel.Companion.REVIEW_ITEM_SLIDE
-import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemViewModel.Companion.SUCCESS_FAIL_SLIDE
+import fr.jorisfavier.youshallnotpass.ui.settings.importitem.review.SelectableExternalItem
 import fr.jorisfavier.youshallnotpass.utils.CoroutineDispatchers
 import fr.jorisfavier.youshallnotpass.utils.State
 import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
@@ -64,9 +63,10 @@ class ImportItemViewModelTest {
         viewModel.setUri(uri)
 
         //then
-        TestCase.assertTrue(viewModel.isSecureFile.value ?: false)
-        TestCase.assertTrue(viewModel.isFileSelected)
-        TestCase.assertEquals(Unit, viewModel.navigate.getOrAwaitValue().peekContent())
+        TestCase.assertEquals(
+            ImportItemStep.PASSWORD_NEEDED.ordinal,
+            viewModel.navigate.getOrAwaitValue().peekContent(),
+        )
     }
 
     @Test
@@ -79,13 +79,14 @@ class ImportItemViewModelTest {
         viewModel.setUri(uri)
 
         //then
-        TestCase.assertFalse(viewModel.isSecureFile.value ?: true)
-        TestCase.assertTrue(viewModel.isFileSelected)
-        TestCase.assertEquals(Unit, viewModel.navigate.getOrAwaitValue().peekContent())
+        TestCase.assertEquals(
+            ImportItemStep.PASSWORD_NEEDED.ordinal,
+            viewModel.navigate.getOrAwaitValue().peekContent()
+        )
     }
 
     @Test
-    fun `onSlideChanged with PASSWORD_NEEDED_SLIDE position should emit a navigate event if isSecureFile is false`() =
+    fun `onSlideChanged with PASSWORD_NEEDED position should emit a navigate event if isSecureFile is false`() =
         runBlocking {
             //given
             val uri: Uri = mockk()
@@ -101,15 +102,14 @@ class ImportItemViewModelTest {
                 }
             }
             viewModel.setUri(uri)
-            viewModel.onSlideChanged(PASSWORD_NEEDED_SLIDE)
+            viewModel.onSlideChanged(ImportItemStep.PASSWORD_NEEDED.ordinal)
 
             //then
-            TestCase.assertFalse(viewModel.isSecureFile.value ?: true)
             TestCase.assertEquals(2, count)
         }
 
     @Test
-    fun `onSlideChanged with PASSWORD_NEEDED_SLIDE position should not emit a navigate event if isSecureFile is true`() =
+    fun `onSlideChanged with PASSWORD_NEEDED position should not emit a navigate event if isSecureFile is true`() =
         runBlocking {
             //given
             val uri: Uri = mockk()
@@ -125,15 +125,14 @@ class ImportItemViewModelTest {
                 }
             }
             viewModel.setUri(uri)
-            viewModel.onSlideChanged(PASSWORD_NEEDED_SLIDE)
+            viewModel.onSlideChanged(ImportItemStep.PASSWORD_NEEDED.ordinal)
 
             //then
-            TestCase.assertTrue(viewModel.isSecureFile.value ?: false)
             TestCase.assertEquals(1, count)
         }
 
     @Test
-    fun `onSlideChanged with REVIEW_ITEM_SLIDE position should load external items`() =
+    fun `onSlideChanged with REVIEW_ITEM position should load external items`() =
         runBlocking {
             //given
             val uri: Uri = mockk()
@@ -148,29 +147,28 @@ class ImportItemViewModelTest {
                 )
             } returns Result.success(listOf(fakeItem))
             viewModel.onPasswordChanged(fakePassword)
-            val states = mutableListOf<State<Unit>>()
+            val states = mutableListOf<State<List<SelectableExternalItem>>>()
 
             //when
             viewModel.loadFromUriState.observeForever { state ->
                 states.add(state)
             }
             viewModel.setUri(uri)
-            viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
+            viewModel.onSlideChanged(ImportItemStep.REVIEW_ITEM.ordinal)
 
             //then
-            TestCase.assertTrue(viewModel.isSecureFile.value ?: false)
             TestCase.assertEquals(fakePassword, filePassword.captured)
             TestCase.assertEquals(2, states.size)
             TestCase.assertTrue(states[0] is State.Loading)
             TestCase.assertTrue(states[1] is State.Success)
             TestCase.assertEquals(
                 fakeItem,
-                viewModel.importedItems.value?.firstOrNull()?.externalItem
+                (states[1] as State.Success).value.firstOrNull()?.externalItem,
             )
         }
 
     @Test
-    fun `onSlideChanged with REVIEW_ITEM_SLIDE position and empty item list should emit error`() =
+    fun `onSlideChanged with REVIEW_ITEM position and empty item list should emit error`() =
         runBlocking {
             //given
             val uri: Uri = mockk()
@@ -185,26 +183,24 @@ class ImportItemViewModelTest {
                 )
             } returns Result.success(listOf())
             viewModel.onPasswordChanged(fakePassword)
-            val states = mutableListOf<State<Unit>>()
+            val states = mutableListOf<State<List<SelectableExternalItem>>>()
 
             //when
             viewModel.loadFromUriState.observeForever {
                 states.add(it)
             }
             viewModel.setUri(uri)
-            viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
+            viewModel.onSlideChanged(ImportItemStep.REVIEW_ITEM.ordinal)
 
             //then
-            TestCase.assertTrue(viewModel.isSecureFile.value ?: false)
             TestCase.assertEquals(fakePassword, filePassword.captured)
             TestCase.assertEquals(2, states.size)
             TestCase.assertTrue(states[0] is State.Loading)
             TestCase.assertTrue(states[1] is State.Error)
-            TestCase.assertEquals(0, viewModel.importedItems.value?.size)
         }
 
     @Test
-    fun `onSlideChanged with REVIEW_ITEM_SLIDE position and exception from the repository should emit an error`() =
+    fun `onSlideChanged with REVIEW_ITEM position and exception from the repository should emit an error`() =
         runBlocking {
             //given
             val uri: Uri = mockk()
@@ -219,7 +215,7 @@ class ImportItemViewModelTest {
                 )
             } returns Result.failure(Exception())
             viewModel.onPasswordChanged(fakePassword)
-            val states = mutableListOf<State<Unit>>()
+            val states = mutableListOf<State<List<SelectableExternalItem>>>()
             var count = 0
 
             //when
@@ -232,20 +228,45 @@ class ImportItemViewModelTest {
                 states.add(it)
             }
             viewModel.setUri(uri)
-            viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
+            viewModel.onSlideChanged(ImportItemStep.REVIEW_ITEM.ordinal)
 
             //then
-            TestCase.assertTrue(viewModel.isSecureFile.value ?: false)
             TestCase.assertEquals(fakePassword, filePassword.captured)
             TestCase.assertEquals(2, states.size)
             TestCase.assertTrue(states[0] is State.Loading)
             TestCase.assertTrue(states[1] is State.Error)
-            TestCase.assertEquals(0, viewModel.importedItems.value?.size)
             TestCase.assertEquals(2, count)
         }
 
     @Test
-    fun `onSlideChanged with SUCCESS_FAIL_SLIDE position and selected items should import items`() =
+    fun `selectAllItems should select all importedItems`() = runBlocking {
+        //given
+        val uri: Uri = mockk()
+        val items = slot<List<Item>>()
+        coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(
+            false
+        )
+        coEvery {
+            externalItemRepository.getExternalItemsFromUri(any(), any())
+        } returns Result.success(listOf(fakeItem, fakeItem.copy(title = "test2")))
+        coEvery { cryptoManager.encryptData(any()) } returns Result.success(fakeEncryptedData)
+        coEvery { itemRepository.insertItems(capture(items)) } returns Result.success(Unit)
+        val states = mutableListOf<State<Unit>>()
+
+        //when
+        viewModel.importItemsState.observeForever {
+            states.add(it)
+        }
+        viewModel.setUri(uri)
+        viewModel.onSlideChanged(ImportItemStep.REVIEW_ITEM.ordinal)
+        viewModel.selectAllItems()
+        viewModel.onSlideChanged(ImportItemStep.SUCCESS_FAIL.ordinal)
+        //then
+        TestCase.assertTrue(items.captured.size == 2)
+    }
+
+    @Test
+    fun `onSlideChanged with SUCCESS_FAIL position and selected items should import items`() =
         runBlocking {
             //given
             val uri: Uri = mockk()
@@ -265,9 +286,9 @@ class ImportItemViewModelTest {
                 states.add(it)
             }
             viewModel.setUri(uri)
-            viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
-            viewModel.importedItems.value?.forEach { it.selected = true }
-            viewModel.onSlideChanged(SUCCESS_FAIL_SLIDE)
+            viewModel.onSlideChanged(ImportItemStep.REVIEW_ITEM.ordinal)
+            viewModel.selectAllItems()
+            viewModel.onSlideChanged(ImportItemStep.SUCCESS_FAIL.ordinal)
             //then
             TestCase.assertEquals(2, states.size)
             TestCase.assertTrue(states[0] is State.Loading)
@@ -283,7 +304,7 @@ class ImportItemViewModelTest {
         }
 
     @Test
-    fun `onSlideChanged with SUCCESS_FAIL_SLIDE position and no item selected should emit an error`() =
+    fun `onSlideChanged with SUCCESS_FAIL position and no item selected should emit an error`() =
         runBlocking {
             //given
             val uri: Uri = mockk()
@@ -300,9 +321,8 @@ class ImportItemViewModelTest {
                 states.add(it)
             }
             viewModel.setUri(uri)
-            viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
-            viewModel.importedItems.value?.forEach { it.selected = false }
-            viewModel.onSlideChanged(SUCCESS_FAIL_SLIDE)
+            viewModel.onSlideChanged(ImportItemStep.REVIEW_ITEM.ordinal)
+            viewModel.onSlideChanged(ImportItemStep.SUCCESS_FAIL.ordinal)
 
             //then
             TestCase.assertEquals(2, states.size)
@@ -311,7 +331,7 @@ class ImportItemViewModelTest {
         }
 
     @Test
-    fun `onSlideChanged with SUCCESS_FAIL_SLIDE position and an exception from the repository should emit an error`() =
+    fun `onSlideChanged with SUCCESS_FAIL position and an exception from the repository should emit an error`() =
         runBlocking {
             //given
             val uri: Uri = mockk()
@@ -330,9 +350,9 @@ class ImportItemViewModelTest {
                 states.add(it)
             }
             viewModel.setUri(uri)
-            viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
-            viewModel.importedItems.value?.forEach { it.selected = true }
-            viewModel.onSlideChanged(SUCCESS_FAIL_SLIDE)
+            viewModel.onSlideChanged(ImportItemStep.REVIEW_ITEM.ordinal)
+            viewModel.selectAllItems()
+            viewModel.onSlideChanged(ImportItemStep.SUCCESS_FAIL.ordinal)
 
             //then
             TestCase.assertEquals(2, states.size)
@@ -341,7 +361,7 @@ class ImportItemViewModelTest {
         }
 
     @Test
-    fun `onSlideChanged with SUCCESS_FAIL_SLIDE position and no item found should emit an error`() =
+    fun `onSlideChanged with SUCCESS_FAIL position and no item found should emit an error`() =
         runBlocking {
             //given
             val uri: Uri = mockk()
@@ -361,34 +381,11 @@ class ImportItemViewModelTest {
                 states.add(it)
             }
             viewModel.setUri(uri)
-            viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
-            viewModel.importedItems.value?.forEach { it.selected = false }
-            viewModel.onSlideChanged(SUCCESS_FAIL_SLIDE)
-
+            viewModel.onSlideChanged(ImportItemStep.REVIEW_ITEM.ordinal)
+            viewModel.onSlideChanged(ImportItemStep.SUCCESS_FAIL.ordinal)
             //then
             TestCase.assertEquals(2, states.size)
             TestCase.assertTrue(states[0] is State.Loading)
             TestCase.assertTrue(states[1] is State.Error)
         }
-
-    @Test
-    fun `selectAllItems should select all importedItems`() = runBlocking {
-        //given
-        val uri: Uri = mockk()
-        coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(false)
-        coEvery {
-            externalItemRepository.getExternalItemsFromUri(any(), any())
-        } returns Result.success(listOf(fakeItem))
-
-        //when
-        viewModel.setUri(uri)
-        viewModel.onSlideChanged(REVIEW_ITEM_SLIDE)
-        viewModel.importedItems.value?.forEach { it.selected = false }
-        viewModel.selectAllItems()
-
-        //then
-        TestCase.assertTrue(
-            viewModel.importedItems.getOrAwaitValue().filter { it.selected }.size == 1
-        )
-    }
 }
