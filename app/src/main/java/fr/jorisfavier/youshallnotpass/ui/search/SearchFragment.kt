@@ -1,5 +1,6 @@
 package fr.jorisfavier.youshallnotpass.ui.search
 
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -55,7 +56,7 @@ class SearchFragment : SearchBaseFragment() {
             .setMessage(R.string.delete_confirmation)
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                viewLifecycleOwner.lifecycleScope.launch {
+                lifecycleScope.launch {
                     viewModel.deleteItem(item).collect {
                         var message = R.string.error_occurred
                         if (it.isSuccess) {
@@ -69,17 +70,21 @@ class SearchFragment : SearchBaseFragment() {
     }
 
     private fun copyToClipboard(item: Item, type: ItemDataType) {
-        viewLifecycleOwner.lifecycleScope.launch {
+        lifecycleScope.launch {
             viewModel.copyToClipboard(item, type).collect { result ->
                 result
-                    .onSuccess { context?.toast(it) }
+                    .onSuccess {
+                        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                            context?.toast(it)
+                        }
+                    }
                     .onFailure { context?.toast(R.string.error_occurred) }
             }
         }
     }
 
     private fun copyToDesktop(item: Item, type: ItemDataType) {
-        viewLifecycleOwner.lifecycleScope.launch {
+        lifecycleScope.launch {
             viewModel.sendToDesktop(item, type).collect { result ->
                 result
                     .onSuccess { requireContext().toast(it) }

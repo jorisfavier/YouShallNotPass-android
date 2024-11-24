@@ -7,9 +7,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
@@ -99,23 +97,21 @@ class ItemFragment : Fragment(R.layout.fragment_item) {
         login: String?,
     ) {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.updateOrCreateItem(
-                    name = name,
-                    password = password,
-                    login = login,
-                ).collect {
-                    val messageResourceId = when {
-                        it.isSuccess -> it.getOrDefault(R.string.item_creation_success)
-                        it.isFailure -> (it.exceptionOrNull() as? YsnpException)?.messageResId
-                            ?: R.string.error_occurred
+            viewModel.updateOrCreateItem(
+                name = name,
+                password = password,
+                login = login,
+            ).collect {
+                val messageResourceId = when {
+                    it.isSuccess -> it.getOrDefault(R.string.item_creation_success)
+                    it.isFailure -> (it.exceptionOrNull() as? YsnpException)?.messageResId
+                        ?: R.string.error_occurred
 
-                        else -> R.string.error_occurred
-                    }
-                    context?.toast(messageResourceId)
-                    if (it.isSuccess) {
-                        findNavController().popBackStack()
-                    }
+                    else -> R.string.error_occurred
+                }
+                context?.toast(messageResourceId)
+                if (it.isSuccess) {
+                    findNavController().popBackStack()
                 }
             }
         }

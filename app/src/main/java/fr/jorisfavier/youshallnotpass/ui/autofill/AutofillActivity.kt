@@ -9,6 +9,7 @@ import android.view.autofill.AutofillManager
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.IntentCompat
 import androidx.navigation.ui.setupActionBarWithNavController
 import dagger.hilt.android.AndroidEntryPoint
 import fr.jorisfavier.youshallnotpass.R
@@ -31,11 +32,15 @@ class AutofillActivity : AppCompatActivity() {
     }
 
     private val assistStructure by lazy {
-        intent.getParcelableExtra<AssistStructure>(AutofillManager.EXTRA_ASSIST_STRUCTURE)!!
+        IntentCompat.getParcelableExtra(
+            intent,
+            AutofillManager.EXTRA_ASSIST_STRUCTURE,
+            AssistStructure::class.java
+        )!!
     }
 
     private val fillRequest by lazy {
-        intent.getParcelableExtra<FillRequest>(FILL_REQUEST_KEY)!!
+        IntentCompat.getParcelableExtra(intent, FILL_REQUEST_KEY, FillRequest::class.java)!!
     }
 
     private val redirectToItemCreation by lazy {

@@ -8,7 +8,7 @@ import fr.jorisfavier.youshallnotpass.databinding.ViewholderAutofillResultBindin
 import fr.jorisfavier.youshallnotpass.model.Item
 
 class AutofillAdapter(
-    private val onItemClicked: (Item) -> Unit
+    private val onItemClicked: (Item) -> Unit,
 ) : ListAdapter<Item, RecyclerView.ViewHolder>(Item.diffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -23,8 +23,8 @@ class AutofillAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val holder = holder as? AutofillResultViewHolder ?: return
-        holder.bind(getItem(position), onItemClicked)
+        val autofillResultHolder = holder as? AutofillResultViewHolder ?: return
+        autofillResultHolder.bind(getItem(position), onItemClicked)
     }
 
 }

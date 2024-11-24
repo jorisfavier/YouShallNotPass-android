@@ -6,7 +6,6 @@ import android.provider.Settings
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK
 import androidx.biometric.BiometricPrompt
@@ -50,14 +49,16 @@ class AuthActivity : AppCompatActivity() {
     private fun initObserver() {
         viewModel.authStatus.observeEvent(this) { authResult ->
             when (authResult) {
-                is AuthViewModel.AuthStatus.Ready -> displayAuthPrompt()
-                is AuthViewModel.AuthStatus.Failure -> {
+                is AuthStatus.Ready -> displayAuthPrompt()
+                is AuthStatus.Failure -> {
                     displayErrorModal(messageResId = authResult.errorMessage)
                 }
-                is AuthViewModel.AuthStatus.Success -> {
+
+                is AuthStatus.Success -> {
                     redirectToSearchPage()
                 }
-                is AuthViewModel.AuthStatus.SetupBiometric -> {
+
+                is AuthStatus.SetupBiometric -> {
                     // Prompts the user to create credentials
                     val enrollIntent = Intent(Settings.ACTION_SECURITY_SETTINGS)
                     displayErrorModal(
@@ -67,7 +68,8 @@ class AuthActivity : AppCompatActivity() {
                         actionButtonCallback = { startActivity(enrollIntent) }
                     )
                 }
-                is AuthViewModel.AuthStatus.NonSecure -> {
+
+                is AuthStatus.NonSecure -> {
                     val enrollIntent = Intent(Settings.ACTION_SECURITY_SETTINGS)
                     displayErrorModal(
                         titleResId = R.string.device_not_secure,
@@ -76,7 +78,8 @@ class AuthActivity : AppCompatActivity() {
                         actionButtonCallback = { startActivity(enrollIntent) }
                     )
                 }
-                is AuthViewModel.AuthStatus.NoBiometric -> {
+
+                is AuthStatus.NoBiometric -> {
                     displayErrorModal(
                         titleResId = R.string.device_not_compatible,
                         messageResId = R.string.unfortunately_you_cant_use_the_app,

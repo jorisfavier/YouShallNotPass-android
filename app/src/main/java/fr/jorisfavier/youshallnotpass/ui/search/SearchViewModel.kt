@@ -17,6 +17,7 @@ import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
 import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.utils.State
+import fr.jorisfavier.youshallnotpass.utils.extensions.addFlagSensitiveData
 import fr.jorisfavier.youshallnotpass.utils.extensions.combine
 import fr.jorisfavier.youshallnotpass.utils.extensions.debounce
 import fr.jorisfavier.youshallnotpass.utils.extensions.default
@@ -134,7 +135,11 @@ class SearchViewModel(
 
             ItemDataType.LOGIN -> (item.login to R.string.copy_login_to_clipboard_success)
         }
-        val clip = ClipData.newPlainText(type.name, data)
+        val clip = ClipData.newPlainText(type.name, data).apply {
+            if (type == ItemDataType.PASSWORD) {
+                addFlagSensitiveData()
+            }
+        }
         clipboardManager.setPrimaryClip(clip)
         emit(Result.success(resId))
     }

@@ -9,9 +9,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.DialogSettingsExportBinding
@@ -72,22 +70,20 @@ class ExportDialogFragment : DialogFragment(R.layout.dialog_settings_export) {
             } else {
                 content.isInvisible = true
                 progressIndicator.isVisible = true
-                viewLifecycleOwner.lifecycleScope.launch {
-                    repeatOnLifecycle(Lifecycle.State.STARTED) {
-                        viewModel.exportPasswords(password).collectLatest { result ->
-                            result
-                                .onSuccess {
-                                    homeViewModel.ignoreNextPause()
-                                    requireActivity().startActivity(it)
-                                    dismiss()
-                                }
-                                .onFailure {
-                                    error.setText(R.string.password_export_failed)
-                                    error.isVisible = true
-                                    content.isVisible = true
-                                    progressIndicator.isVisible = false
-                                }
-                        }
+                lifecycleScope.launch {
+                    viewModel.exportPasswords(password).collectLatest { result ->
+                        result
+                            .onSuccess {
+                                homeViewModel.ignoreNextPause()
+                                requireActivity().startActivity(it)
+                                dismiss()
+                            }
+                            .onFailure {
+                                error.setText(R.string.password_export_failed)
+                                error.isVisible = true
+                                content.isVisible = true
+                                progressIndicator.isVisible = false
+                            }
                     }
                 }
             }

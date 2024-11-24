@@ -1,7 +1,6 @@
 package fr.jorisfavier.youshallnotpass.ui.auth
 
 import android.app.KeyguardManager
-import androidx.annotation.StringRes
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK
@@ -22,15 +21,6 @@ class AuthViewModel @Inject constructor(
     private val keyguardManager: KeyguardManager,
     private val biometricManager: BiometricManager,
 ) : ViewModel() {
-
-    sealed class AuthStatus {
-        object Success : AuthStatus()
-        object NonSecure : AuthStatus()
-        object NoBiometric : AuthStatus()
-        object SetupBiometric : AuthStatus()
-        object Ready : AuthStatus()
-        class Failure(@StringRes val errorMessage: Int) : AuthStatus()
-    }
 
     private var _authStatus = MutableLiveData<Event<AuthStatus>>()
     var authStatus: LiveData<Event<AuthStatus>> = _authStatus
