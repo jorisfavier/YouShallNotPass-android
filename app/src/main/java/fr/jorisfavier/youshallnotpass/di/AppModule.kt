@@ -197,11 +197,9 @@ object AppModule {
     @Named(ANALYTICS_HTTP_CLIENT)
     @Provides
     fun provideAnalyticsHttpClient(
-        httpClient: OkHttpClient,
         authInterceptor: AuthInterceptor,
     ): OkHttpClient {
-        return httpClient
-            .newBuilder()
+        return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
             .addInterceptor(
                 HttpLoggingInterceptor().apply {
