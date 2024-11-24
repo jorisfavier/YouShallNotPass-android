@@ -16,7 +16,6 @@ Thanks to the [YouShallNotPass desktop app](https://github.com/jorisfavier/YouSh
 ## Dependencies & libraries
 
 YouShallNotPass is mostly relying on libraries from AndroidX, other than that the following libraries are used:
-* [AppIntro](https://github.com/AppIntro/AppIntro)
 * [Timber](https://github.com/JakeWharton/timber)
 * [Google ML Kit Barcode scanning](https://developers.google.com/ml-kit)
 * [Sentry](https://sentry.io/)
