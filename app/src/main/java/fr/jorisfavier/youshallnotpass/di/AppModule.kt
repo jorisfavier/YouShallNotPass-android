@@ -110,7 +110,7 @@ object AppModule {
                 ) { sharedPreferences, data ->
                     val updatedData = data.toMutablePreferences()
                     updatedData[THEME_PREFERENCE_KEY] =
-                        sharedPreferences.getInt(THEME_PREFERENCE_KEY.name, -1)
+                        sharedPreferences.getString(THEME_PREFERENCE_KEY.name)?.toIntOrNull() ?: -1
                     updatedData[HIDE_ITEMS_PREFERENCE_KEY] =
                         sharedPreferences.getBoolean(HIDE_ITEMS_PREFERENCE_KEY.name, false)
                     updatedData[DESKTOP_ADDRESS_PREFERENCE_KEY] =
