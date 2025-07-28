@@ -10,14 +10,21 @@ import android.widget.Toast
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 
 @ColorInt
 fun Context.getThemeColor(
     @AttrRes attrColor: Int,
 ): Int {
-    return TypedValue().apply {
+    val resolvedAttr = TypedValue().apply {
         theme.resolveAttribute(attrColor, this, true)
-    }.data
+    }
+    // resourceId is used if it's a ColorStateList, and data if it's a color reference or a hex color
+    return if (resolvedAttr.resourceId != 0) {
+        ContextCompat.getColor(this, resolvedAttr.resourceId)
+    } else {
+        resolvedAttr.data
+    }
 }
 
 fun Context.toast(@StringRes stringResId: Int) {

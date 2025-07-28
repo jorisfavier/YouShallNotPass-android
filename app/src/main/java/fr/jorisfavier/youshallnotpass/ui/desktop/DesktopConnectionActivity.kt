@@ -2,6 +2,7 @@ package fr.jorisfavier.youshallnotpass.ui.desktop
 
 import android.Manifest
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +16,7 @@ import androidx.core.content.PermissionChecker
 import androidx.core.view.doOnLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import dev.chrisbanes.insetter.applyInsetter
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.ActivityDesktopConnectionBinding
 import fr.jorisfavier.youshallnotpass.model.QRCodeAnalyzer
@@ -45,13 +47,16 @@ class DesktopConnectionActivity : AppCompatActivity() {
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         cameraLifecycle = CustomLifecycle(this.lifecycle)
-        supportActionBar?.hide()
         binding = ActivityDesktopConnectionBinding.inflate(layoutInflater)
         cameraExecutor = Executors.newSingleThreadExecutor()
         setContentView(binding.root)
-        binding.close.setOnClickListener { onBackPressed() }
+        binding.close.apply {
+            applyInsetter { type(statusBars = true) { padding() } }
+            setOnClickListener { onBackPressedDispatcher.onBackPressed() }
+        }
         initObserver()
     }
 
@@ -73,6 +78,7 @@ class DesktopConnectionActivity : AppCompatActivity() {
                     cameraLifecycle.resume()
                     toast(R.string.unable_to_read_qr_code)
                 }
+
                 is State.Success<*> -> {
                     toast(R.string.qr_code_success)
                     finish()

@@ -4,20 +4,36 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/colorBackground"
-    android:paddingHorizontal="20dp"
-    android:paddingVertical="40dp">
+    android:background="?android:attr/colorBackground">
 
-    <ScrollView
-        android:id="@+id/itemview_scrollview"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:navigationIcon="@drawable/ic_close" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+        android:id="@+id/itemview_scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintBottom_toTopOf="@id/button_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appbar">
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="20dp">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/name_layout"
@@ -107,8 +123,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/use_uppercase"
                 android:checked="true"
+                android:text="@string/use_uppercase"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/password_length_bar" />
 
@@ -117,8 +133,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/use_number"
                 android:checked="true"
+                android:text="@string/use_number"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/uppercase_checkbox" />
 
@@ -127,8 +143,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/use_symbol"
                 android:checked="true"
+                android:text="@string/use_symbol"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/number_checkbox" />
 
@@ -141,7 +157,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?android:colorBackground"
-        android:paddingVertical="10dp"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 

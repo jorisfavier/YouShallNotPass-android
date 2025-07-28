@@ -4,9 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebViewClient
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import dev.chrisbanes.insetter.applyInsetter
 import fr.jorisfavier.youshallnotpass.BuildConfig
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentPrivacyPolicyBinding
@@ -30,9 +29,13 @@ class PrivacyPolicyFragment : Fragment(R.layout.fragment_privacy_policy) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as AppCompatActivity).supportActionBar?.apply {
-            setTitle(R.string.privacy_policy)
-            show()
+        binding.toolbar.apply {
+            applyInsetter {
+                type(statusBars = true) { padding() }
+            }
+            setNavigationOnClickListener {
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+            }
         }
         binding.webview.apply {
             settings.javaScriptEnabled = true
@@ -40,6 +43,7 @@ class PrivacyPolicyFragment : Fragment(R.layout.fragment_privacy_policy) {
             webViewClient = WebViewWithExtraClient()
             forceDarkMode(isDarkModeOn = requireContext().isDarkMode())
             loadUrl(BuildConfig.PRIVACY_POLICY_URL)
+            applyInsetter { type(navigationBars = true) { margin() } }
         }
     }
 

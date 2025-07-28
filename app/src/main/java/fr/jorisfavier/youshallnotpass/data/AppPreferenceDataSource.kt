@@ -1,5 +1,8 @@
 package fr.jorisfavier.youshallnotpass.data
 
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import fr.jorisfavier.youshallnotpass.analytics.ScreenName
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
@@ -9,18 +12,18 @@ interface AppPreferenceDataSource {
      * Retrieves the theme chosen by the user
      * @return null if not set
      */
-    suspend fun getTheme(): String?
+    val theme: Flow<Int?>
 
     /**
      * Set the user's theme
      * @param theme
      */
-    suspend fun setTheme(theme: String)
+    suspend fun setTheme(theme: Int)
 
     /**
      * Indicates if the we should hide all items on the home screen
      */
-    fun observeShouldHideItems(): Flow<Boolean>
+    val shouldHideItems: Flow<Boolean>
 
     /**
      * Set the user's choice regarding hiding the items on the home screen
@@ -31,7 +34,7 @@ interface AppPreferenceDataSource {
      * Retrieves the ip address from the desktop ysnp app
      * @return null if unknown
      */
-    suspend fun getDesktopAddress(): String?
+    val desktopAddress: Flow<String?>
 
     /**
      * Set the ip address from the desktop ysnp app
@@ -65,9 +68,9 @@ interface AppPreferenceDataSource {
     suspend fun getAnalyticEventDate(screenName: ScreenName): LocalDateTime?
 
     companion object {
-        const val THEME_PREFERENCE_KEY = "theme"
-        const val HIDE_ITEMS_PREFERENCE_KEY = "hideItems"
-        const val DESKTOP_ADDRESS_PREFERENCE_KEY = "desktop_address_preference_key"
+        val THEME_PREFERENCE_KEY = intPreferencesKey("theme")
+        val HIDE_ITEMS_PREFERENCE_KEY = booleanPreferencesKey("hideItems")
+        val DESKTOP_ADDRESS_PREFERENCE_KEY = stringPreferencesKey("desktop_address_preference_key")
         const val DESKTOP_KEY_PREFERENCE_KEY = "desktop_key_preference_key"
     }
 }

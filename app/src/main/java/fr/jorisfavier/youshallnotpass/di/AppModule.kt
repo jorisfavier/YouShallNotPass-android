@@ -7,6 +7,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import androidx.biometric.BiometricManager
+import androidx.datastore.core.DataStore
+import androidx.datastore.migrations.SharedPreferencesMigration
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.preference.PreferenceManager
 import androidx.room.Room
 import androidx.security.crypto.EncryptedSharedPreferences
@@ -24,6 +29,9 @@ import fr.jorisfavier.youshallnotpass.api.AuthInterceptor
 import fr.jorisfavier.youshallnotpass.api.DesktopApi
 import fr.jorisfavier.youshallnotpass.api.HostInterceptor
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
+import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.DESKTOP_ADDRESS_PREFERENCE_KEY
+import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.HIDE_ITEMS_PREFERENCE_KEY
+import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.THEME_PREFERENCE_KEY
 import fr.jorisfavier.youshallnotpass.data.ExternalItemDataSource
 import fr.jorisfavier.youshallnotpass.data.ItemDataSource
 import fr.jorisfavier.youshallnotpass.data.impl.AppPreferenceDataSourceImpl
@@ -32,14 +40,20 @@ import fr.jorisfavier.youshallnotpass.manager.ContentResolverManager
 import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.manager.impl.ContentResolverManagerImpl
 import fr.jorisfavier.youshallnotpass.manager.impl.CryptoManagerImpl
+import fr.jorisfavier.youshallnotpass.repository.AppPreferenceRepository
 import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
 import fr.jorisfavier.youshallnotpass.repository.ExternalItemRepository
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
+import fr.jorisfavier.youshallnotpass.repository.impl.AppPreferenceRepositoryImpl
 import fr.jorisfavier.youshallnotpass.repository.impl.DesktopRepositoryImpl
 import fr.jorisfavier.youshallnotpass.repository.impl.ExternalItemRepositoryImpl
 import fr.jorisfavier.youshallnotpass.repository.impl.ItemRepositoryImpl
 import fr.jorisfavier.youshallnotpass.utils.CoroutineDispatchers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -50,6 +64,7 @@ import javax.inject.Singleton
 
 private const val ANALYTICS_HTTP_CLIENT = "analytics_http_client"
 private const val ANALYTICS_RETROFIT = "analytics_retrofit"
+private const val APP_PREFERENCES = "app_preferences"
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -65,7 +80,7 @@ object AppModule {
     @Provides
     fun provideDb(app: Application): YouShallNotPassDatabase {
         return Room.databaseBuilder(app, YouShallNotPassDatabase::class.java, "ysnp.db")
-            .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration(false)
             .build()
     }
 
@@ -83,8 +98,28 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideSharedPreference(app: Application): SharedPreferences {
-        return PreferenceManager.getDefaultSharedPreferences(app)
+    fun provideSharedPreference(app: Application): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.create(
+            migrations = listOf(
+                SharedPreferencesMigration(
+                    produceSharedPreferences = {
+                        PreferenceManager.getDefaultSharedPreferences(
+                            app
+                        )
+                    }
+                ) { sharedPreferences, data ->
+                    val updatedData = data.toMutablePreferences()
+                    updatedData[THEME_PREFERENCE_KEY] =
+                        sharedPreferences.getInt(THEME_PREFERENCE_KEY.name, -1)
+                    updatedData[HIDE_ITEMS_PREFERENCE_KEY] =
+                        sharedPreferences.getBoolean(HIDE_ITEMS_PREFERENCE_KEY.name, false)
+                    updatedData[DESKTOP_ADDRESS_PREFERENCE_KEY] =
+                        sharedPreferences.getString(DESKTOP_ADDRESS_PREFERENCE_KEY.name) ?: ""
+                    updatedData.toPreferences()
+                }
+            ),
+            produceFile = { app.preferencesDataStoreFile(APP_PREFERENCES) },
+        )
     }
 
     @Singleton
@@ -107,13 +142,13 @@ object AppModule {
     @Singleton
     @Provides
     fun provideAppDataSource(
-        sharedPreferences: SharedPreferences,
+        preferencesDataStore: DataStore<Preferences>,
         @Named("SecuredSharedPreferences")
         securedSharedPreferences: SharedPreferences,
         coroutineDispatcher: CoroutineDispatchers,
     ): AppPreferenceDataSource {
         return AppPreferenceDataSourceImpl(
-            sharedPreferences,
+            preferencesDataStore,
             securedSharedPreferences,
             coroutineDispatcher.io,
         )
@@ -243,6 +278,7 @@ object AppModule {
         return retrofit.create(AnalyticsApi::class.java)
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @Singleton
     @Provides
     fun provideDesktopRepository(
@@ -252,7 +288,7 @@ object AppModule {
         cryptoManager: CryptoManager,
     ): DesktopRepository {
         GlobalScope.launch {
-            hostInterceptor.host = appPreferenceDataSource.getDesktopAddress()
+            hostInterceptor.host = appPreferenceDataSource.desktopAddress.firstOrNull()
         }
         return DesktopRepositoryImpl(api, appPreferenceDataSource, hostInterceptor, cryptoManager)
     }
@@ -280,4 +316,25 @@ object AppModule {
     fun provideCoroutineDispatchers(): CoroutineDispatchers {
         return CoroutineDispatchers()
     }
+
+    @Singleton
+    @Provides
+    fun provideAppScope(
+        dispatchers: CoroutineDispatchers,
+    ): CoroutineScope {
+        return CoroutineScope(dispatchers.main + SupervisorJob())
+    }
+
+    @Singleton
+    @Provides
+    fun provideAppPreferenceRepository(
+        appPreferenceDataSource: AppPreferenceDataSource,
+        appScope: CoroutineScope,
+    ): AppPreferenceRepository {
+        return AppPreferenceRepositoryImpl(
+            appScope = appScope,
+            appPreferenceDataSource = appPreferenceDataSource
+        )
+    }
+
 }

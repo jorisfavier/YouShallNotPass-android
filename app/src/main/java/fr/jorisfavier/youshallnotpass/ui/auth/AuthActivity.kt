@@ -3,6 +3,8 @@ package fr.jorisfavier.youshallnotpass.ui.auth
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
+import androidx.activity.addCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
@@ -28,22 +30,21 @@ class AuthActivity : AppCompatActivity() {
     private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         installSplashScreen()
         setContentView(R.layout.activity_auth)
         initObserver()
         initAuthentication()
         redirectToHome = intent.getBooleanExtra(REDIRECT_TO_HOME_EXTRA, true)
-        supportActionBar?.hide()
+        onBackPressedDispatcher.addCallback(owner = this) {
+            ActivityCompat.finishAffinity(this@AuthActivity)
+        }
     }
 
     override fun onResume() {
         super.onResume()
         viewModel.requestAuthentication()
-    }
-
-    override fun onBackPressed() {
-        ActivityCompat.finishAffinity(this)
     }
 
     private fun initObserver() {

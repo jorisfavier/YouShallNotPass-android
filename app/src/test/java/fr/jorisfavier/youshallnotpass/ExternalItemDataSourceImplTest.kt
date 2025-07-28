@@ -7,11 +7,19 @@ import fr.jorisfavier.youshallnotpass.data.impl.ExternalItemDataSourceImpl
 import fr.jorisfavier.youshallnotpass.data.model.ItemDto
 import fr.jorisfavier.youshallnotpass.manager.ContentResolverManager
 import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
-import fr.jorisfavier.youshallnotpass.utils.CoroutineDispatchers
-import io.mockk.*
+import fr.jorisfavier.youshallnotpass.utils.MainDispatcherRule
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.mockkConstructor
+import io.mockk.mockkStatic
+import io.mockk.runs
+import io.mockk.slot
 import junit.framework.TestCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
@@ -22,7 +30,7 @@ class ExternalItemDataSourceImplTest {
     var instantExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
-    var mainCoroutineRule = MainCoroutineRule()
+    var mainCoroutineRule = MainDispatcherRule()
 
     private val appContext: Context = mockk()
     private val contentResolver: ContentResolverManager = mockk()
@@ -71,7 +79,7 @@ class ExternalItemDataSourceImplTest {
 
 
     @Test
-    fun `saveToCsv with a given list of item should save them as a csv file`() = runBlocking {
+    fun `saveToCsv with a given list of item should save them as a csv file`() = runTest {
         //given
         mockkStatic(FileProvider::class)
         mockkConstructor(FileWriter::class)
@@ -92,12 +100,14 @@ class ExternalItemDataSourceImplTest {
         TestCase.assertTrue(fileContent.isNotEmpty())
         TestCase.assertEquals(3, lines.size)
         TestCase.assertEquals("title,username,password", lines[0])
-        TestCase.assertEquals("${fakeItemDto.title},${fakeItemDto.login},${fakeItemDto.password}",
-            lines[1])
+        TestCase.assertEquals(
+            "${fakeItemDto.title},${fakeItemDto.login},${fakeItemDto.password}",
+            lines[1]
+        )
     }
 
     @Test
-    fun `getItemsFromTextFile should extract items from onepassword export`() = runBlocking {
+    fun `getItemsFromTextFile should extract items from onepassword export`() = runTest {
         //given
         coEvery { contentResolver.getFileContent(any()) } returns onePasswordExport
 
@@ -111,7 +121,7 @@ class ExternalItemDataSourceImplTest {
     }
 
     @Test
-    fun `getItemsFromTextFile should extract items from lastpass export`() = runBlocking {
+    fun `getItemsFromTextFile should extract items from lastpass export`() = runTest {
         //given
         coEvery { contentResolver.getFileContent(any()) } returns lastPassExport
 
@@ -125,7 +135,7 @@ class ExternalItemDataSourceImplTest {
     }
 
     @Test
-    fun `getItemsFromTextFile should extract items from chrome export`() = runBlocking {
+    fun `getItemsFromTextFile should extract items from chrome export`() = runTest {
         //given
         coEvery { contentResolver.getFileContent(any()) } returns chromeExport
 
@@ -139,7 +149,7 @@ class ExternalItemDataSourceImplTest {
     }
 
     @Test
-    fun `getItemsFromTextFile should extract items from bitwarden export`() = runBlocking {
+    fun `getItemsFromTextFile should extract items from bitwarden export`() = runTest {
         //given
         coEvery { contentResolver.getFileContent(any()) } returns bitwardenExport
 
@@ -153,7 +163,7 @@ class ExternalItemDataSourceImplTest {
     }
 
     @Test
-    fun `getItemsFromTextFile should extract items from firefox export`() = runBlocking {
+    fun `getItemsFromTextFile should extract items from firefox export`() = runTest {
         //given
         coEvery { contentResolver.getFileContent(any()) } returns exportFirefox
 
@@ -171,7 +181,7 @@ class ExternalItemDataSourceImplTest {
     }
 
     @Test(expected = YsnpException::class)
-    fun `getItemsFromTextFile should emit error when importing without header`() = runBlocking {
+    fun `getItemsFromTextFile should emit error when importing without header`() = runTest {
         //given
         coEvery { contentResolver.getFileContent(any()) } returns dashLaneExport
 

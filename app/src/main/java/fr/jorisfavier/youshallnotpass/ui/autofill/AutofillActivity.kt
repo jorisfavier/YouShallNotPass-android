@@ -6,12 +6,13 @@ import android.os.Build
 import android.os.Bundle
 import android.service.autofill.FillRequest
 import android.view.autofill.AutofillManager
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.IntentCompat
-import androidx.navigation.ui.setupActionBarWithNavController
 import dagger.hilt.android.AndroidEntryPoint
+import dev.chrisbanes.insetter.applyInsetter
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.ActivityAutofillBinding
 import fr.jorisfavier.youshallnotpass.ui.auth.AuthActivity
@@ -48,10 +49,10 @@ class AutofillActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = ActivityAutofillBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setupActionBarWithNavController(navController)
         if (savedInstanceState == null) {
             viewModel.setAutofillInfos(assistStructure, fillRequest)
             requireAuthentication()

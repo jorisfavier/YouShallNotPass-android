@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -12,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import dev.chrisbanes.insetter.applyInsetter
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentSearchBinding
 import fr.jorisfavier.youshallnotpass.model.Item
@@ -46,7 +46,11 @@ abstract class SearchBaseFragment : Fragment(R.layout.fragment_search) {
         binding.searchEditField.doAfterTextChanged { search ->
             viewModel.onSearchChanged(search?.toString().orEmpty())
         }
-        (activity as AppCompatActivity).supportActionBar?.hide()
+        binding.root.applyInsetter {
+            type(navigationBars = true, statusBars = true, ime = true) {
+                padding(horizontal = true, vertical = true)
+            }
+        }
     }
 
     private fun initSettings() {

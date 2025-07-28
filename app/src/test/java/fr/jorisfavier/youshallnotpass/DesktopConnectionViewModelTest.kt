@@ -3,12 +3,14 @@ package fr.jorisfavier.youshallnotpass
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
 import fr.jorisfavier.youshallnotpass.ui.desktop.DesktopConnectionViewModel
+import fr.jorisfavier.youshallnotpass.utils.MainDispatcherRule
 import fr.jorisfavier.youshallnotpass.utils.State
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import io.mockk.slot
 import junit.framework.TestCase
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 
@@ -21,10 +23,10 @@ class DesktopConnectionViewModelTest {
     var instantExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
-    var mainCoroutineRule = MainCoroutineRule()
+    var mainCoroutineRule = MainDispatcherRule()
 
     @Test
-    fun `onCodeFound with a correct formatted code should emit a success state`() {
+    fun `onCodeFound with a correct formatted code should emit a success state`() = runTest {
         //given
         val urlSlot = slot<String>()
         val publicKeySlot = slot<String>()
@@ -76,62 +78,64 @@ class DesktopConnectionViewModelTest {
     }
 
     @Test
-    fun `onCodeFound with the repository throwing exception should emit a failure state`() {
-        //given
-        val stateList = mutableListOf<State<Unit>>()
-        val fakeUrl = "192.168.0.1:8080"
-        val cleanedKey = "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtFidODAnunzeGxbO8Kt5"
-        val fakeKey = "-----BEGIN PUBLIC KEY-----\n" +
-                cleanedKey +
-                "\n-----END PUBLIC KEY-----"
-        val fakeCode = "$fakeUrl#ysnp#$fakeKey"
-        coEvery {
-            desktopRepository.updateDesktopInfo(any(), any())
-        } throws Exception()
+    fun `onCodeFound with the repository throwing exception should emit a failure state`() =
+        runTest {
+            //given
+            val stateList = mutableListOf<State<Unit>>()
+            val fakeUrl = "192.168.0.1:8080"
+            val cleanedKey = "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtFidODAnunzeGxbO8Kt5"
+            val fakeKey = "-----BEGIN PUBLIC KEY-----\n" +
+                    cleanedKey +
+                    "\n-----END PUBLIC KEY-----"
+            val fakeCode = "$fakeUrl#ysnp#$fakeKey"
+            coEvery {
+                desktopRepository.updateDesktopInfo(any(), any())
+            } throws Exception()
 
-        //when
-        viewModel.qrCodeAnalyseState.observeForever {
-            stateList.add(it)
+            //when
+            viewModel.qrCodeAnalyseState.observeForever {
+                stateList.add(it)
+            }
+            viewModel.onCodeFound(fakeCode)
+
+            //then
+            TestCase.assertEquals(2, stateList.size)
+            TestCase.assertEquals(State.Loading, stateList.firstOrNull())
+            TestCase.assertEquals(State.Error, stateList[1])
         }
-        viewModel.onCodeFound(fakeCode)
-
-        //then
-        TestCase.assertEquals(2, stateList.size)
-        TestCase.assertEquals(State.Loading, stateList.firstOrNull())
-        TestCase.assertEquals(State.Error, stateList[1])
-    }
 
     @Test
-    fun `onCodeFound with a correct formatted code should emit a success state only once`() {
-        //given
-        val urlSlot = slot<String>()
-        val publicKeySlot = slot<String>()
-        val stateList = mutableListOf<State<Unit>>()
-        val fakeUrl = "192.168.0.1:8080"
-        val cleanedKey = "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtFidODAnunzeGxbO8Kt5"
-        val fakeKey = "-----BEGIN PUBLIC KEY-----\n" +
-                cleanedKey +
-                "\n-----END PUBLIC KEY-----"
-        val fakeCode = "$fakeUrl#ysnp#$fakeKey"
-        coEvery {
-            desktopRepository.updateDesktopInfo(capture(urlSlot), capture(publicKeySlot))
-        } returns Result.success(Unit)
+    fun `onCodeFound with a correct formatted code should emit a success state only once`() =
+        runTest {
+            //given
+            val urlSlot = slot<String>()
+            val publicKeySlot = slot<String>()
+            val stateList = mutableListOf<State<Unit>>()
+            val fakeUrl = "192.168.0.1:8080"
+            val cleanedKey = "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtFidODAnunzeGxbO8Kt5"
+            val fakeKey = "-----BEGIN PUBLIC KEY-----\n" +
+                    cleanedKey +
+                    "\n-----END PUBLIC KEY-----"
+            val fakeCode = "$fakeUrl#ysnp#$fakeKey"
+            coEvery {
+                desktopRepository.updateDesktopInfo(capture(urlSlot), capture(publicKeySlot))
+            } returns Result.success(Unit)
 
-        //when
-        viewModel.qrCodeAnalyseState.observeForever {
-            stateList.add(it)
+            //when
+            viewModel.qrCodeAnalyseState.observeForever {
+                stateList.add(it)
+            }
+            viewModel.onCodeFound(fakeCode)
+            viewModel.onCodeFound(fakeCode)
+            viewModel.onCodeFound(fakeCode)
+            viewModel.onCodeFound(fakeCode)
+
+            //then
+            TestCase.assertEquals(2, stateList.size)
+            TestCase.assertEquals(State.Loading, stateList.firstOrNull())
+            TestCase.assertTrue(stateList[1] is State.Success)
+            TestCase.assertEquals("http://$fakeUrl", urlSlot.captured)
+            TestCase.assertEquals(cleanedKey, publicKeySlot.captured)
         }
-        viewModel.onCodeFound(fakeCode)
-        viewModel.onCodeFound(fakeCode)
-        viewModel.onCodeFound(fakeCode)
-        viewModel.onCodeFound(fakeCode)
-
-        //then
-        TestCase.assertEquals(2, stateList.size)
-        TestCase.assertEquals(State.Loading, stateList.firstOrNull())
-        TestCase.assertTrue(stateList[1] is State.Success)
-        TestCase.assertEquals("http://$fakeUrl", urlSlot.captured)
-        TestCase.assertEquals(cleanedKey, publicKeySlot.captured)
-    }
 
 }

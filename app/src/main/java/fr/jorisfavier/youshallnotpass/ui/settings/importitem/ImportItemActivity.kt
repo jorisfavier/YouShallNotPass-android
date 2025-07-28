@@ -1,11 +1,13 @@
 package fr.jorisfavier.youshallnotpass.ui.settings.importitem
 
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.viewpager2.widget.ViewPager2
 import dagger.hilt.android.AndroidEntryPoint
+import dev.chrisbanes.insetter.applyInsetter
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.ActivityImportItemBinding
 import fr.jorisfavier.youshallnotpass.utils.State
@@ -25,12 +27,16 @@ class ImportItemActivity : AppCompatActivity(R.layout.activity_import_item) {
     val viewModel: ImportItemViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = ActivityImportItemBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.root.applyInsetter {
+            type(navigationBars = true, statusBars = true) { padding() }
+        }
+
         initObserver()
         initUI()
-        supportActionBar?.hide()
     }
 
     private fun initUI() {

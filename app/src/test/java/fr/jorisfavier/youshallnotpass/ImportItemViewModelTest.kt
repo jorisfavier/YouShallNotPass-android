@@ -12,6 +12,7 @@ import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemStep
 import fr.jorisfavier.youshallnotpass.ui.settings.importitem.ImportItemViewModel
 import fr.jorisfavier.youshallnotpass.ui.settings.importitem.review.SelectableExternalItem
 import fr.jorisfavier.youshallnotpass.utils.CoroutineDispatchers
+import fr.jorisfavier.youshallnotpass.utils.MainDispatcherRule
 import fr.jorisfavier.youshallnotpass.utils.State
 import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
 import io.mockk.coEvery
@@ -19,16 +20,17 @@ import io.mockk.mockk
 import io.mockk.slot
 import junit.framework.TestCase
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 
 class ImportItemViewModelTest {
+
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
-    var mainCoroutineRule = MainCoroutineRule()
+    var mainCoroutineRule = MainDispatcherRule()
 
     private val itemRepository: ItemRepository = mockk()
     private val cryptoManager: CryptoManager = mockk()
@@ -54,7 +56,7 @@ class ImportItemViewModelTest {
     private val fakePassword = "fake password"
 
     @Test
-    fun `setUri with a ysnp file uri should emit a navigate event`() = runBlocking {
+    fun `setUri with a ysnp file uri should emit a navigate event`() = runTest {
         //given
         val uri: Uri = mockk()
         coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(true)
@@ -70,7 +72,7 @@ class ImportItemViewModelTest {
     }
 
     @Test
-    fun `setUri with a csv file uri should emit a navigate event`() = runBlocking {
+    fun `setUri with a csv file uri should emit a navigate event`() = runTest {
         //given
         val uri: Uri = mockk()
         coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(false)
@@ -87,7 +89,7 @@ class ImportItemViewModelTest {
 
     @Test
     fun `onSlideChanged with PASSWORD_NEEDED position should emit a navigate event if isSecureFile is false`() =
-        runBlocking {
+        runTest {
             //given
             val uri: Uri = mockk()
             coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(
@@ -110,7 +112,7 @@ class ImportItemViewModelTest {
 
     @Test
     fun `onSlideChanged with PASSWORD_NEEDED position should not emit a navigate event if isSecureFile is true`() =
-        runBlocking {
+        runTest {
             //given
             val uri: Uri = mockk()
             coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(
@@ -133,7 +135,7 @@ class ImportItemViewModelTest {
 
     @Test
     fun `onSlideChanged with REVIEW_ITEM position should load external items`() =
-        runBlocking {
+        runTest {
             //given
             val uri: Uri = mockk()
             val filePassword = slot<String>()
@@ -169,7 +171,7 @@ class ImportItemViewModelTest {
 
     @Test
     fun `onSlideChanged with REVIEW_ITEM position and empty item list should emit error`() =
-        runBlocking {
+        runTest {
             //given
             val uri: Uri = mockk()
             val filePassword = slot<String>()
@@ -201,7 +203,7 @@ class ImportItemViewModelTest {
 
     @Test
     fun `onSlideChanged with REVIEW_ITEM position and exception from the repository should emit an error`() =
-        runBlocking {
+        runTest {
             //given
             val uri: Uri = mockk()
             val filePassword = slot<String>()
@@ -239,7 +241,7 @@ class ImportItemViewModelTest {
         }
 
     @Test
-    fun `selectAllItems should select all importedItems`() = runBlocking {
+    fun `selectAllItems should select all importedItems`() = runTest {
         //given
         val uri: Uri = mockk()
         val items = slot<List<Item>>()
@@ -267,7 +269,7 @@ class ImportItemViewModelTest {
 
     @Test
     fun `onSlideChanged with SUCCESS_FAIL position and selected items should import items`() =
-        runBlocking {
+        runTest {
             //given
             val uri: Uri = mockk()
             val items = slot<List<Item>>()
@@ -305,7 +307,7 @@ class ImportItemViewModelTest {
 
     @Test
     fun `onSlideChanged with SUCCESS_FAIL position and no item selected should emit an error`() =
-        runBlocking {
+        runTest {
             //given
             val uri: Uri = mockk()
             coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(
@@ -332,7 +334,7 @@ class ImportItemViewModelTest {
 
     @Test
     fun `onSlideChanged with SUCCESS_FAIL position and an exception from the repository should emit an error`() =
-        runBlocking {
+        runTest {
             //given
             val uri: Uri = mockk()
             coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(
@@ -362,7 +364,7 @@ class ImportItemViewModelTest {
 
     @Test
     fun `onSlideChanged with SUCCESS_FAIL position and no item found should emit an error`() =
-        runBlocking {
+        runTest {
             //given
             val uri: Uri = mockk()
             coEvery { externalItemRepository.isSecuredWithPassword(any()) } returns Result.success(

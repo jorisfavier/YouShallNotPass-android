@@ -10,13 +10,13 @@ import okio.ByteString
  * if nothing was found.
  */
 fun PackageManager.getCertificateHashes(packageName: String): List<String> {
-    return kotlin.runCatching {
+    return runCatching {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
             val packageInfo = getPackageInfo(
                 packageName,
                 PackageManager.GET_SIGNING_CERTIFICATES
             )
-            val signingInfo = packageInfo.signingInfo
+            val signingInfo = packageInfo.signingInfo!!
             if (signingInfo.hasMultipleSigners()) {
                 signingInfo.apkContentsSigners.map {
                     ByteString.of(*it.toByteArray()).sha256().hex()
@@ -28,7 +28,7 @@ fun PackageManager.getCertificateHashes(packageName: String): List<String> {
             }
         } else {
             val packageInfo = getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
-            val signatures = packageInfo.signatures
+            val signatures = packageInfo.signatures!!
             signatures.map {
                 ByteString.of(*it.toByteArray()).sha1().hex()
             }

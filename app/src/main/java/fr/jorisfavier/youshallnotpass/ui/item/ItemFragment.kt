@@ -4,13 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
+import dev.chrisbanes.insetter.applyInsetter
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.databinding.FragmentItemBinding
 import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
@@ -38,10 +38,17 @@ class ItemFragment : Fragment(R.layout.fragment_item) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as AppCompatActivity).supportActionBar?.apply {
-            title =
-                getString(if (args.itemId == 0) R.string.item_create_title else R.string.item_edit_title)
-            show()
+        binding.toolbar.apply {
+            title = getString(
+                if (args.itemId == 0) R.string.item_create_title else R.string.item_edit_title
+            )
+            setNavigationOnClickListener {
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+            }
+            applyInsetter { type(statusBars = true) { padding() } }
+        }
+        binding.root.applyInsetter {
+            type(navigationBars = true, ime = true) { padding() }
         }
         initUI()
         initObservers()

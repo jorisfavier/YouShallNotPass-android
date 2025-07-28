@@ -9,11 +9,11 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.jorisfavier.youshallnotpass.R
-import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
 import fr.jorisfavier.youshallnotpass.manager.CryptoManager
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
 import fr.jorisfavier.youshallnotpass.model.exception.YsnpException
+import fr.jorisfavier.youshallnotpass.repository.AppPreferenceRepository
 import fr.jorisfavier.youshallnotpass.repository.DesktopRepository
 import fr.jorisfavier.youshallnotpass.repository.ItemRepository
 import fr.jorisfavier.youshallnotpass.utils.State
@@ -39,8 +39,8 @@ class SearchViewModel(
     private val itemRepository: ItemRepository,
     private val cryptoManager: CryptoManager,
     private val clipboardManager: ClipboardManager,
-    private val appPreference: AppPreferenceDataSource,
     private val desktopRepository: DesktopRepository,
+    appPreferenceRepository: AppPreferenceRepository,
     debounceDurationMs: Long,
 ) : SearchBaseViewModel() {
 
@@ -49,14 +49,14 @@ class SearchViewModel(
         itemRepository: ItemRepository,
         cryptoManager: CryptoManager,
         clipboardManager: ClipboardManager,
-        appPreference: AppPreferenceDataSource,
+        appPreferenceRepository: AppPreferenceRepository,
         desktopRepository: DesktopRepository,
     ) : this(
         itemRepository,
         cryptoManager,
         clipboardManager,
-        appPreference,
         desktopRepository,
+        appPreferenceRepository,
         debounceDurationMs = 300,
     )
 
@@ -64,7 +64,7 @@ class SearchViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     override val results = combine(
         search.asFlow(),
-        appPreference.observeShouldHideItems(),
+        appPreferenceRepository.shouldHideItems,
         itemRepository.getAllItems(),
     ) { query, hideAll, allItems -> Triple(query, hideAll, allItems) }
         .flatMapLatest { (query, hideAll, allItems) ->
@@ -97,7 +97,7 @@ class SearchViewModel(
     }
 
     override val noResultTextIdRes =
-        search.combine(appPreference.observeShouldHideItems().asLiveData())
+        search.combine(appPreferenceRepository.shouldHideItems.asLiveData())
             .map { (search, hideAll) ->
                 val isSearchEmpty = search.isEmpty() || search.isBlank()
                 when {

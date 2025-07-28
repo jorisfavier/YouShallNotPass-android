@@ -59,6 +59,7 @@
             android:theme="@style/Theme.YouShallNotPass" />
         <activity
             android:name=".ui.auth.AuthActivity"
+            android:theme="@style/Theme.YouShallNotPass"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

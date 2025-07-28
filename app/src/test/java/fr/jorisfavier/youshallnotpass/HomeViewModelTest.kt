@@ -8,6 +8,7 @@ import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
 import fr.jorisfavier.youshallnotpass.manager.AuthManager
 import fr.jorisfavier.youshallnotpass.manager.impl.AuthManagerImpl
 import fr.jorisfavier.youshallnotpass.ui.home.HomeViewModel
+import fr.jorisfavier.youshallnotpass.utils.MainDispatcherRule
 import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -17,6 +18,7 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import java.time.LocalDateTime
@@ -32,10 +34,10 @@ class HomeViewModelTest {
     var instantExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
-    var mainCoroutineRule = MainCoroutineRule()
+    var mainCoroutineRule = MainDispatcherRule()
 
     @Test
-    fun `user should not be authenticated when onAppPaused`() {
+    fun `user should not be authenticated when onAppPaused`() = runTest {
         //given
         every { authManager setProperty "isUserAuthenticated" value false } just runs
         val viewModel = HomeViewModel(authManager, analytics = mockk())
@@ -48,21 +50,22 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `requireAuthentication should emit a value onAppResumed if the user is not authenticated`() {
-        //given
-        every { authManager getProperty "isUserAuthenticated" } returns false
-        val viewModel = HomeViewModel(authManager, analytics = mockk())
+    fun `requireAuthentication should emit a value onAppResumed if the user is not authenticated`() =
+        runTest {
+            //given
+            every { authManager getProperty "isUserAuthenticated" } returns false
+            val viewModel = HomeViewModel(authManager, analytics = mockk())
 
-        //when
-        viewModel.onAppResumed()
+            //when
+            viewModel.onAppResumed()
 
-        //then
-        assertEquals(Unit, viewModel.requireAuthentication.getOrAwaitValue())
-        verify { authManager getProperty "isUserAuthenticated" }
-    }
+            //then
+            assertEquals(Unit, viewModel.requireAuthentication.getOrAwaitValue())
+            verify { authManager getProperty "isUserAuthenticated" }
+        }
 
     @Test(expected = TimeoutException::class)
-    fun `requireAuthentication should not emit a value on configuration change`() {
+    fun `requireAuthentication should not emit a value on configuration change`() = runTest {
         //given
         val authManager: AuthManager = AuthManagerImpl().apply { isUserAuthenticated = true }
         authManager.isUserAuthenticated = true
@@ -79,7 +82,7 @@ class HomeViewModelTest {
     }
 
     @Test(expected = TimeoutException::class)
-    fun `requireAuthentication should not emit a value when ignoreNextPause`() {
+    fun `requireAuthentication should not emit a value when ignoreNextPause`() = runTest {
         //given
         val authManager: AuthManager = AuthManagerImpl().apply { isUserAuthenticated = true }
         val viewModel = HomeViewModel(authManager, analytics = mockk())
@@ -95,7 +98,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `tracking the home screen for the first time is working`() {
+    fun `tracking the home screen for the first time is working`() = runTest {
         //given
         coEvery { analyticsApi.sendEvent(any()) } just runs
         coEvery { appPreference.getAnalyticEventDate(ScreenName.Home) } returns null
@@ -112,7 +115,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `tracking the home screen should only happen once per day`() {
+    fun `tracking the home screen should only happen once per day`() = runTest {
         //given
         coEvery { analyticsApi.sendEvent(any()) } just runs
         coEvery { appPreference.getAnalyticEventDate(ScreenName.Home) } returns LocalDateTime.now()

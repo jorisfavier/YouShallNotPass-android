@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/topAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:navigationIcon="@drawable/ic_back"
+            app:title="@string/settings" />
+
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="20dp">
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/hide_all"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="15dp"
+                android:text="@string/display_all_items"
+                android:textAppearance="?textAppearanceBody1" />
+
+            <TextView
+                android:id="@+id/delete_all"
+                style="@style/Widget.YouShallNotPass.SettingsItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/delete_all" />
+
+            <TextView
+                android:id="@+id/import_items"
+                style="@style/Widget.YouShallNotPass.SettingsItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/import_password" />
+
+            <TextView
+                android:id="@+id/export_items"
+                style="@style/Widget.YouShallNotPass.SettingsItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/export_password" />
+
+            <TextView
+                android:id="@+id/desktop"
+                style="@style/Widget.YouShallNotPass.SettingsItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/ysnp_desktop" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/autofill"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="20dp"
+                android:text="@string/autofill"
+                android:textAppearance="?textAppearanceBody1" />
+
+            <TextView
+                android:id="@+id/theme"
+                style="@style/Widget.YouShallNotPass.SettingsItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/app_theme" />
+
+            <TextView
+                android:id="@+id/header"
+                style="@style/Widget.YouShallNotPass.SettingsItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:accessibilityHeading="true"
+                android:paddingTop="30dp"
+                android:text="@string/about"
+                android:textAppearance="?textAppearanceHeadline6"
+                android:textColor="?colorSecondary"
+                tools:targetApi="28" />
+
+            <TextView
+                android:id="@+id/privacy_policy"
+                style="@style/Widget.YouShallNotPass.SettingsItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/privacy_policy" />
+
+            <TextView
+                android:id="@+id/version"
+                style="@style/Widget.YouShallNotPass.SettingsItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/version" />
+
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

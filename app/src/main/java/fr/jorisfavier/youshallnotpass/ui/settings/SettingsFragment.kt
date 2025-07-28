@@ -2,80 +2,92 @@ package fr.jorisfavier.youshallnotpass.ui.settings
 
 import android.app.Activity
 import android.content.Intent
-import android.content.res.Configuration
-import android.net.Uri
+import android.graphics.drawable.AnimationDrawable
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.text.SpannedString
+import android.text.style.ForegroundColorSpan
+import android.text.style.TextAppearanceSpan
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.view.autofill.AutofillManager
+import android.widget.PopupMenu
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.graphics.ColorUtils
+import androidx.core.net.toUri
+import androidx.core.text.buildSpannedString
+import androidx.core.text.inSpans
+import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.preference.ListPreference
-import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import dev.chrisbanes.insetter.applyInsetter
 import fr.jorisfavier.youshallnotpass.BuildConfig
 import fr.jorisfavier.youshallnotpass.R
-import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.HIDE_ITEMS_PREFERENCE_KEY
-import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.THEME_PREFERENCE_KEY
-import fr.jorisfavier.youshallnotpass.ui.common.BlinkPreference
+import fr.jorisfavier.youshallnotpass.databinding.FragmentSettingsBinding
 import fr.jorisfavier.youshallnotpass.ui.home.HomeViewModel
-import fr.jorisfavier.youshallnotpass.utils.extensions.getEntryforValue
+import fr.jorisfavier.youshallnotpass.utils.autoCleared
+import fr.jorisfavier.youshallnotpass.utils.extensions.getThemeColor
 import fr.jorisfavier.youshallnotpass.utils.extensions.toast
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class SettingsFragment : PreferenceFragmentCompat() {
+class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     private val args: SettingsFragmentArgs by navArgs()
+
+    private var binding: FragmentSettingsBinding by autoCleared()
 
     val viewModel: SettingsViewModel by viewModels()
 
     private val homeViewModel: HomeViewModel by activityViewModels()
 
-    private lateinit var allItemsVisibilityPreference: SwitchPreferenceCompat
-    private lateinit var importPreference: Preference
-    private lateinit var exportPreference: Preference
-    private lateinit var appThemePreference: ListPreference
-    private lateinit var versionPreference: Preference
-    private lateinit var deleteAllPreference: Preference
-    private lateinit var desktopPreference: Preference
-    private lateinit var autofillPreference: SwitchPreferenceCompat
-    private lateinit var privacyPolicyPreference: Preference
-
     private val requestAutofill =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                autofillPreference.isChecked = true
+                binding.autofill.isChecked = true
             }
         }
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setPreferencesFromResource(R.xml.root_preferences, rootKey)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View {
+        binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as AppCompatActivity).supportActionBar?.show()
-        allItemsVisibilityPreference = findPreference(HIDE_ITEMS_PREFERENCE_KEY)!!
-        importPreference = findPreference(KEY_IMPORT)!!
-        exportPreference = findPreference(KEY_EXPORT)!!
-        appThemePreference = findPreference(THEME_PREFERENCE_KEY)!!
-        versionPreference = findPreference(KEY_APP_VERSION)!!
-        deleteAllPreference = findPreference(KEY_DELETE_ALL)!!
-        desktopPreference = findPreference(KEY_DESKTOP)!!
-        autofillPreference = findPreference(KEY_AUTOFILL)!!
-        privacyPolicyPreference = findPreference(KEY_PP)!!
+        binding.topAppBar.apply {
+            applyInsetter {
+                type(statusBars = true) { padding() }
+            }
+            setNavigationOnClickListener {
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+            }
+        }
+        binding.container.applyInsetter {
+            type(navigationBars = true) { padding() }
+        }
 
+        initObservers()
+        initHideAllPreference()
         initAppThemePreference()
         initExportPreference()
         initImportPreference()
@@ -89,58 +101,66 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    private fun initAppThemePreference() {
-        appThemePreference.entryValues = viewModel.themeValues
-        appThemePreference.entries = viewModel.themeEntries.map { getString(it) }.toTypedArray()
-        if (appThemePreference.value != null) {
-            appThemePreference.summary =
-                appThemePreference.getEntryforValue(appThemePreference.value)
+    private fun initHideAllPreference() {
+        binding.hideAll.text = buildTitleAndExplanation(
+            title = getString(R.string.display_all_items),
+            explanation = getString(R.string.all_items_settings_description)
+        )
+        binding.hideAll.setOnCheckedChangeListener { _, shouldHideAll ->
+            viewModel.setHideAllItems(shouldHideAll)
         }
-        appThemePreference.onPreferenceChangeListener =
-            Preference.OnPreferenceChangeListener { _, newValue ->
-                val themeValue = (newValue as? String)?.toIntOrNull()
-                if (themeValue != null) {
-                    AppCompatDelegate.setDefaultNightMode(themeValue)
-                    appThemePreference.summary = appThemePreference.getEntryforValue(newValue)
-                } else {
-                    context?.toast(R.string.error_changing_theme)
+    }
+
+    private fun initAppThemePreference() {
+        val entries = viewModel.themeEntries
+        val popup = PopupMenu(requireContext(), binding.theme).apply {
+            menu.apply {
+                entries.keys.forEach { themeValue ->
+                    add(
+                        Menu.NONE,
+                        themeValue,
+                        Menu.NONE,
+                        entries[themeValue]?.let { getString(it) } ?: ""
+                    )
                 }
-                true
             }
-        lifecycleScope.launchWhenCreated {
-            viewModel.getDefaultThemeValue(resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK)
-                .collect {
-                    appThemePreference.value = it
-                }
+        }
+        popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+            viewModel.selectTheme(menuItem.itemId)
+            return@setOnMenuItemClickListener true
+        }
+        binding.theme.setOnClickListener {
+            popup.show()
         }
     }
 
     private fun initExportPreference() {
-        exportPreference.setOnPreferenceClickListener {
+        binding.exportItems.setOnClickListener {
             ExportDialogFragment().show(
                 childFragmentManager,
                 ExportDialogFragment.TAG,
             )
-            true
         }
     }
 
     private fun initImportPreference() {
-        importPreference.setOnPreferenceClickListener {
+        binding.importItems.setOnClickListener {
             homeViewModel.ignoreNextPause()
             val direction =
                 SettingsFragmentDirections.actionSettingsFragmentToImportPasswordActivity()
             findNavController().navigate(direction)
-            true
         }
     }
 
     private fun initAboutPreference() {
-        versionPreference.summary = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+        binding.version.text = buildTitleAndExplanation(
+            title = getString(R.string.version),
+            explanation = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+        )
     }
 
     private fun initDeleteAllPreference() {
-        deleteAllPreference.setOnPreferenceClickListener {
+        binding.deleteAll.setOnClickListener {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.delete_all)
                 .setMessage(R.string.delete_all_confirmation)
@@ -156,63 +176,110 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 .setNegativeButton(android.R.string.cancel, null)
                 .create()
                 .show()
-            true
         }
     }
 
     private fun initDesktopPreference() {
-        desktopPreference.setViewId(View.generateViewId())
-        desktopPreference.setOnPreferenceClickListener {
+        binding.desktop.text = buildTitleAndExplanation(
+            title = getString(R.string.ysnp_desktop),
+            explanation = getString(R.string.ysnp_desktop_summary)
+        )
+        binding.desktop.setOnClickListener {
             homeViewModel.ignoreNextPause()
             val direction =
                 SettingsFragmentDirections.actionSettingsFragmentToDesktopConnectionActivity()
             findNavController().navigate(direction)
-            true
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initAutofillPreference() {
         val autofillManager = requireContext().getSystemService(AutofillManager::class.java)
-        autofillPreference.isVisible = true
-        autofillPreference.isChecked = autofillManager.hasEnabledAutofillServices()
-        autofillPreference.setOnPreferenceChangeListener { _, checked ->
-            if (checked == true) {
-                homeViewModel.ignoreNextPause()
-                val intent = Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE).apply {
-                    data = Uri.parse("package:${BuildConfig.APPLICATION_ID}")
+        with(binding.autofill) {
+            text = buildTitleAndExplanation(
+                title = getString(R.string.autofill),
+                explanation = getString(R.string.autofill_explanation),
+            )
+            isVisible = true
+            isChecked = autofillManager.hasEnabledAutofillServices()
+            setOnCheckedChangeListener { _, checked ->
+                if (checked) {
+                    homeViewModel.ignoreNextPause()
+                    val intent = Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE).apply {
+                        data = "package:${BuildConfig.APPLICATION_ID}".toUri()
+                    }
+                    requestAutofill.launch(intent)
+                } else {
+                    autofillManager.disableAutofillServices()
                 }
-                requestAutofill.launch(intent)
-                false
-            } else {
-                autofillManager.disableAutofillServices()
-                true
             }
         }
     }
 
     private fun initPrivacyPolicyPreference() {
-        privacyPolicyPreference.setViewId(View.generateViewId())
-        privacyPolicyPreference.setOnPreferenceClickListener {
+        binding.privacyPolicy.setOnClickListener {
             val direction =
                 SettingsFragmentDirections.actionSettingsFragmentToPrivacyPolicyFragment()
             findNavController().navigate(direction)
-            true
         }
     }
 
     private fun playFocusAnimationIfNeeded() {
-        val highlightItem = args.highlightItem ?: return
-        findPreference<BlinkPreference>(highlightItem)?.blink()
+        val highlightItem = args.highlightItem.takeIf { it > 0 } ?: return
+        view?.findViewById<View>(highlightItem)?.apply {
+            setBackgroundResource(R.drawable.blink)
+            (background as? AnimationDrawable)?.start()
+        }
     }
 
-    companion object {
-        const val KEY_IMPORT = "import"
-        const val KEY_EXPORT = "export"
-        const val KEY_APP_VERSION = "appVersion"
-        const val KEY_DELETE_ALL = "deleteAll"
-        const val KEY_DESKTOP = "desktop"
-        const val KEY_AUTOFILL = "autofill"
-        const val KEY_PP = "privacyPolicy"
+    private fun initObservers() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                launch {
+                    viewModel.selectedTheme.collectLatest { themeResId ->
+                        val title = getString(R.string.app_theme)
+                        binding.theme.text = if (themeResId != null) {
+                            buildTitleAndExplanation(
+                                title = title,
+                                explanation = getString(themeResId),
+                            )
+                        } else title
+                    }
+                }
+                launch {
+                    viewModel.hideAllItems.collectLatest { shouldHideAllItems ->
+                        binding.hideAll.isChecked = shouldHideAllItems
+                    }
+                }
+            }
+        }
+    }
+
+    private fun buildTitleAndExplanation(title: String, explanation: String): SpannedString {
+        return buildSpannedString {
+            inSpans(
+                TextAppearanceSpan(
+                    requireContext(),
+                    R.style.TextAppearance_MaterialComponents_Body1
+                )
+            ) {
+                append(title)
+            }
+            append("\n")
+            inSpans(
+                TextAppearanceSpan(
+                    requireContext(),
+                    R.style.TextAppearance_MaterialComponents_Body2
+                ),
+                ForegroundColorSpan(
+                    ColorUtils.setAlphaComponent(
+                        requireContext().getThemeColor(android.R.attr.textColorPrimary),
+                        (255 * 0.6).toInt(),
+                    )
+                )
+            ) {
+                append(explanation)
+            }
+        }
     }
 }

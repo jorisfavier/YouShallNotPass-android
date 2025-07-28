@@ -2,6 +2,10 @@ package fr.jorisfavier.youshallnotpass.data.impl
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import fr.jorisfavier.youshallnotpass.analytics.ScreenName
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.DESKTOP_ADDRESS_PREFERENCE_KEY
@@ -10,74 +14,45 @@ import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.HID
 import fr.jorisfavier.youshallnotpass.data.AppPreferenceDataSource.Companion.THEME_PREFERENCE_KEY
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.onSubscription
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.*
 
 class AppPreferenceDataSourceImpl(
-    private val sharedPreferences: SharedPreferences,
+    private val prefDataStore: DataStore<Preferences>,
     private val securedSharedPreferences: SharedPreferences,
     private val ioDispatcher: CoroutineDispatcher,
 ) : AppPreferenceDataSource {
 
-    private val _shouldHideItems = MutableStateFlow(false)
-
-    init {
-        val onPreferenceChangeListener =
-            SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
-                if (key == HIDE_ITEMS_PREFERENCE_KEY) {
-                    _shouldHideItems.value =
-                        sharedPreferences.getBoolean(HIDE_ITEMS_PREFERENCE_KEY, false)
-                }
-            }
-        sharedPreferences.registerOnSharedPreferenceChangeListener(onPreferenceChangeListener)
+    override val theme: Flow<Int?> = prefDataStore.data.map { preferences ->
+        preferences[THEME_PREFERENCE_KEY]?.takeIf { it > 0 }
     }
 
-    override suspend fun getTheme(): String? {
-        return withContext(ioDispatcher) {
-            sharedPreferences.getString(THEME_PREFERENCE_KEY, null)
-        }
+    override val shouldHideItems: Flow<Boolean> = prefDataStore.data.map { preferences ->
+        preferences[HIDE_ITEMS_PREFERENCE_KEY] ?: false
     }
 
-    override suspend fun setTheme(theme: String) {
-        withContext(ioDispatcher) {
-            sharedPreferences.edit(commit = true) { putString(THEME_PREFERENCE_KEY, theme) }
-        }
-    }
-
-    override fun observeShouldHideItems(): Flow<Boolean> {
-        return _shouldHideItems.onSubscription {
-            withContext(ioDispatcher) {
-                _shouldHideItems.value =
-                    sharedPreferences.getBoolean(HIDE_ITEMS_PREFERENCE_KEY, false)
-            }
+    override suspend fun setTheme(theme: Int) {
+        prefDataStore.edit { preferences ->
+            preferences[THEME_PREFERENCE_KEY] = theme
         }
     }
 
     override suspend fun setShouldHideItems(hide: Boolean) {
-        withContext(ioDispatcher) {
-            sharedPreferences.edit(commit = true) { putBoolean(HIDE_ITEMS_PREFERENCE_KEY, hide) }
-            _shouldHideItems.value = hide
+        prefDataStore.edit { preferences ->
+            preferences[HIDE_ITEMS_PREFERENCE_KEY] = hide
         }
     }
 
-    override suspend fun getDesktopAddress(): String? {
-        return withContext(ioDispatcher) {
-            sharedPreferences.getString(DESKTOP_ADDRESS_PREFERENCE_KEY, null)
-        }
+    override val desktopAddress: Flow<String?> = prefDataStore.data.map { preferences ->
+        preferences[DESKTOP_ADDRESS_PREFERENCE_KEY]?.takeIf { it.isNotEmpty() }
     }
 
     override suspend fun setDesktopAddress(address: String) {
-        withContext(ioDispatcher) {
-            sharedPreferences.edit(commit = true) {
-                putString(
-                    DESKTOP_ADDRESS_PREFERENCE_KEY,
-                    address
-                )
-            }
+        prefDataStore.edit { preferences ->
+            preferences[DESKTOP_ADDRESS_PREFERENCE_KEY] = address
         }
     }
 
@@ -99,18 +74,17 @@ class AppPreferenceDataSourceImpl(
     }
 
     override suspend fun setAnalyticEventDate(screenName: ScreenName, date: LocalDateTime) {
-        withContext(ioDispatcher) {
-            sharedPreferences.edit(commit = true) {
-                putLong(screenName.event, date.toEpochSecond(ZoneOffset.UTC))
-            }
+        prefDataStore.edit { preferences ->
+            preferences[longPreferencesKey(screenName.event)] = date.toEpochSecond(ZoneOffset.UTC)
         }
     }
 
     override suspend fun getAnalyticEventDate(screenName: ScreenName): LocalDateTime? {
-        return withContext(ioDispatcher) {
-            val time = sharedPreferences.getLong(screenName.event, 0)
-            if (time != 0L) LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.UTC) else null
-        }
+        val time = prefDataStore.data.map { preferences ->
+            preferences[longPreferencesKey(screenName.event)]
+        }.firstOrNull() ?: 0L
+        return if (time != 0L) {
+            LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.UTC)
+        } else null
     }
-
 }

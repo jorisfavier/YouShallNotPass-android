@@ -47,9 +47,8 @@
             app:destination="@id/desktopConnectionActivity" />
         <argument
             android:name="highlightItem"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
+            android:defaultValue="-1"
+            app:argType="integer" />
         <action
             android:id="@+id/action_settingsFragment_to_privacyPolicyFragment"
             app:destination="@id/privacyPolicyFragment" />

@@ -12,7 +12,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.model.Item
 import fr.jorisfavier.youshallnotpass.model.ItemDataType
-import fr.jorisfavier.youshallnotpass.ui.settings.SettingsFragment
 import fr.jorisfavier.youshallnotpass.utils.extensions.onUnknownFailure
 import fr.jorisfavier.youshallnotpass.utils.extensions.onYsnpFailure
 import fr.jorisfavier.youshallnotpass.utils.extensions.toast
@@ -96,7 +95,7 @@ class SearchFragment : SearchBaseFragment() {
                             .setPositiveButton(R.string.sync_desktop_amd_mobile) { _, _ ->
                                 val direction =
                                     SearchFragmentDirections.actionSearchFragmentToSettingsFragment(
-                                        highlightItem = SettingsFragment.KEY_DESKTOP
+                                        highlightItem = R.id.desktop
                                     )
                                 findNavController().navigate(direction)
                             }

@@ -5,13 +5,16 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import fr.jorisfavier.youshallnotpass.manager.AuthManager
+import fr.jorisfavier.youshallnotpass.ui.auth.AuthStatus
 import fr.jorisfavier.youshallnotpass.ui.auth.AuthViewModel
+import fr.jorisfavier.youshallnotpass.utils.MainDispatcherRule
 import fr.jorisfavier.youshallnotpass.utils.getOrAwaitValue
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -22,8 +25,11 @@ class AuthViewModelTest {
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
+    @get:Rule
+    var mainCoroutineRule = MainDispatcherRule()
+
     @Test
-    fun `authCallback should emit Success onAuthenticationSucceeded`() {
+    fun `authCallback should emit Success onAuthenticationSucceeded`() = runTest {
         //given
         val authManager: AuthManager = mockk()
         val keyguardManager: KeyguardManager = mockk()
@@ -38,13 +44,13 @@ class AuthViewModelTest {
         //then
         assertEquals(
             viewModel.authStatus.getOrAwaitValue().peekContent(),
-            AuthViewModel.AuthStatus.Success
+            AuthStatus.Success
         )
         verify { authManager setProperty "isUserAuthenticated" value true }
     }
 
     @Test
-    fun `authCallback should emit Failure onAuthenticationError`() {
+    fun `authCallback should emit Failure onAuthenticationError`() = runTest {
         //given
         val authManager: AuthManager = mockk()
         val keyguardManager: KeyguardManager = mockk()
@@ -57,32 +63,33 @@ class AuthViewModelTest {
 
         //then
         val authResult = viewModel.authStatus.getOrAwaitValue()
-            .peekContent() as? AuthViewModel.AuthStatus.Failure
-        assertTrue(authResult is AuthViewModel.AuthStatus.Failure)
+            .peekContent() as? AuthStatus.Failure
+        assertTrue(authResult is AuthStatus.Failure)
         assertEquals(authResult?.errorMessage, R.string.auth_fail_try_again)
     }
 
     @Test
-    fun `authCallback should emit Failure with no biometric message onAuthenticationError with ERROR_NO_BIOMETRICS code`() {
-        //given
-        val authManager: AuthManager = mockk()
-        val keyguardManager: KeyguardManager = mockk()
-        val biometricManager: BiometricManager = mockk()
+    fun `authCallback should emit Failure with no biometric message onAuthenticationError with ERROR_NO_BIOMETRICS code`() =
+        runTest {
+            //given
+            val authManager: AuthManager = mockk()
+            val keyguardManager: KeyguardManager = mockk()
+            val biometricManager: BiometricManager = mockk()
 
-        val viewModel = AuthViewModel(authManager, keyguardManager, biometricManager)
+            val viewModel = AuthViewModel(authManager, keyguardManager, biometricManager)
 
-        //when
-        viewModel.authCallback.onAuthenticationError(BiometricPrompt.ERROR_NO_BIOMETRICS, "")
+            //when
+            viewModel.authCallback.onAuthenticationError(BiometricPrompt.ERROR_NO_BIOMETRICS, "")
 
-        //then
-        val authResult = viewModel.authStatus.getOrAwaitValue()
-            .peekContent() as? AuthViewModel.AuthStatus.Failure
-        assertTrue(authResult is AuthViewModel.AuthStatus.Failure)
-        assertEquals(authResult?.errorMessage, R.string.auth_fail_no_biometrics)
-    }
+            //then
+            val authResult = viewModel.authStatus.getOrAwaitValue()
+                .peekContent() as? AuthStatus.Failure
+            assertTrue(authResult is AuthStatus.Failure)
+            assertEquals(authResult?.errorMessage, R.string.auth_fail_no_biometrics)
+        }
 
     @Test
-    fun `authCallback should emit Failure onAuthenticationFailed`() {
+    fun `authCallback should emit Failure onAuthenticationFailed`() = runTest {
         //given
         val authManager: AuthManager = mockk()
         val keyguardManager: KeyguardManager = mockk()
@@ -95,7 +102,7 @@ class AuthViewModelTest {
 
         //then
         assertTrue(
-            viewModel.authStatus.getOrAwaitValue().peekContent() is AuthViewModel.AuthStatus.Failure
+            viewModel.authStatus.getOrAwaitValue().peekContent() is AuthStatus.Failure
         )
     }
 }
