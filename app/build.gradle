@@ -14,8 +14,8 @@ android {
         applicationId "fr.jorisfavier.youshallnotpass"
         minSdkVersion 23
         targetSdkVersion 35
-        versionCode 11
-        versionName "1.0.3"
+        versionCode 12
+        versionName "1.0.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         buildConfigField "String", "ANALYTIC_URL", "\"https://app.piratepx.com\""
         buildConfigField "String", "PRIVACY_POLICY_URL", "\"https://jorisfavier.fr/youshallnotpass/privacy-policy\""
