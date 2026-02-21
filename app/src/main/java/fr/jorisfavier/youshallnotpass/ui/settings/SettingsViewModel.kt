@@ -47,11 +47,11 @@ class SettingsViewModel @Inject constructor(
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Eagerly,
+            started = SharingStarted.Lazily,
             initialValue = null,
         )
 
-    val themeEntries = buildMap<Int, Int> {
+    val themeEntries = buildMap {
         put(AppCompatDelegate.MODE_NIGHT_NO, R.string.light)
         put(AppCompatDelegate.MODE_NIGHT_YES, R.string.dark)
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
