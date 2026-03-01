@@ -13,11 +13,10 @@ import fr.jorisfavier.youshallnotpass.utils.extensions.firstNotNull
 import fr.jorisfavier.youshallnotpass.utils.extensions.getDomainIfUrl
 import fr.jorisfavier.youshallnotpass.utils.extensions.titleCase
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileWriter
-import java.util.*
+import java.util.Locale
 import javax.inject.Inject
 
 class ExternalItemDataSourceImpl @Inject constructor(

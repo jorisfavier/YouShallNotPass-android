@@ -1,0 +1,18 @@
+appId: fr.jorisfavier.youshallnotpass.maestro
+---
+- launchApp:
+    clearState: false
+- assertVisible: Maestro 1
+- tapOn:
+    id: search_edit_field
+- inputText: Test
+- assertNotVisible: Maestro 1
+- tapOn:
+    id: text_input_end_icon
+- inputText: Maestro
+- assertVisible: Maestro 1
+- tapOn:
+    id: search_edit_field
+- inputText: oooo
+- assertVisible: No results found.
+

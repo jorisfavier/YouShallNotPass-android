@@ -260,6 +260,33 @@ class ItemEditViewModelTest {
         }
 
     @Test
+    fun `updateOrCreateItem should return an error when password and name are empty`() =
+        runTest {
+            //given
+            val viewModel = buildViewModel()
+            coEvery { cryptoManager.encryptData(fakeDecryptedPassword) } returns Result.success(
+                fakeEncryptedData
+            )
+            coEvery { itemRepo.searchItem(fakeItem.title) } returns Result.success(listOf())
+            coEvery { itemRepo.updateOrCreateItem(any()) } returns Result.success(Unit)
+
+            //when
+            viewModel.initData(0)
+            val result = viewModel.updateOrCreateItem(
+                name = "",
+                password = "",
+                login = null,
+            ).first()
+
+            //then
+            assertTrue(result.isFailure)
+            assertEquals(
+                R.string.item_name_or_password_missing,
+                (result.exceptionOrNull() as? YsnpException)?.messageResId
+            )
+        }
+
+    @Test
     fun `updateOrCreateItem should return an error when trying to add an item with a same name`() =
         runTest {
             //given

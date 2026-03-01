@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import fr.jorisfavier.youshallnotpass.BuildConfig
 import fr.jorisfavier.youshallnotpass.R
 import fr.jorisfavier.youshallnotpass.manager.AuthManager
 import fr.jorisfavier.youshallnotpass.utils.Event
@@ -24,6 +25,13 @@ class AuthViewModel @Inject constructor(
 
     private var _authStatus = MutableLiveData<Event<AuthStatus>>()
     var authStatus: LiveData<Event<AuthStatus>> = _authStatus
+
+    init {
+        if (BuildConfig.IS_TEST) {
+            authManager.isUserAuthenticated = true
+            _authStatus.value = Event(AuthStatus.Success)
+        }
+    }
 
     val authCallback = object : BiometricPrompt.AuthenticationCallback() {
         override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {

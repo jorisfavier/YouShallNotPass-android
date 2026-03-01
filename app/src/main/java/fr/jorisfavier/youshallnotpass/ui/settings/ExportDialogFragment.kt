@@ -1,5 +1,6 @@
 package fr.jorisfavier.youshallnotpass.ui.settings
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -75,7 +76,7 @@ class ExportDialogFragment : DialogFragment(R.layout.dialog_settings_export) {
                         result
                             .onSuccess {
                                 homeViewModel.ignoreNextPause()
-                                requireActivity().startActivity(it)
+                                requireActivity().startActivity(Intent.createChooser(it, null))
                                 dismiss()
                             }
                             .onFailure {

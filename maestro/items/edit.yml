@@ -1,0 +1,15 @@
+appId: fr.jorisfavier.youshallnotpass.maestro
+---
+- launchApp:
+    clearState: false
+- assertVisible: Maestro 2
+- tapOn: Maestro 2
+- assertVisible: Edit
+- tapOn: Edit
+- tapOn:
+    id: name
+- inputText: 34
+- tapOn: UPDATE
+- assertVisible: Maestro 234
+
+

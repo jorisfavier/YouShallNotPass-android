@@ -1,0 +1,16 @@
+appId: fr.jorisfavier.youshallnotpass.maestro
+---
+- launchApp:
+    clearState: false
+- assertVisible: Item1
+- tapOn:
+    id: search_settings_button
+- tapOn:
+    id: hide_all
+- back
+- assertNotVisible: Item1
+- tapOn:
+    id: search_edit_field
+- inputText: Item
+- assertVisible: Item1
+

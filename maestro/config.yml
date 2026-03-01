@@ -1,0 +1,17 @@
+flows:
+  - items/*
+  - settings/*
+executionOrder:
+  continueOnFailure: false
+  flowsOrder:
+    - create
+    - create_generated_password
+    - detail
+    - edit
+    - search
+    - delete
+    - import_csv
+    - hide_all
+    - import_ysnp
+    - export
+    - delete_all

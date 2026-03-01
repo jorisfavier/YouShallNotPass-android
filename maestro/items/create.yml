@@ -1,0 +1,17 @@
+appId: fr.jorisfavier.youshallnotpass.maestro
+---
+- launchApp:
+    clearState: true
+- tapOn: NEW
+- assertVisible: Use uppercase
+- assertVisible: Use number
+- assertVisible: Use symbol
+- assertVisible: "Password length:"
+- tapOn: Name
+- inputText: Maestro 1
+- tapOn: Login
+- inputText: maestro@example.com
+- tapOn: Password
+- inputText: test1234
+- tapOn: CREATE
+- assertVisible: Maestro 1

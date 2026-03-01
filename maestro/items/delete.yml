@@ -1,0 +1,19 @@
+appId: fr.jorisfavier.youshallnotpass.maestro
+---
+- launchApp:
+    clearState: false
+- assertVisible: Maestro 1
+- tapOn: Maestro 1
+- assertVisible:
+    id: search_result_item_delete_button
+- tapOn:
+    id: search_result_item_delete_button
+- assertVisible:
+    id: alertTitle
+- assertVisible:
+    id: message
+- assertVisible: CANCEL
+- tapOn: OK
+- assertNotVisible: Maestro 1
+
+

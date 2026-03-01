@@ -1,0 +1,38 @@
+appId: fr.jorisfavier.youshallnotpass.maestro
+---
+- launchApp:
+    clearState: false
+- assertVisible:
+    id: search_result_item_title
+    index: 3
+- tapOn:
+    id: search_settings_button
+- tapOn:
+    id: export_items
+- tapOn:
+    id: csv_button
+- assertVisible:
+    id: cancel
+- tapOn:
+    id: export
+- assertVisible: Sharing 1 file
+- assertVisible: ysnpExport.csv
+- tapOn:
+    id: contentPanel
+- tapOn:
+    id: export_items
+- tapOn:
+    id: ysnp_button
+- tapOn:
+    id: password
+- inputText: test4321
+- assertVisible: test4321
+- tapOn:
+    id: text_input_end_icon
+- assertVisible: test4321
+- tapOn:
+    id: export
+- assertVisible: Sharing 1 file
+- assertVisible: export.ysnp
+- tapOn:
+    id: android:id/contentPanel

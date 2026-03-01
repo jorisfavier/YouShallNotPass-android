@@ -95,7 +95,7 @@ class ItemEditViewModel @Inject constructor(
         return flow {
             val nameValue = name?.titleCase()
             val id = _currentItem.value?.id ?: 0
-            if (password != null && nameValue != null) {
+            if (password?.isNotEmpty() == true && nameValue?.isNotEmpty() == true) {
                 val encryptedData = cryptoManager.encryptData(password).getOrElse {
                     emit(Result.failure(YsnpException(R.string.error_occurred)))
                     currentCoroutineContext().cancel()

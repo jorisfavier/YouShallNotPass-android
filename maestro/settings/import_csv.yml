@@ -1,0 +1,27 @@
+appId: fr.jorisfavier.youshallnotpass.maestro
+---
+- launchApp:
+    clearState: true
+- tapOn:
+    id: search_settings_button
+- tapOn:
+    id: import_items
+- tapOn:
+    id: import_select_file_button
+- tapOn: ysnpExport.csv
+- assertVisible:
+    id: imported_item_values
+    index: 3
+- tapOn:
+    id: import_review_select_all
+- tapOn:
+    id: next_button
+- assertVisible: Import completed!
+- tapOn:
+    id: done_button
+- back
+- assertVisible:
+    id: search_result_item_title
+    index: 3
+
+
